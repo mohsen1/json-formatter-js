@@ -19,10 +19,8 @@
     "url": "https://github.com/mohsen1/json-formatter-js/issues"
   },
   "homepage": "https://github.com/mohsen1/json-formatter-js#readme",
-  "dependencies": {
-    "lodash.template": "^3.6.2"
-  },
   "devDependencies": {
+    "lodash.template": "^3.6.2",
     "babel": "^5.8.21",
     "babelify": "^6.2.0",
     "browserify": "^11.0.1",
