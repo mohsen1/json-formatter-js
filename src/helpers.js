@@ -10,14 +10,6 @@ export function isObject(value) {
   return !!value && (type == 'object' || type == 'function');
 }
 
-export function requestAnimationFrame(cb) {
-  if (!window.requestAnimationFrame) {
-    setTimeout(cb, 0);
-  } else {
-    window.requestAnimationFrame(cb);
-  }
-}
-
 // From http://stackoverflow.com/a/332429
 export function getObjectName(object) {
   if (object === undefined) {

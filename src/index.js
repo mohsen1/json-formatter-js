@@ -1,13 +1,14 @@
 'use strict';
 
+/* globals JSONFormatter */
+
 import template from 'lodash.template';
 import {
   isObject,
   getObjectName,
   getType,
   getValuePreview,
-  getPreview,
-  requestAnimationFrame
+  getPreview
 } from './helpers.js';
 
 export default class JSONFormatter {
@@ -53,10 +54,8 @@ export default class JSONFormatter {
     }
 
     this.isEmptyObject = !this.keys.length && this.isOpen && !this.isArray;
-
     this.onstructorName = getObjectName(this.json);
-
-    this.isEmpty = this.isEmptyObject || (this.keys && !this.keys.length && this.isOpen && this.isArray)
+    this.isEmpty = this.isEmptyObject || (this.keys && !this.keys.length && this.isArray);
   }
 
 
@@ -116,7 +115,7 @@ export default class JSONFormatter {
   }
 
   template() {
-    return template(`
+    const templateString = `
       <a class="toggler-link">
         <% if (this.isObject) { %>
           <span class="toggler ${this.isOpen ? 'open' : ''}"></span>
@@ -148,8 +147,11 @@ export default class JSONFormatter {
         <% } %>
       </a>
 
-      <div class="children ${this.isObject ? 'object': ' '}${this.isArray ? 'array' : ' '}${this.isEmpty ? 'empty': ' '}"></div>
-    `).call(this).replace(/\s*\n/g, '\n'); // clean up empty lines
+      <div class="children ${this.isObject ? 'object': ''} ${this.isArray ? 'array' : ''} ${this.isEmpty ? 'empty': ''}"></div>
+    `;
+
+    return template(templateString).call(this)
+      .replace(/\s*\n/g, '\n'); // clean up empty lines
   }
 
   render() {
@@ -163,26 +165,29 @@ export default class JSONFormatter {
       this.appendChildern();
     }
 
-    // add event listeners
-    this.element.querySelector('a.toggler-link').addEventListener('click', this.toggleOpen.bind(this));
+    // add event listener for toggling
+    this.element.querySelector('a.toggler-link')
+      .addEventListener('click', this.toggleOpen.bind(this));
+
+    // add URL link event listener
     if (this.element.querySelector('span.url')) {
-      this.element.querySelector('span.url').addEventListener('click', this.openLink.bind(this));
+      this.element.querySelector('span.url')
+        .addEventListener('click', this.openLink.bind(this));
     }
 
     return this.element;
   }
 
   appendChildern() {
-    const newChildren = document.createElement('div');
+    const children = this.element.querySelector('div.children');
+
+    if (!children) { return; }
 
     this.keys.forEach((key)=> {
       const formatter = new JSONFormatter(this.json[key], this.open - 1, key, this.config);
-      newChildren.appendChild(formatter.render());
-    });
 
-    if (this.element.querySelector('div.children')) {
-      this.element.querySelector('div.children').innerHTML = newChildren.innerHTML;
-    }
+      children.appendChild(formatter.render());
+    });
   }
 
   removeChildren() {

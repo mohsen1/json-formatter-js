@@ -25,7 +25,7 @@ var config = {
 };
 
 gulp.task('jshint', function() {
-  return gulp.src('src/index.js').pipe(jshint());
+  return gulp.src(['src/**.js']).pipe(jshint());
 });
 
 gulp.task('scripts', ['jshint'], function() {
@@ -34,13 +34,14 @@ gulp.task('scripts', ['jshint'], function() {
     .bundle()
     .on('error', logError)
     .pipe(connect.reload())
-    .pipe(fs.createWriteStream('dist/bundle.js'))
+    .pipe(fs.createWriteStream('dist/bundle.js'));
 });
 
 gulp.task('styles', function() {
 
   return gulp.src('src/style.less')
     .pipe(less())
+    .on('error', logError)
     .pipe(header(config.banner, {
       timestamp: (new Date()).toISOString(), pkg: config.pkg
     }))
