@@ -1,6 +1,9 @@
 'use strict';
 
-import isObject from 'lodash.isobject';
+export function isObject(value) {
+  var type = typeof value;
+  return !!value && (type == 'object' || type == 'function');
+}
 
 function escapeString(str) {
   return str.replace('"', '\"');

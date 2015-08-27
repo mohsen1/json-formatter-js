@@ -20,7 +20,6 @@
   },
   "homepage": "https://github.com/mohsen1/json-formatter-js#readme",
   "dependencies": {
-    "lodash.isobject": "^3.0.2",
     "lodash.template": "^3.6.2"
   },
   "devDependencies": {
