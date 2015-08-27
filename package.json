@@ -1,0 +1,33 @@
+{
+  "name": "json-formatter-js",
+  "version": "0.0.0",
+  "description": "JSON Formatter core library ",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha --compilers js:babel/register"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mohsen1/json-formatter-js.git"
+  },
+  "keywords": [
+    "json"
+  ],
+  "author": "Mohsen Azimi <me@azimi.me>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/mohsen1/json-formatter-js/issues"
+  },
+  "homepage": "https://github.com/mohsen1/json-formatter-js#readme",
+  "dependencies": {
+    "lodash.isobject": "^3.0.2",
+    "lodash.template": "^3.6.2"
+  },
+  "devDependencies": {
+    "babel": "^5.8.21",
+    "babelify": "^6.2.0",
+    "browserify": "^11.0.1",
+    "chai": "^3.2.0",
+    "mocha": "^2.2.5"
+  }
+}
