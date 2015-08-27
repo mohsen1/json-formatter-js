@@ -26,7 +26,7 @@ document.body.appendChild(formatter.render());
 
 ### API
 
-#### `JSONFormatter(json [, open [, config] ]`
+#### `JSONFormatter(json [, open [, config] ])`
 
 ##### `json` (`Object`) - **required**
 The JSON object you want to render. It has to be an object or array. Do NOT pass raw JSON string.

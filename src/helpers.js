@@ -1,16 +1,37 @@
 'use strict';
 
-
+/*
+ * Escapes `"` charachters from string
+ *
+ * @param {string} str
+ * @returns {string}
+*/
 function escapeString(str) {
   return str.replace('"', '\"');
 }
 
+/*
+ * Determines if a value is an object
+ *
+ * @param {any} value
+ *
+ * @returns {boolean}
+ *
+*/
 export function isObject(value) {
   var type = typeof value;
   return !!value && (type == 'object');
 }
 
-// From http://stackoverflow.com/a/332429
+/*
+ * Gets constructor name of an object.
+ * From http://stackoverflow.com/a/332429
+ *
+ * @param {object} object
+ *
+ * @returns {string}
+ *
+*/
 export function getObjectName(object) {
   if (object === undefined) {
     return '';
@@ -31,11 +52,25 @@ export function getObjectName(object) {
   }
 }
 
+/*
+ * Gets type of an object. Returns "null" for null objects
+ *
+ * @param {object} object
+ *
+ * @returns {string}
+*/
 export function getType(object) {
   if (object === null) { return 'null'; }
   return typeof object;
 }
 
+/*
+ * Generates inline preview for a JavaScript object based on a value
+ * @param {object} object
+ * @param {string} value
+ *
+ * @returns {string}
+*/
 export function getValuePreview (object, value) {
   var type = getType(object);
 
@@ -54,6 +89,12 @@ export function getValuePreview (object, value) {
   return value;
 }
 
+/*
+ * Generates inline preview for a JavaScript object
+ * @param {object} object
+ *
+ * @returns {string}
+*/
 export function getPreview(object) {
   let value = '';
   if (isObject(object)) {
