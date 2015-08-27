@@ -69,8 +69,8 @@ export default class JSONFormatter {
       this.removeChildren();
     }
 
-    if (this.element.querySelector('.toggler')) {
-      this.element.querySelector('.toggler').classList.toggle('open');
+    if (this.element) {
+      this.element.classList.toggle('open');
     }
   }
 
@@ -118,7 +118,7 @@ export default class JSONFormatter {
     const templateString = `
       <a class="toggler-link">
         <% if (this.isObject) { %>
-          <span class="toggler ${this.isOpen ? 'open' : ''}"></span>
+          <span class="toggler"></span>
         <% } %>
 
         <% if (this.hasKey) { %>
@@ -159,6 +159,11 @@ export default class JSONFormatter {
 
     this.element = document.createElement('div');
     this.element.classList.add('json-formatter-row');
+
+    if (this.isOpen) {
+      this.element.classList.add('open');
+    }
+
     this.element.innerHTML = resultHTML;
 
     if (this.isObject && this.isOpen) {

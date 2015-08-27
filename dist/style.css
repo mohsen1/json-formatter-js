@@ -1,7 +1,7 @@
 /*!
  * json-formatter-js
  * https://github.com/mohsen1/json-formatter-js#readme
- * Version: 0.0.0 - 2015-08-27T17:36:31.662Z
+ * Version: 0.0.0 - 2015-08-27T20:37:26.722Z
  * License: MIT
  */
 
@@ -16,11 +16,14 @@
   text-decoration: none;
 }
 .json-formatter-row .json-formatter-row {
-  margin-left: 1em;
+  margin-left: 1rem;
 }
 .json-formatter-row .children.empty {
   opacity: 0.5;
-  margin-left: 1em;
+  margin-left: 1rem;
+}
+.json-formatter-row .children.empty:after {
+  display: none;
 }
 .json-formatter-row .children.empty.object:after {
   content: "No properties";
@@ -67,8 +70,8 @@
   cursor: pointer;
 }
 .json-formatter-row .toggler {
+  line-height: 1.2rem;
   font-size: 0.8em;
-  line-height: 1.2em;
   vertical-align: middle;
   opacity: 0.6;
   cursor: pointer;
@@ -78,8 +81,11 @@
   transition: transform 100ms ease-in;
   content: "►";
 }
-.json-formatter-row .toggler.open:after {
+.json-formatter-row.open > .toggler-link .toggler:after {
   transform: rotate(90deg);
+}
+.json-formatter-row.open > .children:after {
+  display: inline-block;
 }
 .json-formatter-row > a > .thumbnail-text {
   opacity: 0;
@@ -99,11 +105,14 @@
   text-decoration: none;
 }
 .json-formatter-dark.json-formatter-row .json-formatter-row {
-  margin-left: 1em;
+  margin-left: 1rem;
 }
 .json-formatter-dark.json-formatter-row .children.empty {
   opacity: 0.5;
-  margin-left: 1em;
+  margin-left: 1rem;
+}
+.json-formatter-dark.json-formatter-row .children.empty:after {
+  display: none;
 }
 .json-formatter-dark.json-formatter-row .children.empty.object:after {
   content: "No properties";
@@ -150,8 +159,8 @@
   cursor: pointer;
 }
 .json-formatter-dark.json-formatter-row .toggler {
+  line-height: 1.2rem;
   font-size: 0.8em;
-  line-height: 1.2em;
   vertical-align: middle;
   opacity: 0.6;
   cursor: pointer;
@@ -161,8 +170,11 @@
   transition: transform 100ms ease-in;
   content: "►";
 }
-.json-formatter-dark.json-formatter-row .toggler.open:after {
+.json-formatter-dark.json-formatter-row.open > .toggler-link .toggler:after {
   transform: rotate(90deg);
+}
+.json-formatter-dark.json-formatter-row.open > .children:after {
+  display: inline-block;
 }
 .json-formatter-dark.json-formatter-row > a > .thumbnail-text {
   opacity: 0;

@@ -20,14 +20,15 @@
   }
 
   .json-formatter-row {
-    margin-left: 1em;
+    margin-left: 1rem;
   }
 
   .children {
     &.empty {
       opacity: 0.5;
-      margin-left: 1em;
+      margin-left: 1rem;
 
+      &:after { display: none; }
       &.object:after { content: "No properties"; }
       &.array:after { content: "[]"; }
     }
@@ -60,8 +61,8 @@
   }
 
   .toggler {
+    line-height: 1.2rem;
     font-size: 0.8em;
-    line-height: 1.2em;
     vertical-align: middle;
     opacity: 0.6;
     cursor: pointer;
@@ -72,8 +73,15 @@
       content: "►";
     }
 
-    &.open:after{
+  }
+
+  // Open state
+  &.open {
+    > .toggler-link .toggler:after{
       transform: rotate(90deg);
+    }
+    > .children:after {
+      display: inline-block;
     }
   }
 
@@ -88,11 +96,12 @@
   }
 }
 
-
+// Default theme
 .json-formatter-row {
   .theme();
 }
 
+// Dark theme
 .json-formatter-dark.json-formatter-row {
   .theme(
     @default-color: white,
