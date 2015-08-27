@@ -1,12 +1,21 @@
 'use strict';
 
+
+function escapeString(str) {
+  return str.replace('"', '\"');
+}
+
 export function isObject(value) {
   var type = typeof value;
   return !!value && (type == 'object' || type == 'function');
 }
 
-function escapeString(str) {
-  return str.replace('"', '\"');
+export function requestAnimationFrame(cb) {
+  if (!window.requestAnimationFrame) {
+    setTimeout(cb, 0);
+  } else {
+    window.requestAnimationFrame(cb);
+  }
 }
 
 // From http://stackoverflow.com/a/332429

@@ -6,7 +6,8 @@ import {
   getObjectName,
   getType,
   getValuePreview,
-  getPreview
+  getPreview,
+  requestAnimationFrame
 } from './helpers.js';
 
 export default class JSONFormatter {
@@ -14,7 +15,7 @@ export default class JSONFormatter {
   constructor(json, open, key, config) {
     this.json = json;
     this.key = key;
-    this.open = open;
+    this.open = open || 1;
     this.config = config || {
       hoverPreviewEnabled: false,
       hoverPreviewArrayCount: 100,
@@ -25,7 +26,7 @@ export default class JSONFormatter {
     this.hasKey = typeof this.key !== 'undefined';
 
     // If 'open' attribute is present
-    this.isOpen = !!this.open;
+    this.isOpen = this.open > 0;
 
     if (this.type === 'string'){
 
@@ -40,36 +41,25 @@ export default class JSONFormatter {
       }
     }
 
-  }
+    this.isArray = Array.isArray(this.json);
+    this.isObject = isObject(this.json);
 
-  isArray() {
-    return Array.isArray(this.json);
-  }
-
-  isObject() {
-    return isObject(this.json);
-  }
-
-  getKeys(){
-    if (this.isObject()) {
-      return Object.keys(this.json).map((key)=> {
+    this.keys = [];
+    if (this.isObject) {
+      this.keys = Object.keys(this.json).map((key)=> {
         if (key === '') { return '""'; }
         return key;
       });
     }
-    return [];
+
+    this.isEmptyObject = !this.keys.length && this.isOpen && !this.isArray;
+
+    this.onstructorName = getObjectName(this.json);
+
+    this.isEmpty = this.isEmptyObject || (this.keys && !this.keys.length && this.isOpen && this.isArray)
   }
 
-  getConstructorName(){
-    return getObjectName(this.json);
-  }
 
-  isEmptyObject() {
-    return this.getKeys() &&
-      !this.getKeys().length &&
-      this.isOpen &&
-      !this.isArray();
-  }
 
   toggleOpen() {
     this.isOpen = !this.isOpen;
@@ -85,8 +75,8 @@ export default class JSONFormatter {
     }
   }
 
-  openLink(isUrl) {
-    if(isUrl) {
+  openLink() {
+    if (typeof this.json === 'string') {
       window.location.href = this.json;
     }
   }
@@ -96,11 +86,11 @@ export default class JSONFormatter {
   }
 
   showThumbnail() {
-    return !!this.config.hoverPreviewEnabled && this.isObject() && !this.isOpen;
+    return !!this.config.hoverPreviewEnabled && this.isObject && !this.isOpen;
   }
 
   getThumbnail() {
-    if (this.isArray()) {
+    if (this.isArray) {
 
       // if array length is greater then 100 it shows "Array[101]"
       if (this.json.length > this.config.hoverPreviewArrayCount) {
@@ -110,7 +100,7 @@ export default class JSONFormatter {
       }
     } else {
 
-      const keys = this.getKeys();
+      const keys = this.keys;
 
       // the first five keys (like Chrome Developer Tool)
       const narrowKeys = keys.slice(0, this.config.hoverPreviewFieldCount);
@@ -128,7 +118,7 @@ export default class JSONFormatter {
   template() {
     return template(`
       <a class="toggler-link">
-        <% if (this.isObject()) { %>
+        <% if (this.isObject) { %>
           <span class="toggler ${this.isOpen ? 'open' : ''}"></span>
         <% } %>
 
@@ -138,16 +128,16 @@ export default class JSONFormatter {
 
         <span class="value">
 
-          <% if (this.isObject()) { %>
+          <% if (this.isObject) { %>
             <span>
-              <span class="constructor-name">${this.getConstructorName(this.json)}</span>
+              <span class="constructor-name">${this.onstructorName}</span>
 
-              <% if (this.isArray()) { %>
+              <% if (this.isArray) { %>
                <span><span class="bracket">[</span><span class="number"><%= this.json.length %></span><span class="bracket">]</span></span>
               <% } %>
 
             </span>
-          <% } else if (!this.isObject()) {%>
+          <% } else if (!this.isObject) {%>
             <span class="${this.type} ${this.isDate ? 'date' : ''} ${this.isUrl? 'url' : ''}"><%= this.parseValue(this.json) %></span>
           <% } %>
 
@@ -158,31 +148,19 @@ export default class JSONFormatter {
         <% } %>
       </a>
 
-      <% if (this.getKeys().length) { %>
-        <div class="children"></div>
-      <% } %>
-
-      <% if (this.isEmptyObject()) { %>
-        <div class="children empty object"></div>
-      <% } %>
-
-      <% if (this.getKeys() && !this.getKeys().length && this.isOpen && this.isArray()) { %>
-        <div class="children empty array"></div>
-      <% } %>`).call(this).replace(/\s*\n/g, '\n');
+      <div class="children ${this.isObject ? 'object': ' '}${this.isArray ? 'array' : ' '}${this.isEmpty ? 'empty': ' '}"></div>
+    `).call(this).replace(/\s*\n/g, '\n'); // clean up empty lines
   }
 
   render() {
-    const cssClass = 'json-formatter-row';
-
-    // clean up empty lines
     const resultHTML = this.template();
 
     this.element = document.createElement('div');
-    this.element.classList.add(cssClass);
+    this.element.classList.add('json-formatter-row');
     this.element.innerHTML = resultHTML;
 
-    if (this.isObject() && this.isOpen) {
-      appendChildern();
+    if (this.isObject && this.isOpen) {
+      this.appendChildern();
     }
 
     // add event listeners
@@ -195,14 +173,22 @@ export default class JSONFormatter {
   }
 
   appendChildern() {
-    this.getKeys().forEach((key)=> {
+    const newChildren = document.createElement('div');
+
+    this.keys.forEach((key)=> {
       const formatter = new JSONFormatter(this.json[key], this.open - 1, key, this.config);
-      this.element.querySelector('div.children').appendChild(formatter.render());
+      newChildren.appendChild(formatter.render());
     });
+
+    if (this.element.querySelector('div.children')) {
+      this.element.querySelector('div.children').innerHTML = newChildren.innerHTML;
+    }
   }
 
   removeChildren() {
-    this.element.querySelector('div.children').innerHTML = '';
+    if (this.element.querySelector('div.children')) {
+      this.element.querySelector('div.children').innerHTML = '';
+    }
   }
 }
 
