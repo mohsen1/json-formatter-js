@@ -1,7 +1,7 @@
 /*!
  * json-formatter-js
  * https://github.com/mohsen1/json-formatter-js#readme
- * Version: 0.0.0 - 2015-08-27T20:37:26.722Z
+ * Version: 0.0.0 - 2015-08-27T21:00:15.035Z
  * License: MIT
  */
 
@@ -81,19 +81,22 @@
   transition: transform 100ms ease-in;
   content: "►";
 }
+.json-formatter-row > a > .preview-text {
+  opacity: 0;
+  transition: opacity 0.15s ease-in;
+  font-style: italic;
+}
+.json-formatter-row:hover > a > .preview-text {
+  opacity: 0.6;
+}
 .json-formatter-row.open > .toggler-link .toggler:after {
   transform: rotate(90deg);
 }
 .json-formatter-row.open > .children:after {
   display: inline-block;
 }
-.json-formatter-row > a > .thumbnail-text {
-  opacity: 0;
-  transition: opacity 0.15s ease-in;
-  font-style: italic;
-}
-.json-formatter-row:hover > a > .thumbnail-text {
-  opacity: 0.6;
+.json-formatter-row.open > a > .preview-text {
+  display: none;
 }
 .json-formatter-dark.json-formatter-row {
   font-family: monospace;
@@ -170,17 +173,20 @@
   transition: transform 100ms ease-in;
   content: "►";
 }
+.json-formatter-dark.json-formatter-row > a > .preview-text {
+  opacity: 0;
+  transition: opacity 0.15s ease-in;
+  font-style: italic;
+}
+.json-formatter-dark.json-formatter-row:hover > a > .preview-text {
+  opacity: 0.6;
+}
 .json-formatter-dark.json-formatter-row.open > .toggler-link .toggler:after {
   transform: rotate(90deg);
 }
 .json-formatter-dark.json-formatter-row.open > .children:after {
   display: inline-block;
 }
-.json-formatter-dark.json-formatter-row > a > .thumbnail-text {
-  opacity: 0;
-  transition: opacity 0.15s ease-in;
-  font-style: italic;
-}
-.json-formatter-dark.json-formatter-row:hover > a > .thumbnail-text {
-  opacity: 0.6;
+.json-formatter-dark.json-formatter-row.open > a > .preview-text {
+  display: none;
 }

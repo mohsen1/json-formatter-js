@@ -72,7 +72,16 @@
       transition: transform @rotate-time ease-in;
       content: "►";
     }
+  }
 
+  // Inline preview on hover (optional)
+  > a >.preview-text {
+    opacity: 0;
+    transition: opacity .15s ease-in;
+    font-style: italic;
+  }
+  &:hover > a > .preview-text {
+    opacity: 0.6;
   }
 
   // Open state
@@ -83,16 +92,9 @@
     > .children:after {
       display: inline-block;
     }
-  }
-
-  > a >.thumbnail-text {
-    opacity: 0;
-    transition: opacity .15s ease-in;
-    font-style: italic;
-  }
-
-  &:hover > a > .thumbnail-text {
-    opacity: 0.6;
+    > a >.preview-text {
+      display: none;
+    }
   }
 }
 

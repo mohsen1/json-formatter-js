@@ -13,15 +13,17 @@ import {
 
 export default class JSONFormatter {
 
-  constructor(json, open, key, config) {
+  constructor(json, open, config, key) {
     this.json = json;
     this.key = key;
-    this.open = open || 1;
-    this.config = config || {
-      hoverPreviewEnabled: false,
-      hoverPreviewArrayCount: 100,
-      hoverPreviewFieldCount: 5
-    };
+    this.open = open === undefined ? 1 : open;
+    this.config = config || {};
+    this.config.hoverPreviewEnabled = this.config.hoverPreviewEnabled === undefined ?
+      false : this.config.hoverPreviewEnabled;
+    this.config.hoverPreviewArrayCount = this.config.hoverPreviewArrayCount === undefined ?
+      100 : this.config.hoverPreviewArrayCount;
+    this.config.hoverPreviewFieldCount = this.config.hoverPreviewFieldCount === undefined ?
+      5 : this.config.hoverPreviewFieldCount;
 
     this.type = getType(this.json);
     this.hasKey = typeof this.key !== 'undefined';
@@ -84,11 +86,11 @@ export default class JSONFormatter {
     return getValuePreview(this.json, value);
   }
 
-  showThumbnail() {
-    return !!this.config.hoverPreviewEnabled && this.isObject && !this.isOpen;
+  showInlinePreview() {
+    return !!this.config.hoverPreviewEnabled && this.isObject;
   }
 
-  getThumbnail() {
+  getInlinepreview() {
     if (this.isArray) {
 
       // if array length is greater then 100 it shows "Array[101]"
@@ -142,8 +144,8 @@ export default class JSONFormatter {
 
         </span>
 
-        <% if (this.showThumbnail()) { %>
-          <span class="thumbnail-text">${this.getThumbnail()}</span>
+        <% if (this.showInlinePreview()) { %>
+          <span class="preview-text">${this.getInlinepreview()}</span>
         <% } %>
       </a>
 
@@ -189,7 +191,7 @@ export default class JSONFormatter {
     if (!children) { return; }
 
     this.keys.forEach((key)=> {
-      const formatter = new JSONFormatter(this.json[key], this.open - 1, key, this.config);
+      const formatter = new JSONFormatter(this.json[key], this.open - 1, this.config, key);
 
       children.appendChild(formatter.render());
     });
