@@ -11,8 +11,42 @@ import {
   getPreview
 } from './helpers.js';
 
+/**
+ * @class JSONFormatter
+ *
+ * JSONFormatter allows you to render JSON objects in HTML with a
+ * **collapsible** navigation.
+*/
 export default class JSONFormatter {
 
+  /**
+   * @param {object} json The JSON object you want to render. It has to be an
+   * object or array. Do NOT pass raw JSON string.
+   *
+   * @param {number} [open=1] his number indicates up to how many levels the
+   * rendered tree should expand. Set it to `0` to make the whole tree collapsed
+   * or set it to `Infinity` to expand the tree deeply
+   *
+   * @param {object} [config=defaultConfig] -
+   *  defaultConfig = {
+   *   hoverPreviewEnabled: false,
+   *   hoverPreviewArrayCount: 100,
+   *   hoverPreviewFieldCount: 5
+   * }
+   *
+   * Available configurations:
+   *  #####Hover Preview
+   * * `hoverPreviewEnabled`:  enable preview on hover
+   * * `hoverPreviewArrayCount`: number of array items to show in preview Any
+   *    array larger than this number will be shown as `Array[XXX]` where `XXX`
+   *    is length of the array.
+   * * `hoverPreviewFieldCount`: number of object properties to show for object
+   *   preview. Any object with more properties that thin number will be
+   *   truncated.
+   *
+   * @param {string} [key=undefined] The key that this object in it's parent
+   * context
+  */
   constructor(json, open, config, key) {
     this.json = json;
     this.key = key;
@@ -58,10 +92,16 @@ export default class JSONFormatter {
     this.isEmptyObject = !this.keys.length && this.isOpen && !this.isArray;
     this.onstructorName = getObjectName(this.json);
     this.isEmpty = this.isEmptyObject || (this.keys && !this.keys.length && this.isArray);
+
+    this.getValuePreview = getValuePreview;
   }
 
 
 
+  /**
+   * Toggles `isOpen` state
+   *
+  */
   toggleOpen() {
     this.isOpen = !this.isOpen;
 
@@ -76,20 +116,11 @@ export default class JSONFormatter {
     }
   }
 
-  openLink() {
-    if (typeof this.json === 'string') {
-      window.location.href = this.json;
-    }
-  }
-
-  parseValue(value){
-    return getValuePreview(this.json, value);
-  }
-
-  showInlinePreview() {
-    return !!this.config.hoverPreviewEnabled && this.isObject;
-  }
-
+  /**
+   * Generates inline preview
+   *
+   * @returns {string}
+  */
   getInlinepreview() {
     if (this.isArray) {
 
@@ -116,6 +147,11 @@ export default class JSONFormatter {
     }
   }
 
+  /**
+   * Generates HTML string  for this JSON based on the template
+   *
+   * @returns {string}
+  */
   template() {
     const templateString = `
       <a class="toggler-link">
@@ -139,12 +175,17 @@ export default class JSONFormatter {
 
             </span>
           <% } else if (!this.isObject) {%>
-            <span class="${this.type} ${this.isDate ? 'date' : ''} ${this.isUrl? 'url' : ''}"><%= this.parseValue(this.json) %></span>
+
+            <${this.isUrl ? 'a' : 'span'}
+              class="${this.type} ${this.isDate ? 'date' : ''} ${this.isUrl? 'url' : ''}"
+              <% if (this.isUrl) { %>href="<%= this.json %>" <% }%>
+            ><%= this.getValuePreview(this.json, this.json) %></${this.isUrl ? 'a' : 'span'}>
+
           <% } %>
 
         </span>
 
-        <% if (this.showInlinePreview()) { %>
+        <% if (this.config.hoverPreviewEnabled && this.isObject) { %>
           <span class="preview-text">${this.getInlinepreview()}</span>
         <% } %>
       </a>
@@ -156,6 +197,11 @@ export default class JSONFormatter {
       .replace(/\s*\n/g, '\n'); // clean up empty lines
   }
 
+  /**
+   * Renders an HTML element and installs event listeners
+   *
+   * @returns {HTMLDivElement}
+  */
   render() {
     const resultHTML = this.template();
 
@@ -176,15 +222,13 @@ export default class JSONFormatter {
     this.element.querySelector('a.toggler-link')
       .addEventListener('click', this.toggleOpen.bind(this));
 
-    // add URL link event listener
-    if (this.element.querySelector('span.url')) {
-      this.element.querySelector('span.url')
-        .addEventListener('click', this.openLink.bind(this));
-    }
-
     return this.element;
   }
 
+  /**
+   * Appends all the children to `<div class="children"></div>` element
+   *
+  */
   appendChildern() {
     const children = this.element.querySelector('div.children');
 
@@ -197,6 +241,10 @@ export default class JSONFormatter {
     });
   }
 
+  /**
+   * Removes all the children from `<div class="children"></div>` element
+   *
+  */
   removeChildren() {
     if (this.element.querySelector('div.children')) {
       this.element.querySelector('div.children').innerHTML = '';

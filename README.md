@@ -48,5 +48,8 @@ Available configurations:
 * `hoverPreviewArrayCount`: number of array items to show in preview Any array larger than this number will be shown as `Array[XXX]` where `XXX` is length of the array.
 * `hoverPreviewFieldCount`: number of object properties to show for object preview. Any object with more properties that thin number will be truncated.
 
+### Development
+Install `gulp` and run `gulp serve` to start the server that serves the development version of the project.
+
 ### License
 [MIT](./LICENSE)
