@@ -1,0 +1,29 @@
+{
+  "name": "json-formatter-js",
+  "version": "0.0.0",
+  "authors": [
+    "Mohsen Azimi <me@azimi.me>"
+  ],
+  "main": [
+    "dist/bundle.js",
+    "dist/style.css"
+  ],
+  "moduleType": [
+    "amd",
+    "es6",
+    "globals",
+    "node"
+  ],
+  "keywords": [
+    "json"
+  ],
+  "license": "MIT",
+  "homepage": "mohsen1/json-formatter-js",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}

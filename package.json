@@ -2,7 +2,10 @@
   "name": "json-formatter-js",
   "version": "0.0.0",
   "description": "JSON Formatter core library ",
-  "main": "index.js",
+  "main": [
+    "dist/bundle.js",
+    "dist/style.css"
+  ],
   "scripts": {
     "test": "mocha --compilers js:babel/register"
   },
