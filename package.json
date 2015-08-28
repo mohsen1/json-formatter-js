@@ -1,6 +1,6 @@
 {
   "name": "json-formatter-js",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "JSON Formatter core library ",
   "main": "dist/bundle.js",
   "scripts": {
