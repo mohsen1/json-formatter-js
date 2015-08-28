@@ -2,10 +2,7 @@
   "name": "json-formatter-js",
   "version": "0.1.0",
   "description": "JSON Formatter core library ",
-  "main": [
-    "dist/bundle.js",
-    "dist/style.css"
-  ],
+  "main": "dist/bundle.js",
   "scripts": {
     "test": "gulp test --singleRun=true"
   },
