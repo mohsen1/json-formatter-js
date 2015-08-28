@@ -55,7 +55,7 @@ gulp.task('styles', function() {
 
 gulp.task('watch', function () {
   gulp.watch(['src/style.less'], ['styles']);
-  gulp.watch(['src/index.js'], ['scripts']);
+  gulp.watch(['src/*.js'], ['scripts']);
 });
 
 gulp.task('connect', function() {

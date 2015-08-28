@@ -2,7 +2,6 @@
 
 /* globals JSONFormatter */
 
-import template from 'lodash.template';
 import {
   isObject,
   getObjectName,
@@ -52,12 +51,18 @@ export default class JSONFormatter {
     this.key = key;
     this.open = open === undefined ? 1 : open;
     this.config = config || {};
-    this.config.hoverPreviewEnabled = this.config.hoverPreviewEnabled === undefined ?
-      false : this.config.hoverPreviewEnabled;
-    this.config.hoverPreviewArrayCount = this.config.hoverPreviewArrayCount === undefined ?
-      100 : this.config.hoverPreviewArrayCount;
-    this.config.hoverPreviewFieldCount = this.config.hoverPreviewFieldCount === undefined ?
-      5 : this.config.hoverPreviewFieldCount;
+
+    this.config.hoverPreviewEnabled =
+      this.config.hoverPreviewEnabled === undefined ? false :
+      this.config.hoverPreviewEnabled;
+
+    this.config.hoverPreviewArrayCount =
+      this.config.hoverPreviewArrayCount === undefined ? 100 :
+      this.config.hoverPreviewArrayCount;
+
+    this.config.hoverPreviewFieldCount =
+      this.config.hoverPreviewFieldCount === undefined ? 5 :
+      this.config.hoverPreviewFieldCount;
 
     this.type = getType(this.json);
     this.hasKey = typeof this.key !== 'undefined';
@@ -91,7 +96,9 @@ export default class JSONFormatter {
 
     this.isEmptyObject = !this.keys.length && this.isOpen && !this.isArray;
     this.onstructorName = getObjectName(this.json);
-    this.isEmpty = this.isEmptyObject || (this.keys && !this.keys.length && this.isArray);
+    this.isEmpty = this.isEmptyObject || (this.keys &&
+      !this.keys.length &&
+      this.isArray);
 
     this.getValuePreview = getValuePreview;
   }
@@ -153,48 +160,88 @@ export default class JSONFormatter {
    * @returns {string}
   */
   template() {
+
+    /*
+     * if condition for ES6 template strings
+     * to be used only in template string
+     *
+     * @example mystr = `Random is ${_if(Math.random() > 0.5)`greater than 0.5``
+     *
+     * @param {boolean} condition
+     *
+     * @returns {function} the template function
+    */
+    function _if(condition) {
+      return condition ? normal : empty;
+    }
+    function empty(){
+      return '';
+    }
+    function normal (template, ...expressions) {
+      return template.slice(1).reduce((accumulator, part, i) => {
+        return accumulator + expressions[i] + part;
+      }, template[0]);
+    }
+
     const templateString = `
       <a class="toggler-link">
-        <% if (this.isObject) { %>
+        ${_if(this.isObject)`
           <span class="toggler"></span>
-        <% } %>
+        `}
 
-        <% if (this.hasKey) { %>
+        ${_if(this.hasKey)`
           <span class="key">${this.key}:</span>
-        <% } %>
+        `}
 
         <span class="value">
 
-          <% if (this.isObject) { %>
+          ${_if(this.isObject)`
             <span>
               <span class="constructor-name">${this.onstructorName}</span>
 
-              <% if (this.isArray) { %>
-               <span><span class="bracket">[</span><span class="number"><%= this.json.length %></span><span class="bracket">]</span></span>
-              <% } %>
+              ${_if(this.isArray)`
+                <span><span class="bracket">[</span><span class="number">${
+                  this.json && this.json.length
+                }</span><span class="bracket">]</span></span>
+              `}
 
             </span>
-          <% } else if (!this.isObject) {%>
+          `}
+
+          ${_if(!this.isObject)`
 
             <${this.isUrl ? 'a' : 'span'}
-              class="${this.type} ${this.isDate ? 'date' : ''} ${this.isUrl? 'url' : ''}"
-              <% if (this.isUrl) { %>href="<%= this.json %>" <% }%>
-            ><%= this.getValuePreview(this.json, this.json) %></${this.isUrl ? 'a' : 'span'}>
+              class="${
+                this.type
+              } ${
+                _if(this.isDate)`date`
+              } ${
+                _if(this.isUrl)`url`
+              }"
+              ${_if(this.isUrl)`href="${this.json}"`}
+            >${this.getValuePreview(this.json, this.json)}</${
+              this.isUrl ? 'a' : 'span'
+            }>
 
-          <% } %>
+          `}
 
         </span>
 
-        <% if (this.config.hoverPreviewEnabled && this.isObject) { %>
+        ${_if(this.config.hoverPreviewEnabled && this.isObject)`
           <span class="preview-text">${this.getInlinepreview()}</span>
-        <% } %>
+        `}
       </a>
 
-      <div class="children ${this.isObject ? 'object': ''} ${this.isArray ? 'array' : ''} ${this.isEmpty ? 'empty': ''}"></div>
+      <div class="children ${
+        _if(this.isObject)`object`
+      } ${
+        _if(this.isArray)`array`
+      } ${
+        _if(this.isEmpty)`empty`
+      }"></div>
     `;
 
-    return template(templateString).call(this)
-      .replace(/\s*\n/g, '\n'); // clean up empty lines
+    return templateString.replace(/\s*\n/g, '\n'); // clean up empty lines
   }
 
   /**
@@ -235,7 +282,8 @@ export default class JSONFormatter {
     if (!children) { return; }
 
     this.keys.forEach((key)=> {
-      const formatter = new JSONFormatter(this.json[key], this.open - 1, this.config, key);
+      const formatter = new JSONFormatter(
+        this.json[key], this.open - 1, this.config, key);
 
       children.appendChild(formatter.render());
     });
