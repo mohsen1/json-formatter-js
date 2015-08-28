@@ -51,5 +51,18 @@ Available configurations:
 ### Development
 Install `gulp` and run `gulp serve` to start the server that serves the development version of the project.
 
+#### Running tests
+
+**Once:**
+```shell
+npm test
+```
+
+**Continues:**
+```shell
+gulp test
+```
+
+
 ### License
 [MIT](./LICENSE)

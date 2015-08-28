@@ -7,7 +7,7 @@
     "dist/style.css"
   ],
   "scripts": {
-    "test": "mocha --compilers js:babel/register"
+    "test": "gulp test --singleRun=true"
   },
   "repository": {
     "type": "git",
@@ -23,7 +23,6 @@
   },
   "homepage": "https://github.com/mohsen1/json-formatter-js#readme",
   "devDependencies": {
-    "lodash.template": "^3.6.2",
     "babel": "^5.8.21",
     "babelify": "^6.2.0",
     "browserify": "^11.0.1",
@@ -35,6 +34,15 @@
     "gulp-less": "^3.0.3",
     "gulp-minify-css": "^1.2.1",
     "gulp-rename": "^1.2.2",
+    "karma": "^0.13.9",
+    "karma-babel-preprocessor": "^5.2.1",
+    "karma-chai": "^0.1.0",
+    "karma-chrome-launcher": "^0.2.0",
+    "karma-firefox-launcher": "^0.1.6",
+    "karma-mocha": "^0.2.0",
+    "karma-mocha-reporter": "^1.1.1",
+    "lodash.template": "^3.6.2",
+    "minimist": "^1.2.0",
     "mocha": "^2.2.5"
   }
 }

@@ -2,16 +2,17 @@
 
 /* jshint node: true */
 
-var fs = require('fs');
-var browserify = require('browserify');
-var babelify   = require('babelify');
-var minifyCSS  = require('gulp-minify-css');
-var less       = require('gulp-less');
-var gulp       = require('gulp');
-var header     = require('gulp-header');
-var rename     = require('gulp-rename');
-var jshint     = require('gulp-jshint');
-var connect    = require('gulp-connect');
+var fs          = require('fs');
+var KarmaServer = require('karma').Server;
+var browserify  = require('browserify');
+var babelify    = require('babelify');
+var minifyCSS   = require('gulp-minify-css');
+var less        = require('gulp-less');
+var gulp        = require('gulp');
+var header      = require('gulp-header');
+var rename      = require('gulp-rename');
+var jshint      = require('gulp-jshint');
+var connect     = require('gulp-connect');
 
 var config = {
   pkg : require('./package.json'),
@@ -63,6 +64,15 @@ gulp.task('connect', function() {
     open: 'demo',
     livereload: true
   });
+});
+
+gulp.task('test', function(done) {
+  var argv = require('minimist')(process.argv.slice(2));
+
+  new KarmaServer({
+    configFile: __dirname + '/test/karma.conf.js',
+    singleRun: argv.singleRun
+  }, done).start();
 });
 
 gulp.task('serve', ['watch', 'connect']);
