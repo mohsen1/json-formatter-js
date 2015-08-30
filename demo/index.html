@@ -28,6 +28,7 @@
       var deep = {a:{b:{c:{d:{}}}}};
 
       var examples = [
+        {title: 'Simple', json: {me: 1}},
         {title: 'Complex', json: complex},
         {title: 'Number', json: 42},
         {title: 'null', json: null},
@@ -50,13 +51,13 @@
 
       fetch('giant.json').then(function(resp) {
         resp.json().then(function(giant) {
-          var giantFormatter = new JSONFormatter(giant, 2, {hoverPreviewEnabled: true});
           var title = document.createElement('h3');
 
           title.innerText = 'Giant JSON';
           result.appendChild(title);
 
           console.time('Rendering giant JSON');
+          var giantFormatter = new JSONFormatter(giant, 2000, {hoverPreviewEnabled: true});
           result.appendChild(giantFormatter.render());
           console.timeEnd('Rendering giant JSON');
         });

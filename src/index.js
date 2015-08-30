@@ -10,6 +10,11 @@ import {
   getPreview
 } from './helpers.js';
 
+function hasClass(element, className) {
+  return element && element.getAttribute('class') &&
+    (element.getAttribute('class').indexOf(className) !== -1)
+}
+
 /**
  * @class JSONFormatter
  *
@@ -101,26 +106,6 @@ export default class JSONFormatter {
       this.isArray);
 
     this.getValuePreview = getValuePreview;
-  }
-
-
-
-  /**
-   * Toggles `isOpen` state
-   *
-  */
-  toggleOpen() {
-    this.isOpen = !this.isOpen;
-
-    if (this.isOpen) {
-      this.appendChildern();
-    } else{
-      this.removeChildren();
-    }
-
-    if (this.element) {
-      this.element.classList.toggle('open');
-    }
   }
 
   /**
@@ -238,10 +223,29 @@ export default class JSONFormatter {
         _if(this.isArray)`array`
       } ${
         _if(this.isEmpty)`empty`
-      }"></div>
+      }">
+        ${_if(this.isOpen)`
+          ${this.keys.map(this.childTemplate.bind(this)).join('')}
+        `}
+      </div>
     `;
 
     return templateString.replace(/\s*\n/g, '\n'); // clean up empty lines
+  }
+
+  /**
+   * Generates HTML string for each child of this JSON based on the template
+   * and the provided key
+   *
+   * @param {string} key - the key to select the child
+   *
+   * @returns {string}
+  */
+  childTemplate(key) {
+    const formatter = new JSONFormatter(this.json[key], this.open - 1,
+      this.config, key);
+
+    return `<div class="json-formatter-row">${formatter.template()}</div>`;
   }
 
   /**
@@ -261,29 +265,60 @@ export default class JSONFormatter {
 
     this.element.innerHTML = resultHTML;
 
-    if (this.isObject && this.isOpen) {
-      this.appendChildern();
-    }
-
     // add event listener for toggling
-    this.element.querySelector('a.toggler-link')
-      .addEventListener('click', this.toggleOpen.bind(this));
+    this.element.addEventListener('click', this.toggleOpen.bind(this));
 
     return this.element;
   }
 
   /**
+   * Toggles `isOpen` state
+   *
+   * @param {DOMEvent} event
+  */
+  toggleOpen(event) {
+    let target = event.target;
+
+    while (!hasClass(target, 'json-formatter-row') && target.parentElement) {
+      target = target.parentElement;
+    }
+
+    let key = null;
+    const isOpen = hasClass(target, 'open');
+
+    if (target.querySelector('.key')) {
+      key = target.querySelector('.key').innerText.replace(/\:$/, '');
+    }
+
+    if (isOpen) {
+      this.removeChildren(target);
+    } else{
+      this.appendChildern(target, key);
+    }
+
+    target.classList.toggle('open');
+  }
+
+  /**
    * Appends all the children to `<div class="children"></div>` element
    *
+   * @param {HTMLElement} element
   */
-  appendChildern() {
-    const children = this.element.querySelector('div.children');
+  appendChildern(element, subkey) {
+    const children = element.querySelector('div.children');
 
     if (!children) { return; }
 
-    this.keys.forEach((key)=> {
-      const formatter = new JSONFormatter(
-        this.json[key], this.open - 1, this.config, key);
+    let json = this.json;
+
+    if (subkey) {
+      json = json[subkey]
+    }
+
+    Object.keys(json).forEach((key)=> {
+      const json = json[key];
+      const open = this.open - 1;
+      const formatter = new JSONFormatter(json, open, this.config, key);
 
       children.appendChild(formatter.render());
     });
@@ -292,10 +327,11 @@ export default class JSONFormatter {
   /**
    * Removes all the children from `<div class="children"></div>` element
    *
+   * @param {HTMLElement} element
   */
-  removeChildren() {
-    if (this.element.querySelector('div.children')) {
-      this.element.querySelector('div.children').innerHTML = '';
+  removeChildren(element) {
+    if (element.querySelector('div.children')) {
+      element.querySelector('div.children').innerHTML = '';
     }
   }
 }
