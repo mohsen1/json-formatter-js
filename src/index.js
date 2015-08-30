@@ -15,6 +15,15 @@ function hasClass(element, className) {
     (element.getAttribute('class').indexOf(className) !== -1)
 }
 
+function walk(json, path_) {
+  const path = path_.slice(0);
+
+  while ((typeof json === 'object') && path.length) {
+    json = json[path.shift()];
+  }
+  return json;
+}
+
 /**
  * @class JSONFormatter
  *
@@ -48,12 +57,11 @@ export default class JSONFormatter {
    *   preview. Any object with more properties that thin number will be
    *   truncated.
    *
-   * @param {string} [key=undefined] The key that this object in it's parent
-   * context
+   * @param {string} [[path]=[]] - The path to reach to this object
   */
-  constructor(json, open, config, key) {
+  constructor(json, open, config, path) {
     this.json = json;
-    this.key = key;
+    this.path = path || [];
     this.open = open === undefined ? 1 : open;
     this.config = config || {};
 
@@ -70,7 +78,8 @@ export default class JSONFormatter {
       this.config.hoverPreviewFieldCount;
 
     this.type = getType(this.json);
-    this.hasKey = typeof this.key !== 'undefined';
+    this.hasKey = this.path.length;
+    this.key = this.hasKey && this.path[this.path.length - 1]
 
     // If 'open' attribute is present
     this.isOpen = this.open > 0;
@@ -169,64 +178,68 @@ export default class JSONFormatter {
     }
 
     const templateString = `
-      <a class="toggler-link">
-        ${_if(this.isObject)`
-          <span class="toggler"></span>
-        `}
-
-        ${_if(this.hasKey)`
-          <span class="key">${this.key}:</span>
-        `}
-
-        <span class="value">
-
+      <div class="json-formatter-row${_if(this.isOpen)` open`}" data-path='${
+          JSON.stringify(this.path)
+        }'>
+        <a class="toggler-link">
           ${_if(this.isObject)`
-            <span>
-              <span class="constructor-name">${this.onstructorName}</span>
-
-              ${_if(this.isArray)`
-                <span><span class="bracket">[</span><span class="number">${
-                  this.json && this.json.length
-                }</span><span class="bracket">]</span></span>
-              `}
-
-            </span>
+            <span class="toggler"></span>
           `}
 
-          ${_if(!this.isObject)`
-
-            <${this.isUrl ? 'a' : 'span'}
-              class="${
-                this.type
-              } ${
-                _if(this.isDate)`date`
-              } ${
-                _if(this.isUrl)`url`
-              }"
-              ${_if(this.isUrl)`href="${this.json}"`}
-            >${this.getValuePreview(this.json, this.json)}</${
-              this.isUrl ? 'a' : 'span'
-            }>
-
+          ${_if(this.hasKey)`
+            <span class="key">${this.key}:</span>
           `}
 
-        </span>
+          <span class="value">
 
-        ${_if(this.config.hoverPreviewEnabled && this.isObject)`
-          <span class="preview-text">${this.getInlinepreview()}</span>
-        `}
-      </a>
+            ${_if(this.isObject)`
+              <span>
+                <span class="constructor-name">${this.onstructorName}</span>
 
-      <div class="children ${
-        _if(this.isObject)`object`
-      } ${
-        _if(this.isArray)`array`
-      } ${
-        _if(this.isEmpty)`empty`
-      }">
-        ${_if(this.isOpen)`
-          ${this.keys.map(this.childTemplate.bind(this)).join('')}
-        `}
+                ${_if(this.isArray)`
+                  <span><span class="bracket">[</span><span class="number">${
+                    this.json && this.json.length
+                  }</span><span class="bracket">]</span></span>
+                `}
+
+              </span>
+            `}
+
+            ${_if(!this.isObject)`
+
+              <${this.isUrl ? 'a' : 'span'}
+                class="${
+                  this.type
+                } ${
+                  _if(this.isDate)`date`
+                } ${
+                  _if(this.isUrl)`url`
+                }"
+                ${_if(this.isUrl)`href="${this.json}"`}
+              >${this.getValuePreview(this.json, this.json)}</${
+                this.isUrl ? 'a' : 'span'
+              }>
+
+            `}
+
+          </span>
+
+          ${_if(this.config.hoverPreviewEnabled && this.isObject)`
+            <span class="preview-text">${this.getInlinepreview()}</span>
+          `}
+        </a>
+
+        <div class="children ${
+          _if(this.isObject)`object`
+        } ${
+          _if(this.isArray)`array`
+        } ${
+          _if(this.isEmpty)`empty`
+        }">
+          ${_if(this.isOpen)`
+            ${this.keys.map(this.childTemplate.bind(this)).join('')}
+          `}
+        </div>
       </div>
     `;
 
@@ -242,10 +255,12 @@ export default class JSONFormatter {
    * @returns {string}
   */
   childTemplate(key) {
-    const formatter = new JSONFormatter(this.json[key], this.open - 1,
-      this.config, key);
+    const newPath = this.path.slice(0); newPath.push(key);
+    const json = walk(this.json, newPath);
+    const open = this.open - 1;
+    const formatter = new JSONFormatter(json, open, this.config, newPath);
 
-    return `<div class="json-formatter-row">${formatter.template()}</div>`;
+    return formatter.template();
   }
 
   /**
@@ -254,21 +269,14 @@ export default class JSONFormatter {
    * @returns {HTMLDivElement}
   */
   render() {
-    const resultHTML = this.template();
+    const element = document.createElement('div');
 
-    this.element = document.createElement('div');
-    this.element.classList.add('json-formatter-row');
-
-    if (this.isOpen) {
-      this.element.classList.add('open');
-    }
-
-    this.element.innerHTML = resultHTML;
+    element.innerHTML = this.template();
 
     // add event listener for toggling
-    this.element.addEventListener('click', this.toggleOpen.bind(this));
+    element.children[0].addEventListener('click', this.toggleOpen.bind(this));
 
-    return this.element;
+    return element.children[0];
   }
 
   /**
@@ -283,11 +291,13 @@ export default class JSONFormatter {
       target = target.parentElement;
     }
 
-    let key = null;
+    let path = null;
     const isOpen = hasClass(target, 'open');
 
-    if (target.querySelector('.key')) {
-      key = target.querySelector('.key').innerText.replace(/\:$/, '');
+    if (target.dataset.path) {
+      try {
+        path = JSON.parse(target.dataset.path);
+      } catch (e) {}
     }
 
     if (isOpen) {
@@ -302,26 +312,22 @@ export default class JSONFormatter {
   /**
    * Appends all the children to `<div class="children"></div>` element
    *
-   * @param {HTMLElement} element
+   * @param {object} json
   */
-  appendChildern(element, subkey) {
+  appendChildern(element, json) {
     const children = element.querySelector('div.children');
 
     if (!children) { return; }
 
-    let json = this.json;
+    if (typeof json === 'object') {
+      Object.keys(json).forEach((key)=> {
+        const json = json[key];
+        const open = this.open - 1;
+        const formatter = new JSONFormatter(json, open, this.config, key);
 
-    if (subkey) {
-      json = json[subkey]
+        children.appendChild(formatter.render());
+      });
     }
-
-    Object.keys(json).forEach((key)=> {
-      const json = json[key];
-      const open = this.open - 1;
-      const formatter = new JSONFormatter(json, open, this.config, key);
-
-      children.appendChild(formatter.render());
-    });
   }
 
   /**
