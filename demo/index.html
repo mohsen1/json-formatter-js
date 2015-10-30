@@ -2,6 +2,11 @@
   <head>
     <script src="../dist/bundle.js"></script>
     <link rel="stylesheet" href="../dist/style.css">
+    <style type="text/css">
+    .result  h3 + div {
+      padding: 10px;
+    }
+    </style>
   </head>
   <body>
     <div class="result"></div>
@@ -25,6 +30,7 @@
         date: 'Sun Aug 03 2014 20:46:55 GMT-0700 (PDT)',
         func: function add(a,b){return a + b; }
       };
+
       var deep = {a:{b:{c:{d:{}}}}};
 
       var examples = [
@@ -33,19 +39,26 @@
         {title: 'null', json: null},
         {title: 'Empty Object', json: Object.create(null)},
         {title: 'Empty Array', json: []},
-        {title: 'Deep', json: deep}
+        {title: 'Deep', json: deep},
+        {title: 'Dark', json: complex, config: {theme: 'dark'}}
       ];
 
       var result = document.querySelector('.result');
 
       examples.forEach(function(example) {
         var title = document.createElement('h3');
-        var formatter = new JSONFormatter(example.json);
+        var formatter = new JSONFormatter(example.json, 1, example.config);
 
         title.innerText = example.title;
 
         result.appendChild(title)
-        result.appendChild(formatter.render());
+        var el = formatter.render();
+
+        if (example.config && example.config.theme === 'dark') {
+          el.style.backgroundColor = '#1E1E1E';
+        }
+
+        result.appendChild(el);
       });
 
       fetch('giant.json').then(function(resp) {

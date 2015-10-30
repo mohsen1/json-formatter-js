@@ -43,10 +43,13 @@ Default:
 }
 ```
 Available configurations:
-#####Hover Preview
+##### Hover Preview
 * `hoverPreviewEnabled`:  enable preview on hover
 * `hoverPreviewArrayCount`: number of array items to show in preview Any array larger than this number will be shown as `Array[XXX]` where `XXX` is length of the array.
 * `hoverPreviewFieldCount`: number of object properties to show for object preview. Any object with more properties that thin number will be truncated.
+
+##### Theme
+ * `theme`: a string that can be any of these options: `['dark']`. Look at [`src/style.less`](src/style.less) for making new themes.
 
 ### Development
 Install `gulp` and run `gulp serve` to start the server that serves the development version of the project.
@@ -54,15 +57,20 @@ Install `gulp` and run `gulp serve` to start the server that serves the developm
 #### Running tests
 
 **Once:**
+
 ```shell
 npm test
 ```
 
 **Continues:**
+
 ```shell
 gulp test
 ```
+#### Running the demo
 
-
+```shell
+gulp serve
+```
 ### License
 [MIT](./LICENSE)

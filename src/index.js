@@ -255,6 +255,10 @@ export default class JSONFormatter {
     this.element = document.createElement('div');
     this.element.classList.add('json-formatter-row');
 
+    if (this.config && this.config.theme) {
+      this.element.classList.add(`json-formatter-${this.config.theme}`);
+    }
+
     if (this.isOpen) {
       this.element.classList.add('open');
     }
