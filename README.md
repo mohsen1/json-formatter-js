@@ -39,7 +39,8 @@ Default:
 {
   hoverPreviewEnabled: false,
   hoverPreviewArrayCount: 100,
-  hoverPreviewFieldCount: 5
+  hoverPreviewFieldCount: 5,
+  theme: ''
 }
 ```
 Available configurations:
