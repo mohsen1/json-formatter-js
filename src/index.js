@@ -1,7 +1,5 @@
 'use strict';
 
-/* globals JSONFormatter */
-
 import {
   isObject,
   getObjectName,
@@ -9,6 +7,8 @@ import {
   getValuePreview,
   getPreview
 } from './helpers.js';
+
+const DATE_STRING_REGEX = /(^\d{1,4}[\.|\\/|-]\d{1,2}[\.|\\/|-]\d{1,4})(\s*(?:0?[1-9]:[0-5]|1(?=[012])\d:[0-5])\d\s*[ap]m)?$/;
 
 /**
  * @class JSONFormatter
@@ -73,7 +73,7 @@ export default class JSONFormatter {
     if (this.type === 'string'){
 
       // Add custom type for date
-      if((new Date(this.json)).toString() !== 'Invalid Date') {
+      if(DATE_STRING_REGEX.test(json)) {
         this.isDate = true;
       }
 
@@ -285,7 +285,7 @@ export default class JSONFormatter {
 
     if (!children) { return; }
 
-    this.keys.forEach((key)=> {
+    this.keys.forEach(key => {
       const formatter = new JSONFormatter(
         this.json[key], this.open - 1, this.config, key);
 
@@ -303,6 +303,3 @@ export default class JSONFormatter {
     }
   }
 }
-
-// TODO: UMD
-window.JSONFormatter = JSONFormatter;

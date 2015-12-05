@@ -1,9 +1,5 @@
 'use strict';
 
-// import {expect} from 'chai';
-
-// import JSONFormatter from '../index.js';
-
 describe('rendering', ()=> {
   describe('null', ()=> {
     it('should render "null"', function () {
@@ -39,6 +35,11 @@ describe('rendering', ()=> {
 
       expect(formatter.render().innerText).to.contain('Hello World');
     });
+
+		it('should assing date class to date string', ()=> {
+			const formatter = new JSONFormatter('2015-12-05T18:58:53.727Z');
+			expect([].slice.call(formatter.render().querySelector('.value span').classList)).to.contain('date');
+		});
   });
 
   describe('date string', ()=> {
@@ -54,14 +55,14 @@ describe('rendering', ()=> {
     });
   });
 
-  describe('url string', function(){
+  describe('url string', ()=> {
     const formatter = new JSONFormatter('https://example.com');
 
-    it('should render "https://example.com"', function () {
+    it('should render "https://example.com"', ()=> {
       expect(formatter.render().innerText).to.contain('"https://example.com"');
     });
 
-    it('should make a link and add class "url"', function() {
+    it('should make a link and add class "url"', ()=> {
       expect(formatter.render().querySelector('a.url')).not.to.equal(null);
     });
   });
