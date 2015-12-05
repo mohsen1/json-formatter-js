@@ -6,7 +6,7 @@
  * @param {string} str
  * @returns {string}
 */
-function escapeString(str) {
+function escapeString(str: string): string {
   return str.replace('"', '\"');
 }
 
@@ -18,8 +18,8 @@ function escapeString(str) {
  * @returns {boolean}
  *
 */
-export function isObject(value) {
-  var type = typeof value;
+export function isObject(value: any): boolean {
+  const type = typeof value;
   return !!value && (type == 'object');
 }
 
@@ -32,7 +32,7 @@ export function isObject(value) {
  * @returns {string}
  *
 */
-export function getObjectName(object) {
+export function getObjectName(object: {}): string {
   if (object === undefined) {
     return '';
   }
@@ -59,7 +59,7 @@ export function getObjectName(object) {
  *
  * @returns {string}
 */
-export function getType(object) {
+export function getType(object: {}): string {
   if (object === null) { return 'null'; }
   return typeof object;
 }
@@ -71,8 +71,8 @@ export function getType(object) {
  *
  * @returns {string}
 */
-export function getValuePreview (object, value) {
-  var type = getType(object);
+export function getValuePreview (object: {}, value: string): string {
+  const type = getType(object);
 
   if (type === 'null' || type === 'undefined') { return type; }
 
@@ -91,11 +91,11 @@ export function getValuePreview (object, value) {
 
 /*
  * Generates inline preview for a JavaScript object
- * @param {object} object
+ * @param {object} any
  *
  * @returns {string}
 */
-export function getPreview(object) {
+export function getPreview(object: any): string {
   let value = '';
   if (isObject(object)) {
     value = getObjectName(object);

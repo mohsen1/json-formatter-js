@@ -6,9 +6,23 @@ import {
   getType,
   getValuePreview,
   getPreview
-} from './helpers.js';
+} from './helpers.ts';
 
 const DATE_STRING_REGEX = /(^\d{1,4}[\.|\\/|-]\d{1,2}[\.|\\/|-]\d{1,4})(\s*(?:0?[1-9]:[0-5]|1(?=[012])\d:[0-5])\d\s*[ap]m)?$/;
+
+interface JSONFormatterConfiguration {
+	hoverPreviewArrayCount: number;
+	hoverPreviewEnabled: boolean;
+	hoverPreviewFieldCount: number;
+  theme: string;
+}
+
+const defaultConfig: JSONFormatterConfiguration = {
+	hoverPreviewArrayCount: 100,
+	hoverPreviewEnabled: false,
+	hoverPreviewFieldCount: 5,
+  theme: ''
+};
 
 /**
  * @class JSONFormatter
@@ -17,6 +31,22 @@ const DATE_STRING_REGEX = /(^\d{1,4}[\.|\\/|-]\d{1,2}[\.|\\/|-]\d{1,4})(\s*(?:0?
  * **collapsible** navigation.
 */
 export default class JSONFormatter {
+	json: any;
+	key: string;
+	open: number;
+	config: JSONFormatterConfiguration;
+	type: string;
+  keys: Array<string>;
+  element: HTMLDivElement;
+	hasKey: boolean;
+  isOpen: boolean;
+  isDate: boolean;
+  isUrl: boolean;
+  isArray: boolean;
+  isObject: boolean;
+  isEmptyObject: boolean;
+  isEmpty: boolean;
+  constructorName: string;
 
   /**
    * @param {object} json The JSON object you want to render. It has to be an
@@ -46,23 +76,18 @@ export default class JSONFormatter {
    * @param {string} [key=undefined] The key that this object in it's parent
    * context
   */
-  constructor(json, open, config, key) {
+  constructor(json: any, open: number, config: JSONFormatterConfiguration = defaultConfig, key: string) {
     this.json = json;
     this.key = key;
     this.open = open === undefined ? 1 : open;
-    this.config = config || {};
+    this.config = config;
 
-    this.config.hoverPreviewEnabled =
-      this.config.hoverPreviewEnabled === undefined ? false :
-      this.config.hoverPreviewEnabled;
-
-    this.config.hoverPreviewArrayCount =
-      this.config.hoverPreviewArrayCount === undefined ? 100 :
-      this.config.hoverPreviewArrayCount;
-
-    this.config.hoverPreviewFieldCount =
-      this.config.hoverPreviewFieldCount === undefined ? 5 :
-      this.config.hoverPreviewFieldCount;
+    this.config.hoverPreviewEnabled = this.config.hoverPreviewEnabled === undefined ?
+      defaultConfig.hoverPreviewEnabled : this.config.hoverPreviewEnabled;
+    this.config.hoverPreviewArrayCount = this.config.hoverPreviewArrayCount === undefined ?
+      defaultConfig.hoverPreviewArrayCount : this.config.hoverPreviewArrayCount;
+    this.config.hoverPreviewFieldCount = this.config.hoverPreviewFieldCount === undefined ?
+      defaultConfig.hoverPreviewFieldCount : this.config.hoverPreviewFieldCount;
 
     this.type = getType(this.json);
     this.hasKey = typeof this.key !== 'undefined';
@@ -95,12 +120,10 @@ export default class JSONFormatter {
     }
 
     this.isEmptyObject = !this.keys.length && this.isOpen && !this.isArray;
-    this.onstructorName = getObjectName(this.json);
+    this.constructorName = getObjectName(this.json);
     this.isEmpty = this.isEmptyObject || (this.keys &&
       !this.keys.length &&
       this.isArray);
-
-    this.getValuePreview = getValuePreview;
   }
 
 
@@ -128,7 +151,7 @@ export default class JSONFormatter {
    *
    * @returns {string}
   */
-  getInlinepreview() {
+  getInlinepreview(): string {
     if (this.isArray) {
 
       // if array length is greater then 100 it shows "Array[101]"
@@ -159,7 +182,7 @@ export default class JSONFormatter {
    *
    * @returns {string}
   */
-  template() {
+  template(): string {
 
     /*
      * if condition for ES6 template strings
@@ -171,14 +194,15 @@ export default class JSONFormatter {
      *
      * @returns {function} the template function
     */
-    function _if(condition) {
+    function _if(condition: boolean): {(template: Array<string>, ...expressions: Array<string>): string; } {
       return condition ? normal : empty;
     }
-    function empty(){
+
+    function empty(template: Array<string>, ...expressions: Array<string>): string {
       return '';
     }
-    function normal (template, ...expressions) {
-      return template.slice(1).reduce((accumulator, part, i) => {
+    function normal (template: Array<string>, ...expressions: Array<string>): string {
+      return template.slice(1).reduce((accumulator:string, part:string, i:number) => {
         return accumulator + expressions[i] + part;
       }, template[0]);
     }
@@ -197,7 +221,7 @@ export default class JSONFormatter {
 
           ${_if(this.isObject)`
             <span>
-              <span class="constructor-name">${this.onstructorName}</span>
+              <span class="constructor-name">${this.constructorName}</span>
 
               ${_if(this.isArray)`
                 <span><span class="bracket">[</span><span class="number">${
@@ -219,7 +243,7 @@ export default class JSONFormatter {
                 _if(this.isUrl)`url`
               }"
               ${_if(this.isUrl)`href="${this.json}"`}
-            >${this.getValuePreview(this.json, this.json)}</${
+            >${getValuePreview(this.json, this.json)}</${
               this.isUrl ? 'a' : 'span'
             }>
 
@@ -249,8 +273,8 @@ export default class JSONFormatter {
    *
    * @returns {HTMLDivElement}
   */
-  render() {
-    const resultHTML = this.template();
+  render(): Element {
+    const resultHTML: string = this.template();
 
     this.element = document.createElement('div');
     this.element.classList.add('json-formatter-row');
@@ -281,13 +305,12 @@ export default class JSONFormatter {
    *
   */
   appendChildern() {
-    const children = this.element.querySelector('div.children');
+    const children: Element = this.element.querySelector('div.children');
 
     if (!children) { return; }
 
     this.keys.forEach(key => {
-      const formatter = new JSONFormatter(
-        this.json[key], this.open - 1, this.config, key);
+      const formatter = new JSONFormatter(this.json[key], this.open - 1, this.config, key);
 
       children.appendChild(formatter.render());
     });
