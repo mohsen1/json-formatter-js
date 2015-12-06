@@ -322,7 +322,7 @@ export default class JSONFormatter {
   */
   removeChildren() {
     if (this.element.querySelector('div.children')) {
-      this.element.querySelector('div.children').innerHTML = '';
+      this.element.removeChild(this.element.querySelector('div.children'));
     }
   }
 }
