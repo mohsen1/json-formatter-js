@@ -30,7 +30,7 @@ const defaultConfig: JSONFormatterConfiguration = {
  * JSONFormatter allows you to render JSON objects in HTML with a
  * **collapsible** navigation.
 */
-export default class JSONFormatter {
+class JSONFormatter {
 	json: any;
 	key: string;
 	open: number;
@@ -326,3 +326,16 @@ export default class JSONFormatter {
     }
   }
 }
+
+/*
+ * Almost َUMD!
+ *
+ * Browserify "standalone" is not playing well with TypeScript `export default`
+*/
+declare var module: any;
+if (typeof module !== 'undefined') {
+  module.exports = JSONFormatter;
+} else if (typeof window !== 'undefined') {
+  window.JSONFormatter = JSONFormatter;
+}
+

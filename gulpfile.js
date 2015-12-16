@@ -30,7 +30,7 @@ gulp.task('jshint', function() {
 });
 
 gulp.task('scripts', ['jshint'], function() {
-  return browserify('src/index.ts', { debug: true, standalone: 'JSONFormatter' })
+  return browserify('src/index.ts', { debug: true })
     .plugin(tsify)
     .bundle()
     .on('error', logError)
