@@ -6,7 +6,16 @@
  * @returns {string}
 */
 function escapeString(str) {
-    return str.replace('"', '\"');
+  
+  var entitiesMap = {              
+      '<': '&lt;',
+      '>': '&gt;',
+      '&': '&amp;'
+  };
+  
+  return str.replace('"', '\"').replace(/[&<>]/g, function(key) {
+    return entitiesMap[key];
+  });
 }
 /*
  * Determines if a value is an object
