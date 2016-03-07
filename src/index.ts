@@ -321,8 +321,11 @@ class JSONFormatter {
    *
   */
   removeChildren() {
-    if (this.element.querySelector('div.children')) {
-      this.element.removeChild(this.element.querySelector('div.children'));
+  	
+    var container = this.element.querySelector('div.children')
+    
+    if (container) {
+      while (container.firstChild) container.removeChild(container.firstChild);
     }
   }
 }
