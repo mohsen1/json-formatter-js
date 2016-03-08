@@ -48,8 +48,11 @@ examples.forEach(function(example) {
   result.appendChild(el);
 });
 
-fetch('giant.json').then(function(resp) {
-  resp.json().then(function(giant) {
+fetch('giant.json')
+  .then(function(resp) {
+    return resp.json();
+  })
+  .then(function(giant) {
     var giantFormatter = new JSONFormatter(giant, 2, {hoverPreviewEnabled: true});
     var title = document.createElement('h3');
 
@@ -59,5 +62,6 @@ fetch('giant.json').then(function(resp) {
     console.time('Rendering giant JSON');
     result.appendChild(giantFormatter.render());
     console.timeEnd('Rendering giant JSON');
-  });
-});
+  })
+  .catch(alert);
+
