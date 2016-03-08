@@ -8,16 +8,26 @@ import {
   getPreview
 } from './helpers.ts';
 
+
+declare var require: {
+    <T>(path: string): T;
+    (paths: string[], callback: (...modules: any[]) => void): void;
+    ensure: (paths: string[], callback: (require: <T>(path: string) => T) => void) => void;
+};
+
+// require('!style!less!./style');
+import '!style!css!less!./style';
+
 const DATE_STRING_REGEX = /(^\d{1,4}[\.|\\/|-]\d{1,2}[\.|\\/|-]\d{1,4})(\s*(?:0?[1-9]:[0-5]|1(?=[012])\d:[0-5])\d\s*[ap]m)?$/;
 
-interface JSONFormatterConfiguration {
+export interface JSONFormatterConfiguration {
 	hoverPreviewArrayCount: number;
 	hoverPreviewEnabled: boolean;
 	hoverPreviewFieldCount: number;
   theme: string;
 }
 
-const defaultConfig: JSONFormatterConfiguration = {
+export const defaultConfig: JSONFormatterConfiguration = {
 	hoverPreviewArrayCount: 100,
 	hoverPreviewEnabled: false,
 	hoverPreviewFieldCount: 5,
@@ -30,7 +40,7 @@ const defaultConfig: JSONFormatterConfiguration = {
  * JSONFormatter allows you to render JSON objects in HTML with a
  * **collapsible** navigation.
 */
-class JSONFormatter {
+export class JSONFormatter {
 	json: any;
 	key: string;
 	open: number;
@@ -326,16 +336,3 @@ class JSONFormatter {
     }
   }
 }
-
-/*
- * Almost َUMD!
- *
- * Browserify "standalone" is not playing well with TypeScript `export default`
-*/
-declare var module: any;
-if (typeof module !== 'undefined') {
-  module.exports = JSONFormatter;
-} else if (typeof window !== 'undefined') {
-  window.JSONFormatter = JSONFormatter;
-}
-
