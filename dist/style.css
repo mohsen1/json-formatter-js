@@ -1,7 +1,7 @@
 /*!
  * json-formatter-js
  * https://github.com/mohsen1/json-formatter-js#readme
- * Version: 0.3.0 - 2015-12-05T19:17:50.712Z
+ * Version: 0.3.0 - 2016-03-08T19:00:22.998Z
  * License: MIT
  */
 
@@ -43,13 +43,13 @@
   color: red;
 }
 .json-formatter-row .null {
-  color: #855a00;
+  color: #855A00;
 }
 .json-formatter-row .undefined {
   color: #ca0b69;
 }
 .json-formatter-row .function {
-  color: #ff20ed;
+  color: #FF20ED;
 }
 .json-formatter-row .date {
   background-color: rgba(0, 0, 0, 0.05);
@@ -63,7 +63,7 @@
   color: blue;
 }
 .json-formatter-row .key {
-  color: #00008b;
+  color: #00008B;
   cursor: pointer;
 }
 .json-formatter-row .constructor-name {
@@ -124,38 +124,38 @@
   content: "[]";
 }
 .json-formatter-dark.json-formatter-row .string {
-  color: #31f031;
+  color: #31F031;
   white-space: pre;
   word-wrap: break-word;
 }
 .json-formatter-dark.json-formatter-row .number {
-  color: #66c2ff;
+  color: #66C2FF;
 }
 .json-formatter-dark.json-formatter-row .boolean {
-  color: #ec4242;
+  color: #EC4242;
 }
 .json-formatter-dark.json-formatter-row .null {
-  color: #eec97d;
+  color: #EEC97D;
 }
 .json-formatter-dark.json-formatter-row .undefined {
   color: #ef8fbe;
 }
 .json-formatter-dark.json-formatter-row .function {
-  color: #fd48cb;
+  color: #FD48CB;
 }
 .json-formatter-dark.json-formatter-row .date {
   background-color: rgba(255, 255, 255, 0.05);
 }
 .json-formatter-dark.json-formatter-row .url {
   text-decoration: underline;
-  color: #027bff;
+  color: #027BFF;
   cursor: pointer;
 }
 .json-formatter-dark.json-formatter-row .bracket {
-  color: #9494ff;
+  color: #9494FF;
 }
 .json-formatter-dark.json-formatter-row .key {
-  color: #23a0db;
+  color: #23A0DB;
   cursor: pointer;
 }
 .json-formatter-dark.json-formatter-row .constructor-name {
