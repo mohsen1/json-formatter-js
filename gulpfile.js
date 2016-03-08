@@ -5,7 +5,7 @@
 var fs          = require('fs');
 var KarmaServer = require('karma').Server;
 var browserify  = require('browserify');
-var babelify    = require('babelify');
+var tsify       = require('tsify');
 var minifyCSS   = require('gulp-minify-css');
 var less        = require('gulp-less');
 var gulp        = require('gulp');
@@ -30,8 +30,8 @@ gulp.task('jshint', function() {
 });
 
 gulp.task('scripts', ['jshint'], function() {
-  return browserify('src/index.js', { debug: true })
-    .transform(babelify)
+  return browserify('src/index.ts', { debug: true })
+    .plugin(tsify)
     .bundle()
     .on('error', logError)
     .pipe(connect.reload())
