@@ -15,6 +15,8 @@ const DATE_STRING_REGEX = /(^\d{1,4}[\.|\\/|-]\d{1,2}[\.|\\/|-]\d{1,4})(\s*(?:0?
 const PARTIAL_DATE_REGEX = /\d{2}:\d{2}:\d{2} GMT-\d{4}/;
 const JSON_DATE_REGEX = /\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{3}Z/;
 
+const requestAnimationFrame = window.requestAnimationFrame || function(cb: ()=>void) { cb(); return 0; };
+
 /*
  * Generates a prefixed CSS class name
 */
@@ -158,9 +160,9 @@ export = class JSONFormatter {
     this.isOpen = !this.isOpen;
 
     if (this.isOpen) {
-      this.appendChildern();
+      this.appendChildern(true);
     } else{
-      this.removeChildren();
+      this.removeChildren(true);
     }
 
     if (this.element) {
@@ -291,28 +293,56 @@ export = class JSONFormatter {
    * Appends all the children to `<div class="children"></div>` element
    *
   */
-  appendChildern() {
+  appendChildern(animated: boolean = false) {
     const children = this.element.querySelector(`div.${cssClass('children')}`);
 
     if (!children) { return; }
 
-    this.keys.forEach(key => {
-      const formatter = new JSONFormatter(
-        this.json[key], this.open - 1, this.config, key);
+    if (animated) {
+      let index = 0;
+      const addAChild = ()=> {
+        const key = this.keys[index];
+        const formatter = new JSONFormatter(this.json[key], this.open - 1, this.config, key);
+        children.appendChild(formatter.render());
 
-      children.appendChild(formatter.render());
-    });
+        index += 1;
+
+        if (index < this.keys.length) {
+          requestAnimationFrame(addAChild);
+        }
+      };
+
+      requestAnimationFrame(addAChild);
+
+    } else {
+      this.keys.forEach(key => {
+        requestAnimationFrame(()=>{
+          const formatter = new JSONFormatter(this.json[key], this.open - 1, this.config, key);
+          children.appendChild(formatter.render());
+        });
+      });
+    }
   }
 
   /**
    * Removes all the children from `<div class="children"></div>` element
    *
   */
-  removeChildren() {
-    const children = this.element.querySelector(`div.${cssClass('children')}`);
-    if (children) {
-      // TOOD: do not use innerHTML
-      children.innerHTML = '';
+  removeChildren(animated: boolean = false) {
+    const childrenElement = this.element.querySelector(`div.${cssClass('children')}`) as HTMLDivElement;
+
+    if (animated) {
+      const removeAChild = ()=> {
+        if (childrenElement && childrenElement.children.length) {
+          childrenElement.removeChild(childrenElement.children[0]);
+          requestAnimationFrame(removeAChild);
+        }
+      };
+      requestAnimationFrame(removeAChild);
+    } else {
+      if (childrenElement) {
+        childrenElement.innerHTML = '';
+      }
     }
   }
 }

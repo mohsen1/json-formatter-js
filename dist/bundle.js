@@ -67,6 +67,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	var DATE_STRING_REGEX = /(^\d{1,4}[\.|\\/|-]\d{1,2}[\.|\\/|-]\d{1,4})(\s*(?:0?[1-9]:[0-5]|1(?=[012])\d:[0-5])\d\s*[ap]m)?$/;
 	var PARTIAL_DATE_REGEX = /\d{2}:\d{2}:\d{2} GMT-\d{4}/;
 	var JSON_DATE_REGEX = /\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{3}Z/;
+	var requestAnimationFrame = window.requestAnimationFrame || function (cb) { cb(); return 0; };
 	/*
 	 * Generates a prefixed CSS class name
 	*/
@@ -176,10 +177,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	    JSONFormatter.prototype.toggleOpen = function () {
 	        this.isOpen = !this.isOpen;
 	        if (this.isOpen) {
-	            this.appendChildern();
+	            this.appendChildern(true);
 	        }
 	        else {
-	            this.removeChildren();
+	            this.removeChildren(true);
 	        }
 	        if (this.element) {
 	            this.element.classList.toggle(cssClass('open'));
@@ -285,26 +286,55 @@ return /******/ (function(modules) { // webpackBootstrap
 	     * Appends all the children to `<div class="children"></div>` element
 	     *
 	    */
-	    JSONFormatter.prototype.appendChildern = function () {
+	    JSONFormatter.prototype.appendChildern = function (animated) {
 	        var _this = this;
+	        if (animated === void 0) { animated = false; }
 	        var children = this.element.querySelector("div." + cssClass('children'));
 	        if (!children) {
 	            return;
 	        }
-	        this.keys.forEach(function (key) {
-	            var formatter = new JSONFormatter(_this.json[key], _this.open - 1, _this.config, key);
-	            children.appendChild(formatter.render());
-	        });
+	        if (animated) {
+	            var index_1 = 0;
+	            var addAChild_1 = function () {
+	                var key = _this.keys[index_1];
+	                var formatter = new JSONFormatter(_this.json[key], _this.open - 1, _this.config, key);
+	                children.appendChild(formatter.render());
+	                index_1 += 1;
+	                if (index_1 < _this.keys.length) {
+	                    requestAnimationFrame(addAChild_1);
+	                }
+	            };
+	            requestAnimationFrame(addAChild_1);
+	        }
+	        else {
+	            this.keys.forEach(function (key) {
+	                requestAnimationFrame(function () {
+	                    var formatter = new JSONFormatter(_this.json[key], _this.open - 1, _this.config, key);
+	                    children.appendChild(formatter.render());
+	                });
+	            });
+	        }
 	    };
 	    /**
 	     * Removes all the children from `<div class="children"></div>` element
 	     *
 	    */
-	    JSONFormatter.prototype.removeChildren = function () {
-	        var children = this.element.querySelector("div." + cssClass('children'));
-	        if (children) {
-	            // TOOD: do not use innerHTML
-	            children.innerHTML = '';
+	    JSONFormatter.prototype.removeChildren = function (animated) {
+	        if (animated === void 0) { animated = false; }
+	        var childrenElement = this.element.querySelector("div." + cssClass('children'));
+	        if (animated) {
+	            var removeAChild_1 = function () {
+	                if (childrenElement && childrenElement.children.length) {
+	                    childrenElement.removeChild(childrenElement.children[0]);
+	                    requestAnimationFrame(removeAChild_1);
+	                }
+	            };
+	            requestAnimationFrame(removeAChild_1);
+	        }
+	        else {
+	            if (childrenElement) {
+	                childrenElement.innerHTML = '';
+	            }
 	        }
 	    };
 	    return JSONFormatter;
