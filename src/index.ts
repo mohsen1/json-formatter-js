@@ -46,6 +46,20 @@ function createElement(type: string, className?: string, content?: Element|strin
   return el;
 }
 
+interface JSONFormatterConfiguration {
+  hoverPreviewEnabled: boolean;
+  hoverPreviewArrayCount: number;
+  hoverPreviewFieldCount: number;
+  theme: string;
+};
+
+const _defaultConfig: JSONFormatterConfiguration = {
+  hoverPreviewEnabled: false,
+  hoverPreviewArrayCount: 100,
+  hoverPreviewFieldCount: 5,
+  theme: null
+};
+
 /**
  * @class JSONFormatter
  *
@@ -53,20 +67,11 @@ function createElement(type: string, className?: string, content?: Element|strin
  * **collapsible** navigation.
 */
 export = class JSONFormatter {
-  private key;
-  private keys;
-  private config;
 
-  private type;
-  private hasKey;
-  private isOpen;
-  private isDate;
-  private isUrl;
-  private isArray;
-  private isObject;
-  private isEmptyObject;
-  private isEmpty;
-  private constructorName;
+  // Hold the open state after the toggler is used
+  private _isOpen = null;
+
+  // A reference to the element that we render to
   private element: Element;
 
   /**
@@ -97,63 +102,118 @@ export = class JSONFormatter {
    * @param {string} [key=undefined] The key that this object in it's parent
    * context
   */
-  constructor(public json: any, private open, config, key: string) {
-    this.key = key;
-    this.open = open === undefined ? 1 : open;
-    this.config = config || {};
+  constructor(public json: any, private open = 1, private config: JSONFormatterConfiguration = _defaultConfig, private key?: string) {
 
-    this.config.hoverPreviewEnabled =
-      this.config.hoverPreviewEnabled === undefined ? false :
-      this.config.hoverPreviewEnabled;
-
-    this.config.hoverPreviewArrayCount =
-      this.config.hoverPreviewArrayCount === undefined ? 100 :
-      this.config.hoverPreviewArrayCount;
-
-    this.config.hoverPreviewFieldCount =
-      this.config.hoverPreviewFieldCount === undefined ? 5 :
-      this.config.hoverPreviewFieldCount;
-
-    this.type = getType(this.json);
-    this.hasKey = typeof this.key !== 'undefined';
-
-    // If 'open' attribute is present
-    this.isOpen = this.open > 0;
-
-    if (this.type === 'string'){
-
-      // Add custom type for date
-      if(DATE_STRING_REGEX.test(json) ||
-         JSON_DATE_REGEX.test(json) ||
-         PARTIAL_DATE_REGEX.test(json)) {
-        this.isDate = true;
-      }
-
-      // Add custom type for URLs
-      if (this.json.indexOf('http') === 0) {
-        this.isUrl = true;
-      }
+    // Setting default values for config object
+    if (this.config.hoverPreviewEnabled === undefined) {
+      this.config.hoverPreviewEnabled = _defaultConfig.hoverPreviewEnabled;
     }
-
-    this.isArray = Array.isArray(this.json);
-    this.isObject = isObject(this.json);
-
-    this.keys = [];
-    if (this.isObject) {
-      this.keys = Object.keys(this.json).map((key)=> {
-        if (key === '') { return '""'; }
-        return key;
-      });
+    if (this.config.hoverPreviewArrayCount === undefined) {
+      this.config.hoverPreviewArrayCount = _defaultConfig.hoverPreviewArrayCount;
     }
-
-    this.isEmptyObject = !this.keys.length && this.isOpen && !this.isArray;
-    this.constructorName = getObjectName(this.json);
-    this.isEmpty = this.isEmptyObject || (this.keys &&
-      !this.keys.length &&
-      this.isArray);
+    if (this.config.hoverPreviewFieldCount === undefined) {
+      this.config.hoverPreviewFieldCount = _defaultConfig.hoverPreviewFieldCount;
+    }
   }
 
+  /*
+   * is formatter open?
+  */
+  private get isOpen(): boolean {
+    if (this._isOpen !== null) {
+      return this._isOpen
+    } else {
+      return this.open > 0;
+    }
+  }
 
+  /*
+   * set open state (from toggler)
+  */
+  private set isOpen(value: boolean) {
+    this._isOpen = value;
+  }
+
+  /*
+   * is this a date string?
+  */
+  private get isDate(): boolean {
+    return (this.type === 'string') &&
+      (DATE_STRING_REGEX.test(this.json) ||
+      JSON_DATE_REGEX.test(this.json) ||
+      PARTIAL_DATE_REGEX.test(this.json));
+  }
+
+  /*
+   * is this a URL string?
+  */
+  private get isUrl(): boolean {
+    return this.type === 'string' && (this.json.indexOf('http') === 0);
+  }
+
+  /*
+   * is this an array?
+  */
+  private get isArray(): boolean {
+    return Array.isArray(this.json);
+  }
+
+  /*
+   * is this an object?
+   * Note: In this context objects are array as well
+  */
+  private get isObject(): boolean {
+    return isObject(this.json);
+  }
+
+  /*
+   * is this an empty object with no properties?
+  */
+  private get isEmptyObject(): boolean {
+    return !this.keys.length && this.isOpen && !this.isArray;
+  }
+
+  /*
+   * is this an empty object or array?
+  */
+  private get isEmpty(): boolean {
+    return this.isEmptyObject || (this.keys && !this.keys.length && this.isArray);
+  }
+
+  /*
+   * did we recieve a key argument?
+   * This means that the formatter was called as a sub formatter of a parent formatter
+  */
+  private get hasKey(): boolean {
+    return typeof this.key !== 'undefined';
+  }
+
+  /*
+   * if this is an object, get constructor function name
+  */
+  private get constructorName(): string {
+    return getObjectName(this.json);
+  }
+
+  /*
+   * get type of this value
+   * Possible values: all JavaScript primitive types plus "array" and "null"
+  */
+  private get type(): string {
+    return getType(this.json);
+  }
+
+  /*
+   * get object keys
+   * If there is an empty key we pad it wit quotes to make it visible
+  */
+  private get keys(): string[] {
+    if (this.isObject) {
+      return Object.keys(this.json).map((key)=> key ? key : '""');
+    } else {
+      return [];
+    }
+  }
 
   /**
    * Toggles `isOpen` state
@@ -212,39 +272,55 @@ export = class JSONFormatter {
   */
   render(): HTMLDivElement {
 
+    // construct the root element and assign it to this.element
     this.element = createElement('div', 'row');
+
+    // construct the toggler link
     const togglerLink = createElement('a', 'toggler-link');
 
+    // if this is an object we need a wrapper span (toggler)
     if (this.isObject) {
       togglerLink.appendChild(createElement('span', 'toggler'));
     }
 
+    // if this is child of a parent formatter we need to append the key
     if (this.hasKey) {
       togglerLink.appendChild(createElement('span', 'key', `${this.key}:`));
     }
 
-    const value = createElement('span', 'value');
+    // Value for objects and arrays
     if (this.isObject) {
-      const wrapperSpan = createElement('span');
 
+      // construct the value holder element
+      const value = createElement('span', 'value');
+
+      // we need a wrapper span for objects
+      const objectWrapperSpan = createElement('span');
+
+      // get constructor name and append it to wrapper span
       var constructorName = createElement('span', 'constructor-name', this.constructorName);
-      wrapperSpan.appendChild(constructorName);
+      objectWrapperSpan.appendChild(constructorName);
 
+      // if it's an array append the array specific elements like brackets and length
       if (this.isArray) {
         const arrayWrapperSpan = createElement('span');
         arrayWrapperSpan.appendChild(createElement('span', 'bracket', '['));
         arrayWrapperSpan.appendChild(createElement('span', 'number', (this.json.length)));
         arrayWrapperSpan.appendChild(createElement('span', 'bracket', ']'));
-        wrapperSpan.appendChild(arrayWrapperSpan);
+        objectWrapperSpan.appendChild(arrayWrapperSpan);
       }
 
-
-      value.appendChild(wrapperSpan);
+      // append object wrapper span to toggler link
+      value.appendChild(objectWrapperSpan);
       togglerLink.appendChild(value);
 
     // Primitive values
     } else {
+
+      // make a value holder element
       const value = this.isUrl ? createElement('a') : createElement('span');
+
+      // add type and other type related CSS classes
       value.classList.add(cssClass(this.type));
       if (this.isDate) {
         value.classList.add(cssClass('date'));
@@ -254,12 +330,18 @@ export = class JSONFormatter {
         value.setAttribute('href', this.json);
       }
 
+      // Append value content to value element
       const valuePreview = getValuePreview(this.json, this.json);
       value.appendChild(document.createTextNode(valuePreview));
+
+      // append the value element to toggler link
       togglerLink.appendChild(value);
     }
 
+    // construct a children element
     const children = createElement('div', 'children');
+
+    // set CSS classes for children
     if (this.isObject) {
       children.classList.add(cssClass('object'));
     }
@@ -270,31 +352,32 @@ export = class JSONFormatter {
       children.classList.add(cssClass('empty'));
     }
 
+    // set CSS classes for root element
     if (this.config && this.config.theme) {
       this.element.classList.add(cssClass(this.config.theme));
     }
-
     if (this.isOpen) {
       this.element.classList.add(cssClass('open'));
     }
 
+    // append toggler and children elements to root element
     this.element.appendChild(togglerLink);
     this.element.appendChild(children);
 
+    // if formatter is set to be open call appendChildern
     if (this.isObject && this.isOpen) {
       this.appendChildern();
     }
 
     // add event listener for toggling
-    this.element.querySelector(`a.${cssClass('toggler-link')}`)
-      .addEventListener('click', this.toggleOpen.bind(this));
+    togglerLink.addEventListener('click', this.toggleOpen.bind(this));
 
     return this.element as HTMLDivElement;
   }
 
   /**
-   * Appends all the children to `<div class="children"></div>` element
-   *
+   * Appends all the children to children element
+   * Animated option is used when user triggers this via a click
   */
   appendChildern(animated: boolean = false) {
     const children = this.element.querySelector(`div.${cssClass('children')}`);
@@ -332,8 +415,8 @@ export = class JSONFormatter {
   }
 
   /**
-   * Removes all the children from `<div class="children"></div>` element
-   *
+   * Removes all the children from children element
+   * Animated option is used when user triggers this via a click
   */
   removeChildren(animated: boolean = false) {
     const childrenElement = this.element.querySelector(`div.${cssClass('children')}`) as HTMLDivElement;
