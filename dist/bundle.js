@@ -323,7 +323,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            // json value schematic information
 	            var kvs = narrowKeys.map(function (key) { return (key + ":" + helpers_ts_1.getPreview(_this.json[key])); });
 	            // if keys count greater then 5 then show ellipsis
-	            var ellipsis = keys.length >= 5 ? '…' : '';
+	            var ellipsis = keys.length >= this.config.hoverPreviewFieldCount ? '…' : '';
 	            return "{" + kvs.join(', ') + ellipsis + "}";
 	        }
 	    };
@@ -383,6 +383,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	            value.appendChild(document.createTextNode(valuePreview));
 	            // append the value element to toggler link
 	            togglerLink.appendChild(value);
+	        }
+	        // if hover preview is enabled, append the inline preview element
+	        if (this.isObject && this.config.hoverPreviewEnabled) {
+	            var preview = createElement('span', 'preview-text');
+	            preview.appendChild(document.createTextNode(this.getInlinepreview()));
+	            togglerLink.appendChild(preview);
 	        }
 	        // construct a children element
 	        var children = createElement('div', 'children');

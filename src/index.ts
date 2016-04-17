@@ -258,7 +258,7 @@ export = class JSONFormatter {
       const kvs = narrowKeys.map(key => `${key}:${getPreview(this.json[key])}`);
 
       // if keys count greater then 5 then show ellipsis
-      const ellipsis = keys.length >= 5 ? '…' : '';
+      const ellipsis = keys.length >= this.config.hoverPreviewFieldCount ? '…' : '';
 
       return `{${kvs.join(', ')}${ellipsis}}`;
     }
@@ -336,6 +336,13 @@ export = class JSONFormatter {
 
       // append the value element to toggler link
       togglerLink.appendChild(value);
+    }
+
+    // if hover preview is enabled, append the inline preview element
+    if (this.isObject && this.config.hoverPreviewEnabled) {
+      const preview = createElement('span', 'preview-text');
+      preview.appendChild(document.createTextNode(this.getInlinepreview()));
+      togglerLink.appendChild(preview);
     }
 
     // construct a children element
