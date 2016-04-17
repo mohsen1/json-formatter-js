@@ -61,7 +61,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 1 */
 /***/ function(module, exports, __webpack_require__) {
 
-	'use strict';
+	"use strict";
 	__webpack_require__(2);
 	var helpers_ts_1 = __webpack_require__(6);
 	var DATE_STRING_REGEX = /(^\d{1,4}[\.|\\/|-]\d{1,2}[\.|\\/|-]\d{1,4})(\s*(?:0?[1-9]:[0-5]|1(?=[012])\d:[0-5])\d\s*[ap]m)?$/;
@@ -70,31 +70,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	// When toggleing, don't animated removal or addition of more than a few items
 	var MAX_ANIMATED_TOGGLE_ITEMS = 10;
 	var requestAnimationFrame = window.requestAnimationFrame || function (cb) { cb(); return 0; };
-	/*
-	 * Generates a prefixed CSS class name
-	*/
-	function cssClass(className) {
-	    return "json-formatter-" + className;
-	}
-	/*
-	  * Creates a new DOM element wiht given type and class
-	  * TODO: move me to helpers
-	*/
-	function createElement(type, className, content) {
-	    var el = document.createElement(type);
-	    if (className) {
-	        el.classList.add(cssClass(className));
-	    }
-	    if (content) {
-	        if (content instanceof Node) {
-	            el.appendChild(content);
-	        }
-	        else {
-	            el.appendChild(document.createTextNode(String(content)));
-	        }
-	    }
-	    return el;
-	}
 	;
 	var _defaultConfig = {
 	    hoverPreviewEnabled: false,
@@ -297,7 +272,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            this.removeChildren(true);
 	        }
 	        if (this.element) {
-	            this.element.classList.toggle(cssClass('open'));
+	            this.element.classList.toggle(helpers_ts_1.cssClass('open'));
 	        }
 	    };
 	    /**
@@ -334,32 +309,32 @@ return /******/ (function(modules) { // webpackBootstrap
 	    */
 	    JSONFormatter.prototype.render = function () {
 	        // construct the root element and assign it to this.element
-	        this.element = createElement('div', 'row');
+	        this.element = helpers_ts_1.createElement('div', 'row');
 	        // construct the toggler link
-	        var togglerLink = createElement('a', 'toggler-link');
+	        var togglerLink = helpers_ts_1.createElement('a', 'toggler-link');
 	        // if this is an object we need a wrapper span (toggler)
 	        if (this.isObject) {
-	            togglerLink.appendChild(createElement('span', 'toggler'));
+	            togglerLink.appendChild(helpers_ts_1.createElement('span', 'toggler'));
 	        }
 	        // if this is child of a parent formatter we need to append the key
 	        if (this.hasKey) {
-	            togglerLink.appendChild(createElement('span', 'key', this.key + ":"));
+	            togglerLink.appendChild(helpers_ts_1.createElement('span', 'key', this.key + ":"));
 	        }
 	        // Value for objects and arrays
 	        if (this.isObject) {
 	            // construct the value holder element
-	            var value = createElement('span', 'value');
+	            var value = helpers_ts_1.createElement('span', 'value');
 	            // we need a wrapper span for objects
-	            var objectWrapperSpan = createElement('span');
+	            var objectWrapperSpan = helpers_ts_1.createElement('span');
 	            // get constructor name and append it to wrapper span
-	            var constructorName = createElement('span', 'constructor-name', this.constructorName);
+	            var constructorName = helpers_ts_1.createElement('span', 'constructor-name', this.constructorName);
 	            objectWrapperSpan.appendChild(constructorName);
 	            // if it's an array append the array specific elements like brackets and length
 	            if (this.isArray) {
-	                var arrayWrapperSpan = createElement('span');
-	                arrayWrapperSpan.appendChild(createElement('span', 'bracket', '['));
-	                arrayWrapperSpan.appendChild(createElement('span', 'number', (this.json.length)));
-	                arrayWrapperSpan.appendChild(createElement('span', 'bracket', ']'));
+	                var arrayWrapperSpan = helpers_ts_1.createElement('span');
+	                arrayWrapperSpan.appendChild(helpers_ts_1.createElement('span', 'bracket', '['));
+	                arrayWrapperSpan.appendChild(helpers_ts_1.createElement('span', 'number', (this.json.length)));
+	                arrayWrapperSpan.appendChild(helpers_ts_1.createElement('span', 'bracket', ']'));
 	                objectWrapperSpan.appendChild(arrayWrapperSpan);
 	            }
 	            // append object wrapper span to toggler link
@@ -368,14 +343,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	        else {
 	            // make a value holder element
-	            var value = this.isUrl ? createElement('a') : createElement('span');
+	            var value = this.isUrl ? helpers_ts_1.createElement('a') : helpers_ts_1.createElement('span');
 	            // add type and other type related CSS classes
-	            value.classList.add(cssClass(this.type));
+	            value.classList.add(helpers_ts_1.cssClass(this.type));
 	            if (this.isDate) {
-	                value.classList.add(cssClass('date'));
+	                value.classList.add(helpers_ts_1.cssClass('date'));
 	            }
 	            if (this.isUrl) {
-	                value.classList.add(cssClass('url'));
+	                value.classList.add(helpers_ts_1.cssClass('url'));
 	                value.setAttribute('href', this.json);
 	            }
 	            // Append value content to value element
@@ -386,28 +361,28 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	        // if hover preview is enabled, append the inline preview element
 	        if (this.isObject && this.config.hoverPreviewEnabled) {
-	            var preview = createElement('span', 'preview-text');
+	            var preview = helpers_ts_1.createElement('span', 'preview-text');
 	            preview.appendChild(document.createTextNode(this.getInlinepreview()));
 	            togglerLink.appendChild(preview);
 	        }
 	        // construct a children element
-	        var children = createElement('div', 'children');
+	        var children = helpers_ts_1.createElement('div', 'children');
 	        // set CSS classes for children
 	        if (this.isObject) {
-	            children.classList.add(cssClass('object'));
+	            children.classList.add(helpers_ts_1.cssClass('object'));
 	        }
 	        if (this.isArray) {
-	            children.classList.add(cssClass('array'));
+	            children.classList.add(helpers_ts_1.cssClass('array'));
 	        }
 	        if (this.isEmpty) {
-	            children.classList.add(cssClass('empty'));
+	            children.classList.add(helpers_ts_1.cssClass('empty'));
 	        }
 	        // set CSS classes for root element
 	        if (this.config && this.config.theme) {
-	            this.element.classList.add(cssClass(this.config.theme));
+	            this.element.classList.add(helpers_ts_1.cssClass(this.config.theme));
 	        }
 	        if (this.isOpen) {
-	            this.element.classList.add(cssClass('open'));
+	            this.element.classList.add(helpers_ts_1.cssClass('open'));
 	        }
 	        // append toggler and children elements to root element
 	        this.element.appendChild(togglerLink);
@@ -427,7 +402,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    JSONFormatter.prototype.appendChildern = function (animated) {
 	        var _this = this;
 	        if (animated === void 0) { animated = false; }
-	        var children = this.element.querySelector("div." + cssClass('children'));
+	        var children = this.element.querySelector("div." + helpers_ts_1.cssClass('children'));
 	        if (!children) {
 	            return;
 	        }
@@ -464,7 +439,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    */
 	    JSONFormatter.prototype.removeChildren = function (animated) {
 	        if (animated === void 0) { animated = false; }
-	        var childrenElement = this.element.querySelector("div." + cssClass('children'));
+	        var childrenElement = this.element.querySelector("div." + helpers_ts_1.cssClass('children'));
 	        if (animated) {
 	            var childrenRemoved_1 = 0;
 	            var removeAChild_1 = function () {
@@ -843,23 +818,15 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 6 */
 /***/ function(module, exports) {
 
-	'use strict';
+	"use strict";
 	/*
 	 * Escapes `"` charachters from string
-	 *
-	 * @param {string} str
-	 * @returns {string}
 	*/
 	function escapeString(str) {
 	    return str.replace('"', '\"');
 	}
 	/*
 	 * Determines if a value is an object
-	 *
-	 * @param {any} value
-	 *
-	 * @returns {boolean}
-	 *
 	*/
 	function isObject(value) {
 	    var type = typeof value;
@@ -869,10 +836,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	/*
 	 * Gets constructor name of an object.
 	 * From http://stackoverflow.com/a/332429
-	 *
-	 * @param {object} object
-	 *
-	 * @returns {string}
 	 *
 	*/
 	function getObjectName(object) {
@@ -897,10 +860,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.getObjectName = getObjectName;
 	/*
 	 * Gets type of an object. Returns "null" for null objects
-	 *
-	 * @param {object} object
-	 *
-	 * @returns {string}
 	*/
 	function getType(object) {
 	    if (object === null) {
@@ -911,10 +870,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.getType = getType;
 	/*
 	 * Generates inline preview for a JavaScript object based on a value
-	 * @param {object} object
-	 * @param {string} value
-	 *
-	 * @returns {string}
 	*/
 	function getValuePreview(object, value) {
 	    var type = getType(object);
@@ -935,9 +890,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.getValuePreview = getValuePreview;
 	/*
 	 * Generates inline preview for a JavaScript object
-	 * @param {object} object
-	 *
-	 * @returns {string}
 	*/
 	function getPreview(object) {
 	    var value = '';
@@ -952,6 +904,33 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return value;
 	}
 	exports.getPreview = getPreview;
+	/*
+	 * Generates a prefixed CSS class name
+	*/
+	function cssClass(className) {
+	    return "json-formatter-" + className;
+	}
+	exports.cssClass = cssClass;
+	/*
+	  * Creates a new DOM element wiht given type and class
+	  * TODO: move me to helpers
+	*/
+	function createElement(type, className, content) {
+	    var el = document.createElement(type);
+	    if (className) {
+	        el.classList.add(cssClass(className));
+	    }
+	    if (content) {
+	        if (content instanceof Node) {
+	            el.appendChild(content);
+	        }
+	        else {
+	            el.appendChild(document.createTextNode(String(content)));
+	        }
+	    }
+	    return el;
+	}
+	exports.createElement = createElement;
 
 
 /***/ }

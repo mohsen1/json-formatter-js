@@ -1,5 +1,3 @@
-'use strict';
-
 import './style.less';
 
 import {
@@ -7,7 +5,9 @@ import {
   getObjectName,
   getType,
   getValuePreview,
-  getPreview
+  getPreview,
+  cssClass,
+  createElement
 } from './helpers.ts';
 
 
@@ -19,32 +19,6 @@ const JSON_DATE_REGEX = /\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{3}Z/;
 const MAX_ANIMATED_TOGGLE_ITEMS = 10;
 
 const requestAnimationFrame = window.requestAnimationFrame || function(cb: ()=>void) { cb(); return 0; };
-
-/*
- * Generates a prefixed CSS class name
-*/
-function cssClass(className:string): string {
-  return `json-formatter-${className}`;
-}
-
-/*
-  * Creates a new DOM element wiht given type and class
-  * TODO: move me to helpers
-*/
-function createElement(type: string, className?: string, content?: Element|string): Element {
-  const el = document.createElement(type);
-  if (className) {
-    el.classList.add(cssClass(className));
-  }
-  if (content) {
-    if (content instanceof Node) {
-      el.appendChild(content);
-    } else {
-      el.appendChild(document.createTextNode(String(content)));
-    }
-  }
-  return el;
-}
 
 interface JSONFormatterConfiguration {
   hoverPreviewEnabled: boolean;

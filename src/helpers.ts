@@ -1,24 +1,14 @@
-'use strict';
-
 /*
  * Escapes `"` charachters from string
- *
- * @param {string} str
- * @returns {string}
 */
-function escapeString(str) {
+function escapeString(str: string): string {
   return str.replace('"', '\"');
 }
 
 /*
  * Determines if a value is an object
- *
- * @param {any} value
- *
- * @returns {boolean}
- *
 */
-export function isObject(value) {
+export function isObject(value: any): boolean {
   var type = typeof value;
   return !!value && (type == 'object');
 }
@@ -27,12 +17,8 @@ export function isObject(value) {
  * Gets constructor name of an object.
  * From http://stackoverflow.com/a/332429
  *
- * @param {object} object
- *
- * @returns {string}
- *
 */
-export function getObjectName(object) {
+export function getObjectName(object: Object):string {
   if (object === undefined) {
     return '';
   }
@@ -54,24 +40,16 @@ export function getObjectName(object) {
 
 /*
  * Gets type of an object. Returns "null" for null objects
- *
- * @param {object} object
- *
- * @returns {string}
 */
-export function getType(object) {
+export function getType(object: Object): string {
   if (object === null) { return 'null'; }
   return typeof object;
 }
 
 /*
  * Generates inline preview for a JavaScript object based on a value
- * @param {object} object
- * @param {string} value
- *
- * @returns {string}
 */
-export function getValuePreview (object, value) {
+export function getValuePreview (object: Object, value: string): string {
   var type = getType(object);
 
   if (type === 'null' || type === 'undefined') { return type; }
@@ -91,11 +69,8 @@ export function getValuePreview (object, value) {
 
 /*
  * Generates inline preview for a JavaScript object
- * @param {object} object
- *
- * @returns {string}
 */
-export function getPreview(object) {
+export function getPreview(object: string): string {
   let value = '';
   if (isObject(object)) {
     value = getObjectName(object);
@@ -105,4 +80,30 @@ export function getPreview(object) {
     value = getValuePreview(object, object);
   }
   return value;
+}
+
+/*
+ * Generates a prefixed CSS class name
+*/
+export function cssClass(className:string): string {
+  return `json-formatter-${className}`;
+}
+
+/*
+  * Creates a new DOM element wiht given type and class
+  * TODO: move me to helpers
+*/
+export function createElement(type: string, className?: string, content?: Element|string): Element {
+  const el = document.createElement(type);
+  if (className) {
+    el.classList.add(cssClass(className));
+  }
+  if (content) {
+    if (content instanceof Node) {
+      el.appendChild(content);
+    } else {
+      el.appendChild(document.createTextNode(String(content)));
+    }
+  }
+  return el;
 }
