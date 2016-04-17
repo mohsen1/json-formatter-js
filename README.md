@@ -53,6 +53,15 @@ Available configurations:
  * `theme`: a string that can be any of these options: `['dark']`. Look at [`src/style.less`](src/style.less) for making new themes.
 
 ### Development
+Install the dependencies:
+
+```
+npm install
+```
+
+Run the dev server
+
+
 Install `gulp` and run `gulp serve` to start the server that serves the development version of the project.
 
 #### Running tests

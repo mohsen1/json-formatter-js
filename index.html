@@ -1,7 +1,6 @@
 <html>
   <head>
     <script src="../dist/bundle.js"></script>
-    <link rel="stylesheet" href="../dist/style.css">
     <style type="text/css">
     .result  h3 + div {
       padding: 10px;
@@ -61,7 +60,7 @@
         result.appendChild(el);
       });
 
-      fetch('giant.json').then(function(resp) {
+      fetch('demo/giant.json').then(function(resp) {
         resp.json().then(function(giant) {
           var giantFormatter = new JSONFormatter(giant, 2, {hoverPreviewEnabled: true});
           var title = document.createElement('h3');

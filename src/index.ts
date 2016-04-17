@@ -6,11 +6,35 @@ import {
   getType,
   getValuePreview,
   getPreview
-} from './helpers.js';
+} from './helpers.ts';
+
+declare var require;
+const style = require('./style.less');
+
+console.log(style);
 
 const DATE_STRING_REGEX = /(^\d{1,4}[\.|\\/|-]\d{1,2}[\.|\\/|-]\d{1,4})(\s*(?:0?[1-9]:[0-5]|1(?=[012])\d:[0-5])\d\s*[ap]m)?$/;
 const PARTIAL_DATE_REGEX = /\d{2}:\d{2}:\d{2} GMT-\d{4}/;
 const JSON_DATE_REGEX = /\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{3}Z/;
+
+/*
+  * Creates a new DOM element wiht given type and class
+  * TODO: move me to helpers
+*/
+function createElement(type: string, className?: string, content?: Element|string): Element {
+  const el = document.createElement(type);
+  if (className) {
+    el.classList.add(className);
+  }
+  if (content) {
+    if (content instanceof Node) {
+      el.appendChild(content);
+    } else {
+      el.appendChild(document.createTextNode(String(content)));
+    }
+  }
+  return el;
+}
 
 /**
  * @class JSONFormatter
@@ -18,7 +42,22 @@ const JSON_DATE_REGEX = /\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{3}Z/;
  * JSONFormatter allows you to render JSON objects in HTML with a
  * **collapsible** navigation.
 */
-export default class JSONFormatter {
+export = class JSONFormatter {
+  private key;
+  private keys;
+  private config;
+
+  private type;
+  private hasKey;
+  private isOpen;
+  private isDate;
+  private isUrl;
+  private isArray;
+  private isObject;
+  private isEmptyObject;
+  private isEmpty;
+  private constructorName;
+  private element: Element;
 
   /**
    * @param {object} json The JSON object you want to render. It has to be an
@@ -48,8 +87,7 @@ export default class JSONFormatter {
    * @param {string} [key=undefined] The key that this object in it's parent
    * context
   */
-  constructor(json, open, config, key) {
-    this.json = json;
+  constructor(public json: any, private open, config, key: string) {
     this.key = key;
     this.open = open === undefined ? 1 : open;
     this.config = config || {};
@@ -99,12 +137,10 @@ export default class JSONFormatter {
     }
 
     this.isEmptyObject = !this.keys.length && this.isOpen && !this.isArray;
-    this.onstructorName = getObjectName(this.json);
+    this.constructorName = getObjectName(this.json);
     this.isEmpty = this.isEmptyObject || (this.keys &&
       !this.keys.length &&
       this.isArray);
-
-    this.getValuePreview = getValuePreview;
   }
 
 
@@ -158,106 +194,68 @@ export default class JSONFormatter {
     }
   }
 
-  /**
-   * Generates HTML string  for this JSON based on the template
-   *
-   * @returns {string}
-  */
-  template() {
-
-    /*
-     * if condition for ES6 template strings
-     * to be used only in template string
-     *
-     * @example mystr = `Random is ${_if(Math.random() > 0.5)`greater than 0.5``
-     *
-     * @param {boolean} condition
-     *
-     * @returns {function} the template function
-    */
-    function _if(condition) {
-      return condition ? normal : empty;
-    }
-    function empty(){
-      return '';
-    }
-    function normal (template, ...expressions) {
-      return template.slice(1).reduce((accumulator, part, i) => {
-        return accumulator + expressions[i] + part;
-      }, template[0]);
-    }
-
-    const templateString = `
-      <a class="toggler-link">
-        ${_if(this.isObject)`
-          <span class="toggler"></span>
-        `}
-
-        ${_if(this.hasKey)`
-          <span class="key">${this.key}:</span>
-        `}
-
-        <span class="value">
-
-          ${_if(this.isObject)`
-            <span>
-              <span class="constructor-name">${this.onstructorName}</span>
-
-              ${_if(this.isArray)`
-                <span><span class="bracket">[</span><span class="number">${
-                  this.json && this.json.length
-                }</span><span class="bracket">]</span></span>
-              `}
-
-            </span>
-          `}
-
-          ${_if(!this.isObject)`
-
-            <${this.isUrl ? 'a' : 'span'}
-              class="${
-                this.type
-              } ${
-                _if(this.isDate)`date`
-              } ${
-                _if(this.isUrl)`url`
-              }"
-              ${_if(this.isUrl)`href="${this.json}"`}
-            >${this.getValuePreview(this.json, this.json)}</${
-              this.isUrl ? 'a' : 'span'
-            }>
-
-          `}
-
-        </span>
-
-        ${_if(this.config.hoverPreviewEnabled && this.isObject)`
-          <span class="preview-text">${this.getInlinepreview()}</span>
-        `}
-      </a>
-
-      <div class="children ${
-        _if(this.isObject)`object`
-      } ${
-        _if(this.isArray)`array`
-      } ${
-        _if(this.isEmpty)`empty`
-      }"></div>
-    `;
-
-    return templateString.replace(/\s*\n/g, '\n'); // clean up empty lines
-  }
 
   /**
    * Renders an HTML element and installs event listeners
    *
    * @returns {HTMLDivElement}
   */
-  render() {
-    const resultHTML = this.template();
+  render(): HTMLDivElement {
 
-    this.element = document.createElement('div');
-    this.element.classList.add('json-formatter-row');
+    this.element = createElement('div', 'json-formatter-row');
+    const togglerLink = createElement('a', 'toggler-link');
+
+    if (this.isObject) {
+      togglerLink.appendChild(createElement('span', 'toggler'));
+    }
+
+    if (this.hasKey) {
+      togglerLink.appendChild(createElement('span', 'key', `${this.key}:`));
+    }
+
+    const value = createElement('span', 'value');
+    if (this.isObject) {
+      const wrapperSpan = createElement('span');
+
+      var constructorName = createElement('span', 'constructor-name', this.constructorName);
+      wrapperSpan.appendChild(constructorName);
+
+      if (this.isArray) {
+        const arrayWrapperSpan = createElement('span');
+        arrayWrapperSpan.appendChild(createElement('span', 'bracket', '['));
+        arrayWrapperSpan.appendChild(createElement('span', 'number', (this.json.length)));
+        arrayWrapperSpan.appendChild(createElement('span', 'bracket', ']'));
+        wrapperSpan.appendChild(arrayWrapperSpan);
+      }
+
+      value.appendChild(wrapperSpan);
+
+      if (this.isObject) {
+        const value = this.isUrl ? createElement('a') : createElement('span');
+        value.classList.add(this.type);
+        if (this.isDate) {
+          value.classList.add('date');
+        }
+        if (this.isUrl) {
+          value.classList.add('url');
+          value.setAttribute('href', this.json);
+        }
+
+      }
+
+    }
+    togglerLink.appendChild(value);
+
+    const children = createElement('div', 'children');
+    if (this.isObject) {
+      children.classList.add('object');
+    }
+    if (this.isArray) {
+      children.classList.add('array');
+    }
+    if (this.isEmpty) {
+      children.classList.add('empty');
+    }
 
     if (this.config && this.config.theme) {
       this.element.classList.add(`json-formatter-${this.config.theme}`);
@@ -267,7 +265,8 @@ export default class JSONFormatter {
       this.element.classList.add('open');
     }
 
-    this.element.innerHTML = resultHTML;
+    this.element.appendChild(togglerLink);
+    this.element.appendChild(children);
 
     if (this.isObject && this.isOpen) {
       this.appendChildern();
@@ -277,7 +276,7 @@ export default class JSONFormatter {
     this.element.querySelector('a.toggler-link')
       .addEventListener('click', this.toggleOpen.bind(this));
 
-    return this.element;
+    return this.element as HTMLDivElement;
   }
 
   /**
@@ -307,15 +306,3 @@ export default class JSONFormatter {
     }
   }
 }
-
- /*
-  * Almost َUMD!
-  *
-  * Browserify "standalone" is not playing well with TypeScript `export default`
- */
- declare var module: any;
- if (typeof module !== 'undefined') {
-   module.exports = JSONFormatter;
- } else if (typeof window !== 'undefined') {
-   window.JSONFormatter = JSONFormatter;
- }
