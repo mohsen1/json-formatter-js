@@ -62,11 +62,17 @@ return /******/ (function(modules) { // webpackBootstrap
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
-	var helpers_ts_1 = __webpack_require__(2);
-	var style = __webpack_require__(3);
+	__webpack_require__(2);
+	var helpers_ts_1 = __webpack_require__(6);
 	var DATE_STRING_REGEX = /(^\d{1,4}[\.|\\/|-]\d{1,2}[\.|\\/|-]\d{1,4})(\s*(?:0?[1-9]:[0-5]|1(?=[012])\d:[0-5])\d\s*[ap]m)?$/;
 	var PARTIAL_DATE_REGEX = /\d{2}:\d{2}:\d{2} GMT-\d{4}/;
 	var JSON_DATE_REGEX = /\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{3}Z/;
+	/*
+	 * Generates a prefixed CSS class name
+	*/
+	function cssClass(className) {
+	    return "json-formatter-" + className;
+	}
 	/*
 	  * Creates a new DOM element wiht given type and class
 	  * TODO: move me to helpers
@@ -74,7 +80,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	function createElement(type, className, content) {
 	    var el = document.createElement(type);
 	    if (className) {
-	        el.classList.add(className);
+	        el.classList.add(cssClass(className));
 	    }
 	    if (content) {
 	        if (content instanceof Node) {
@@ -176,7 +182,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            this.removeChildren();
 	        }
 	        if (this.element) {
-	            this.element.classList.toggle('open');
+	            this.element.classList.toggle(cssClass('open'));
 	        }
 	    };
 	    /**
@@ -212,7 +218,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	     * @returns {HTMLDivElement}
 	    */
 	    JSONFormatter.prototype.render = function () {
-	        this.element = createElement('div', 'json-formatter-row');
+	        this.element = createElement('div', 'row');
 	        var togglerLink = createElement('a', 'toggler-link');
 	        if (this.isObject) {
 	            togglerLink.appendChild(createElement('span', 'toggler'));
@@ -233,34 +239,37 @@ return /******/ (function(modules) { // webpackBootstrap
 	                wrapperSpan.appendChild(arrayWrapperSpan);
 	            }
 	            value.appendChild(wrapperSpan);
-	            if (this.isObject) {
-	                var value_1 = this.isUrl ? createElement('a') : createElement('span');
-	                value_1.classList.add(this.type);
-	                if (this.isDate) {
-	                    value_1.classList.add('date');
-	                }
-	                if (this.isUrl) {
-	                    value_1.classList.add('url');
-	                    value_1.setAttribute('href', this.json);
-	                }
-	            }
+	            togglerLink.appendChild(value);
 	        }
-	        togglerLink.appendChild(value);
+	        else {
+	            var value_1 = this.isUrl ? createElement('a') : createElement('span');
+	            value_1.classList.add(cssClass(this.type));
+	            if (this.isDate) {
+	                value_1.classList.add(cssClass('date'));
+	            }
+	            if (this.isUrl) {
+	                value_1.classList.add(cssClass('url'));
+	                value_1.setAttribute('href', this.json);
+	            }
+	            var valuePreview = helpers_ts_1.getValuePreview(this.json, this.json);
+	            value_1.appendChild(document.createTextNode(valuePreview));
+	            togglerLink.appendChild(value_1);
+	        }
 	        var children = createElement('div', 'children');
 	        if (this.isObject) {
-	            children.classList.add('object');
+	            children.classList.add(cssClass('object'));
 	        }
 	        if (this.isArray) {
-	            children.classList.add('array');
+	            children.classList.add(cssClass('array'));
 	        }
 	        if (this.isEmpty) {
-	            children.classList.add('empty');
+	            children.classList.add(cssClass('empty'));
 	        }
 	        if (this.config && this.config.theme) {
-	            this.element.classList.add("json-formatter-" + this.config.theme);
+	            this.element.classList.add(cssClass(this.config.theme));
 	        }
 	        if (this.isOpen) {
-	            this.element.classList.add('open');
+	            this.element.classList.add(cssClass('open'));
 	        }
 	        this.element.appendChild(togglerLink);
 	        this.element.appendChild(children);
@@ -268,7 +277,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            this.appendChildern();
 	        }
 	        // add event listener for toggling
-	        this.element.querySelector('a.toggler-link')
+	        this.element.querySelector("a." + cssClass('toggler-link'))
 	            .addEventListener('click', this.toggleOpen.bind(this));
 	        return this.element;
 	    };
@@ -278,7 +287,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    */
 	    JSONFormatter.prototype.appendChildern = function () {
 	        var _this = this;
-	        var children = this.element.querySelector('div.children');
+	        var children = this.element.querySelector("div." + cssClass('children'));
 	        if (!children) {
 	            return;
 	        }
@@ -292,8 +301,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	     *
 	    */
 	    JSONFormatter.prototype.removeChildren = function () {
-	        if (this.element.querySelector('div.children')) {
-	            this.element.querySelector('div.children').innerHTML = '';
+	        var children = this.element.querySelector("div." + cssClass('children'));
+	        if (children) {
+	            // TOOD: do not use innerHTML
+	            children.innerHTML = '';
 	        }
 	    };
 	    return JSONFormatter;
@@ -302,130 +313,15 @@ return /******/ (function(modules) { // webpackBootstrap
 
 /***/ },
 /* 2 */
-/***/ function(module, exports) {
-
-	'use strict';
-	/*
-	 * Escapes `"` charachters from string
-	 *
-	 * @param {string} str
-	 * @returns {string}
-	*/
-	function escapeString(str) {
-	    return str.replace('"', '\"');
-	}
-	/*
-	 * Determines if a value is an object
-	 *
-	 * @param {any} value
-	 *
-	 * @returns {boolean}
-	 *
-	*/
-	function isObject(value) {
-	    var type = typeof value;
-	    return !!value && (type == 'object');
-	}
-	exports.isObject = isObject;
-	/*
-	 * Gets constructor name of an object.
-	 * From http://stackoverflow.com/a/332429
-	 *
-	 * @param {object} object
-	 *
-	 * @returns {string}
-	 *
-	*/
-	function getObjectName(object) {
-	    if (object === undefined) {
-	        return '';
-	    }
-	    if (object === null) {
-	        return 'Object';
-	    }
-	    if (typeof object === 'object' && !object.constructor) {
-	        return 'Object';
-	    }
-	    var funcNameRegex = /function (.{1,})\(/;
-	    var results = (funcNameRegex).exec((object).constructor.toString());
-	    if (results && results.length > 1) {
-	        return results[1];
-	    }
-	    else {
-	        return '';
-	    }
-	}
-	exports.getObjectName = getObjectName;
-	/*
-	 * Gets type of an object. Returns "null" for null objects
-	 *
-	 * @param {object} object
-	 *
-	 * @returns {string}
-	*/
-	function getType(object) {
-	    if (object === null) {
-	        return 'null';
-	    }
-	    return typeof object;
-	}
-	exports.getType = getType;
-	/*
-	 * Generates inline preview for a JavaScript object based on a value
-	 * @param {object} object
-	 * @param {string} value
-	 *
-	 * @returns {string}
-	*/
-	function getValuePreview(object, value) {
-	    var type = getType(object);
-	    if (type === 'null' || type === 'undefined') {
-	        return type;
-	    }
-	    if (type === 'string') {
-	        value = '"' + escapeString(value) + '"';
-	    }
-	    if (type === 'function') {
-	        // Remove content of the function
-	        return object.toString()
-	            .replace(/[\r\n]/g, '')
-	            .replace(/\{.*\}/, '') + '{…}';
-	    }
-	    return value;
-	}
-	exports.getValuePreview = getValuePreview;
-	/*
-	 * Generates inline preview for a JavaScript object
-	 * @param {object} object
-	 *
-	 * @returns {string}
-	*/
-	function getPreview(object) {
-	    var value = '';
-	    if (isObject(object)) {
-	        value = getObjectName(object);
-	        if (Array.isArray(object))
-	            value += '[' + object.length + ']';
-	    }
-	    else {
-	        value = getValuePreview(object, object);
-	    }
-	    return value;
-	}
-	exports.getPreview = getPreview;
-
-
-/***/ },
-/* 3 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// style-loader: Adds some css to the DOM by adding a <style> tag
 	
 	// load the styles
-	var content = __webpack_require__(4);
+	var content = __webpack_require__(3);
 	if(typeof content === 'string') content = [[module.id, content, '']];
 	// add the styles to the DOM
-	var update = __webpack_require__(6)(content, {"sourceMap":true});
+	var update = __webpack_require__(5)(content, {"sourceMap":true});
 	if(content.locals) module.exports = content.locals;
 	// Hot Module Replacement
 	if(false) {
@@ -442,21 +338,21 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 /***/ },
-/* 4 */
+/* 3 */
 /***/ function(module, exports, __webpack_require__) {
 
-	exports = module.exports = __webpack_require__(5)();
+	exports = module.exports = __webpack_require__(4)();
 	// imports
 	
 	
 	// module
-	exports.push([module.id, ".json-formatter-row {\n  font-family: monospace;\n}\n.json-formatter-row,\n.json-formatter-row a,\n.json-formatter-row a:hover {\n  color: black;\n  text-decoration: none;\n}\n.json-formatter-row .json-formatter-row {\n  margin-left: 1rem;\n}\n.json-formatter-row .children.empty {\n  opacity: 0.5;\n  margin-left: 1rem;\n}\n.json-formatter-row .children.empty:after {\n  display: none;\n}\n.json-formatter-row .children.empty.object:after {\n  content: \"No properties\";\n}\n.json-formatter-row .children.empty.array:after {\n  content: \"[]\";\n}\n.json-formatter-row .string {\n  color: green;\n  white-space: pre;\n  word-wrap: break-word;\n}\n.json-formatter-row .number {\n  color: blue;\n}\n.json-formatter-row .boolean {\n  color: red;\n}\n.json-formatter-row .null {\n  color: #855A00;\n}\n.json-formatter-row .undefined {\n  color: #ca0b69;\n}\n.json-formatter-row .function {\n  color: #FF20ED;\n}\n.json-formatter-row .date {\n  background-color: rgba(0, 0, 0, 0.05);\n}\n.json-formatter-row .url {\n  text-decoration: underline;\n  color: blue;\n  cursor: pointer;\n}\n.json-formatter-row .bracket {\n  color: blue;\n}\n.json-formatter-row .key {\n  color: #00008B;\n  cursor: pointer;\n}\n.json-formatter-row .constructor-name {\n  cursor: pointer;\n}\n.json-formatter-row .toggler {\n  line-height: 1.2rem;\n  font-size: 0.8em;\n  vertical-align: middle;\n  opacity: 0.6;\n  cursor: pointer;\n}\n.json-formatter-row .toggler:after {\n  display: inline-block;\n  transition: transform 100ms ease-in;\n  content: \"\\25BA\";\n}\n.json-formatter-row > a > .preview-text {\n  opacity: 0;\n  transition: opacity 0.15s ease-in;\n  font-style: italic;\n}\n.json-formatter-row:hover > a > .preview-text {\n  opacity: 0.6;\n}\n.json-formatter-row.open > .toggler-link .toggler:after {\n  transform: rotate(90deg);\n}\n.json-formatter-row.open > .children:after {\n  display: inline-block;\n}\n.json-formatter-row.open > a > .preview-text {\n  display: none;\n}\n.json-formatter-dark.json-formatter-row {\n  font-family: monospace;\n}\n.json-formatter-dark.json-formatter-row,\n.json-formatter-dark.json-formatter-row a,\n.json-formatter-dark.json-formatter-row a:hover {\n  color: white;\n  text-decoration: none;\n}\n.json-formatter-dark.json-formatter-row .json-formatter-row {\n  margin-left: 1rem;\n}\n.json-formatter-dark.json-formatter-row .children.empty {\n  opacity: 0.5;\n  margin-left: 1rem;\n}\n.json-formatter-dark.json-formatter-row .children.empty:after {\n  display: none;\n}\n.json-formatter-dark.json-formatter-row .children.empty.object:after {\n  content: \"No properties\";\n}\n.json-formatter-dark.json-formatter-row .children.empty.array:after {\n  content: \"[]\";\n}\n.json-formatter-dark.json-formatter-row .string {\n  color: #31F031;\n  white-space: pre;\n  word-wrap: break-word;\n}\n.json-formatter-dark.json-formatter-row .number {\n  color: #66C2FF;\n}\n.json-formatter-dark.json-formatter-row .boolean {\n  color: #EC4242;\n}\n.json-formatter-dark.json-formatter-row .null {\n  color: #EEC97D;\n}\n.json-formatter-dark.json-formatter-row .undefined {\n  color: #ef8fbe;\n}\n.json-formatter-dark.json-formatter-row .function {\n  color: #FD48CB;\n}\n.json-formatter-dark.json-formatter-row .date {\n  background-color: rgba(255, 255, 255, 0.05);\n}\n.json-formatter-dark.json-formatter-row .url {\n  text-decoration: underline;\n  color: #027BFF;\n  cursor: pointer;\n}\n.json-formatter-dark.json-formatter-row .bracket {\n  color: #9494FF;\n}\n.json-formatter-dark.json-formatter-row .key {\n  color: #23A0DB;\n  cursor: pointer;\n}\n.json-formatter-dark.json-formatter-row .constructor-name {\n  cursor: pointer;\n}\n.json-formatter-dark.json-formatter-row .toggler {\n  line-height: 1.2rem;\n  font-size: 0.8em;\n  vertical-align: middle;\n  opacity: 0.6;\n  cursor: pointer;\n}\n.json-formatter-dark.json-formatter-row .toggler:after {\n  display: inline-block;\n  transition: transform 100ms ease-in;\n  content: \"\\25BA\";\n}\n.json-formatter-dark.json-formatter-row > a > .preview-text {\n  opacity: 0;\n  transition: opacity 0.15s ease-in;\n  font-style: italic;\n}\n.json-formatter-dark.json-formatter-row:hover > a > .preview-text {\n  opacity: 0.6;\n}\n.json-formatter-dark.json-formatter-row.open > .toggler-link .toggler:after {\n  transform: rotate(90deg);\n}\n.json-formatter-dark.json-formatter-row.open > .children:after {\n  display: inline-block;\n}\n.json-formatter-dark.json-formatter-row.open > a > .preview-text {\n  display: none;\n}\n", "", {"version":3,"sources":["/./src/style.less","/./src/style.less"],"names":[],"mappings":"AAqGA;EAtFE,uBAAA;CCbD;ADcC;;;EACE,aAAA;EACA,sBAAA;CCVH;AD6FD;EA/EI,kBAAA;CCXH;ADeG;EACE,aAAA;EACA,kBAAA;CCbL;ADeK;EAAU,cAAA;CCZf;ADaK;EAAiB,yBAAA;CCVtB;ADWK;EAAgB,cAAA;CCRrB;AD6ED;EAhEI,aAAA;EACA,iBAAA;EACA,sBAAA;CCVH;ADwED;EA5DY,YAAA;CCTX;ADqED;EA3Da,WAAA;CCPZ;ADkED;EA1DU,eAAA;CCLT;AD+DD;EAzDe,eAAA;CCHd;AD4DD;EAxDc,eAAA;CCDb;ADyDD;EAvDU,sCAAA;CCCT;ADsDD;EArDI,2BAAA;EACA,YAAA;EACA,gBAAA;CCEH;ADiDD;EAhDa,YAAA;CCEZ;AD8CD;EA9CI,eAAA;EACA,gBAAA;CCGH;AD0CD;EA1CI,gBAAA;CCGH;ADuCD;EAtCI,oBAAA;EACA,iBAAA;EACA,uBAAA;EACA,aAAA;EACA,gBAAA;CCEH;ADAG;EACE,sBAAA;EACA,oCAAA;EACA,iBAAA;CCEL;AD2BD;EAvBI,WAAA;EACA,kCAAA;EACA,mBAAA;CCDH;ADGC;EACE,aAAA;CCDH;ADKC;EAEI,yBAAA;CCJL;ADEC;EAKI,sBAAA;CCJL;ADDC;EAQI,cAAA;CCJL;ADeD;EA3FE,uBAAA;CC+ED;AD9EC;;;EACE,aAAA;EACA,sBAAA;CCkFH;ADMD;EApFI,kBAAA;CCiFH;AD7EG;EACE,aAAA;EACA,kBAAA;CC+EL;AD7EK;EAAU,cAAA;CCgFf;AD/EK;EAAiB,yBAAA;CCkFtB;ADjFK;EAAgB,cAAA;CCoFrB;ADVD;EArEI,eAAA;EACA,iBAAA;EACA,sBAAA;CCkFH;ADfD;EAjEY,eAAA;CCmFX;ADlBD;EAhEa,eAAA;CCqFZ;ADrBD;EA/DU,eAAA;CCuFT;ADxBD;EA9De,eAAA;CCyFd;AD3BD;EA7Dc,eAAA;CC2Fb;AD9BD;EA5DU,4CAAA;CC6FT;ADjCD;EA1DI,2BAAA;EACA,eAAA;EACA,gBAAA;CC8FH;ADtCD;EArDa,eAAA;CC8FZ;ADzCD;EAnDI,eAAA;EACA,gBAAA;CC+FH;AD7CD;EA/CI,gBAAA;CC+FH;ADhDD;EA3CI,oBAAA;EACA,iBAAA;EACA,uBAAA;EACA,aAAA;EACA,gBAAA;CC8FH;AD5FG;EACE,sBAAA;EACA,oCAAA;EACA,iBAAA;CC8FL;AD5DD;EA5BI,WAAA;EACA,kCAAA;EACA,mBAAA;CC2FH;ADzFC;EACE,aAAA;CC2FH;ADvFC;EAEI,yBAAA;CCwFL;AD1FC;EAKI,sBAAA;CCwFL;AD7FC;EAQI,cAAA;CCwFL","file":"style.less","sourcesContent":[".theme(\n  @default-color: black,\n  @string-color: green,\n  @number-color: blue,\n  @boolean-color: red,\n  @null-color: #855A00,\n  @undefined-color: rgb(202, 11, 105),\n  @function-color: #FF20ED,\n  @rotate-time: 100ms,\n  @toggler-opacity: 0.6,\n  @toggler-color: #45376F,\n  @bracket-color: blue,\n  @key-color: #00008B,\n  @url-color: blue ){\n\n  font-family: monospace;\n  &, a, a:hover {\n    color: @default-color;\n    text-decoration: none;\n  }\n\n  .json-formatter-row {\n    margin-left: 1rem;\n  }\n\n  .children {\n    &.empty {\n      opacity: 0.5;\n      margin-left: 1rem;\n\n      &:after { display: none; }\n      &.object:after { content: \"No properties\"; }\n      &.array:after { content: \"[]\"; }\n    }\n  }\n\n  .string {\n    color: @string-color;\n    white-space: pre;\n    word-wrap: break-word;\n  }\n  .number { color: @number-color; }\n  .boolean { color: @boolean-color; }\n  .null { color: @null-color; }\n  .undefined { color: @undefined-color; }\n  .function { color: @function-color; }\n  .date { background-color: fade(@default-color, 5%); }\n  .url {\n    text-decoration: underline;\n    color: @url-color;\n    cursor: pointer;\n  }\n\n  .bracket { color: @bracket-color; }\n  .key {\n    color: @key-color;\n    cursor: pointer;\n  }\n  .constructor-name {\n    cursor: pointer;\n  }\n\n  .toggler {\n    line-height: 1.2rem;\n    font-size: 0.8em;\n    vertical-align: middle;\n    opacity: 0.6;\n    cursor: pointer;\n\n    &:after {\n      display: inline-block;\n      transition: transform @rotate-time ease-in;\n      content: \"►\";\n    }\n  }\n\n  // Inline preview on hover (optional)\n  > a >.preview-text {\n    opacity: 0;\n    transition: opacity .15s ease-in;\n    font-style: italic;\n  }\n  &:hover > a > .preview-text {\n    opacity: 0.6;\n  }\n\n  // Open state\n  &.open {\n    > .toggler-link .toggler:after{\n      transform: rotate(90deg);\n    }\n    > .children:after {\n      display: inline-block;\n    }\n    > a >.preview-text {\n      display: none;\n    }\n  }\n}\n\n// Default theme\n.json-formatter-row {\n  .theme();\n}\n\n// Dark theme\n.json-formatter-dark.json-formatter-row {\n  .theme(\n    @default-color: white,\n    @string-color: #31F031,\n    @number-color: #66C2FF,\n    @boolean-color: #EC4242,\n    @null-color: #EEC97D,\n    @undefined-color: rgb(239, 143, 190),\n    @function-color: #FD48CB,\n    @rotate-time: 100ms,\n    @toggler-opacity: 0.6,\n    @toggler-color: #45376F,\n    @bracket-color: #9494FF,\n    @key-color: #23A0DB,\n    @url-color: #027BFF);\n}\n",".json-formatter-row {\n  font-family: monospace;\n}\n.json-formatter-row,\n.json-formatter-row a,\n.json-formatter-row a:hover {\n  color: black;\n  text-decoration: none;\n}\n.json-formatter-row .json-formatter-row {\n  margin-left: 1rem;\n}\n.json-formatter-row .children.empty {\n  opacity: 0.5;\n  margin-left: 1rem;\n}\n.json-formatter-row .children.empty:after {\n  display: none;\n}\n.json-formatter-row .children.empty.object:after {\n  content: \"No properties\";\n}\n.json-formatter-row .children.empty.array:after {\n  content: \"[]\";\n}\n.json-formatter-row .string {\n  color: green;\n  white-space: pre;\n  word-wrap: break-word;\n}\n.json-formatter-row .number {\n  color: blue;\n}\n.json-formatter-row .boolean {\n  color: red;\n}\n.json-formatter-row .null {\n  color: #855A00;\n}\n.json-formatter-row .undefined {\n  color: #ca0b69;\n}\n.json-formatter-row .function {\n  color: #FF20ED;\n}\n.json-formatter-row .date {\n  background-color: rgba(0, 0, 0, 0.05);\n}\n.json-formatter-row .url {\n  text-decoration: underline;\n  color: blue;\n  cursor: pointer;\n}\n.json-formatter-row .bracket {\n  color: blue;\n}\n.json-formatter-row .key {\n  color: #00008B;\n  cursor: pointer;\n}\n.json-formatter-row .constructor-name {\n  cursor: pointer;\n}\n.json-formatter-row .toggler {\n  line-height: 1.2rem;\n  font-size: 0.8em;\n  vertical-align: middle;\n  opacity: 0.6;\n  cursor: pointer;\n}\n.json-formatter-row .toggler:after {\n  display: inline-block;\n  transition: transform 100ms ease-in;\n  content: \"►\";\n}\n.json-formatter-row > a > .preview-text {\n  opacity: 0;\n  transition: opacity 0.15s ease-in;\n  font-style: italic;\n}\n.json-formatter-row:hover > a > .preview-text {\n  opacity: 0.6;\n}\n.json-formatter-row.open > .toggler-link .toggler:after {\n  transform: rotate(90deg);\n}\n.json-formatter-row.open > .children:after {\n  display: inline-block;\n}\n.json-formatter-row.open > a > .preview-text {\n  display: none;\n}\n.json-formatter-dark.json-formatter-row {\n  font-family: monospace;\n}\n.json-formatter-dark.json-formatter-row,\n.json-formatter-dark.json-formatter-row a,\n.json-formatter-dark.json-formatter-row a:hover {\n  color: white;\n  text-decoration: none;\n}\n.json-formatter-dark.json-formatter-row .json-formatter-row {\n  margin-left: 1rem;\n}\n.json-formatter-dark.json-formatter-row .children.empty {\n  opacity: 0.5;\n  margin-left: 1rem;\n}\n.json-formatter-dark.json-formatter-row .children.empty:after {\n  display: none;\n}\n.json-formatter-dark.json-formatter-row .children.empty.object:after {\n  content: \"No properties\";\n}\n.json-formatter-dark.json-formatter-row .children.empty.array:after {\n  content: \"[]\";\n}\n.json-formatter-dark.json-formatter-row .string {\n  color: #31F031;\n  white-space: pre;\n  word-wrap: break-word;\n}\n.json-formatter-dark.json-formatter-row .number {\n  color: #66C2FF;\n}\n.json-formatter-dark.json-formatter-row .boolean {\n  color: #EC4242;\n}\n.json-formatter-dark.json-formatter-row .null {\n  color: #EEC97D;\n}\n.json-formatter-dark.json-formatter-row .undefined {\n  color: #ef8fbe;\n}\n.json-formatter-dark.json-formatter-row .function {\n  color: #FD48CB;\n}\n.json-formatter-dark.json-formatter-row .date {\n  background-color: rgba(255, 255, 255, 0.05);\n}\n.json-formatter-dark.json-formatter-row .url {\n  text-decoration: underline;\n  color: #027BFF;\n  cursor: pointer;\n}\n.json-formatter-dark.json-formatter-row .bracket {\n  color: #9494FF;\n}\n.json-formatter-dark.json-formatter-row .key {\n  color: #23A0DB;\n  cursor: pointer;\n}\n.json-formatter-dark.json-formatter-row .constructor-name {\n  cursor: pointer;\n}\n.json-formatter-dark.json-formatter-row .toggler {\n  line-height: 1.2rem;\n  font-size: 0.8em;\n  vertical-align: middle;\n  opacity: 0.6;\n  cursor: pointer;\n}\n.json-formatter-dark.json-formatter-row .toggler:after {\n  display: inline-block;\n  transition: transform 100ms ease-in;\n  content: \"►\";\n}\n.json-formatter-dark.json-formatter-row > a > .preview-text {\n  opacity: 0;\n  transition: opacity 0.15s ease-in;\n  font-style: italic;\n}\n.json-formatter-dark.json-formatter-row:hover > a > .preview-text {\n  opacity: 0.6;\n}\n.json-formatter-dark.json-formatter-row.open > .toggler-link .toggler:after {\n  transform: rotate(90deg);\n}\n.json-formatter-dark.json-formatter-row.open > .children:after {\n  display: inline-block;\n}\n.json-formatter-dark.json-formatter-row.open > a > .preview-text {\n  display: none;\n}\n"],"sourceRoot":"webpack://"}]);
+	exports.push([module.id, ".json-formatter-row {\n  font-family: monospace;\n}\n.json-formatter-row,\n.json-formatter-row a,\n.json-formatter-row a:hover {\n  color: black;\n  text-decoration: none;\n}\n.json-formatter-row .json-formatter-row {\n  margin-left: 1rem;\n}\n.json-formatter-row .json-formatter-json-formatter-children.empty {\n  opacity: 0.5;\n  margin-left: 1rem;\n}\n.json-formatter-row .json-formatter-json-formatter-children.empty:after {\n  display: none;\n}\n.json-formatter-row .json-formatter-json-formatter-children.empty.object:after {\n  content: \"No properties\";\n}\n.json-formatter-row .json-formatter-json-formatter-children.empty.array:after {\n  content: \"[]\";\n}\n.json-formatter-row .json-formatter-string {\n  color: green;\n  white-space: pre;\n  word-wrap: break-word;\n}\n.json-formatter-row .json-formatter-number {\n  color: blue;\n}\n.json-formatter-row .json-formatter-boolean {\n  color: red;\n}\n.json-formatter-row .json-formatter-null {\n  color: #855A00;\n}\n.json-formatter-row .json-formatter-undefined {\n  color: #ca0b69;\n}\n.json-formatter-row .json-formatter-function {\n  color: #FF20ED;\n}\n.json-formatter-row .json-formatter-date {\n  background-color: rgba(0, 0, 0, 0.05);\n}\n.json-formatter-row .json-formatter-url {\n  text-decoration: underline;\n  color: blue;\n  cursor: pointer;\n}\n.json-formatter-row .json-formatter-bracket {\n  color: blue;\n}\n.json-formatter-row .json-formatter-key {\n  color: #00008B;\n  cursor: pointer;\n}\n.json-formatter-row .json-formatter-constructor-name {\n  cursor: pointer;\n}\n.json-formatter-row .json-formatter-toggler {\n  line-height: 1.2rem;\n  font-size: 0.8em;\n  vertical-align: middle;\n  opacity: 0.6;\n  cursor: pointer;\n}\n.json-formatter-row .json-formatter-toggler:after {\n  display: inline-block;\n  transition: transform 100ms ease-in;\n  content: \"\\25BA\";\n}\n.json-formatter-row > a > .json-formatter-preview-text {\n  opacity: 0;\n  transition: opacity 0.15s ease-in;\n  font-style: italic;\n}\n.json-formatter-row:hover > a > .json-formatter-preview-text {\n  opacity: 0.6;\n}\n.json-formatter-row.json-formatter-open > .json-formatter-toggler-link .json-formatter-toggler:after {\n  transform: rotate(90deg);\n}\n.json-formatter-row.json-formatter-open > .json-formatter-children:after {\n  display: inline-block;\n}\n.json-formatter-row.json-formatter-open > a > .json-formatter-preview-text {\n  display: none;\n}\n.json-formatter-dark.json-formatter-row {\n  font-family: monospace;\n}\n.json-formatter-dark.json-formatter-row,\n.json-formatter-dark.json-formatter-row a,\n.json-formatter-dark.json-formatter-row a:hover {\n  color: white;\n  text-decoration: none;\n}\n.json-formatter-dark.json-formatter-row .json-formatter-row {\n  margin-left: 1rem;\n}\n.json-formatter-dark.json-formatter-row .json-formatter-json-formatter-children.empty {\n  opacity: 0.5;\n  margin-left: 1rem;\n}\n.json-formatter-dark.json-formatter-row .json-formatter-json-formatter-children.empty:after {\n  display: none;\n}\n.json-formatter-dark.json-formatter-row .json-formatter-json-formatter-children.empty.object:after {\n  content: \"No properties\";\n}\n.json-formatter-dark.json-formatter-row .json-formatter-json-formatter-children.empty.array:after {\n  content: \"[]\";\n}\n.json-formatter-dark.json-formatter-row .json-formatter-string {\n  color: #31F031;\n  white-space: pre;\n  word-wrap: break-word;\n}\n.json-formatter-dark.json-formatter-row .json-formatter-number {\n  color: #66C2FF;\n}\n.json-formatter-dark.json-formatter-row .json-formatter-boolean {\n  color: #EC4242;\n}\n.json-formatter-dark.json-formatter-row .json-formatter-null {\n  color: #EEC97D;\n}\n.json-formatter-dark.json-formatter-row .json-formatter-undefined {\n  color: #ef8fbe;\n}\n.json-formatter-dark.json-formatter-row .json-formatter-function {\n  color: #FD48CB;\n}\n.json-formatter-dark.json-formatter-row .json-formatter-date {\n  background-color: rgba(255, 255, 255, 0.05);\n}\n.json-formatter-dark.json-formatter-row .json-formatter-url {\n  text-decoration: underline;\n  color: #027BFF;\n  cursor: pointer;\n}\n.json-formatter-dark.json-formatter-row .json-formatter-bracket {\n  color: #9494FF;\n}\n.json-formatter-dark.json-formatter-row .json-formatter-key {\n  color: #23A0DB;\n  cursor: pointer;\n}\n.json-formatter-dark.json-formatter-row .json-formatter-constructor-name {\n  cursor: pointer;\n}\n.json-formatter-dark.json-formatter-row .json-formatter-toggler {\n  line-height: 1.2rem;\n  font-size: 0.8em;\n  vertical-align: middle;\n  opacity: 0.6;\n  cursor: pointer;\n}\n.json-formatter-dark.json-formatter-row .json-formatter-toggler:after {\n  display: inline-block;\n  transition: transform 100ms ease-in;\n  content: \"\\25BA\";\n}\n.json-formatter-dark.json-formatter-row > a > .json-formatter-preview-text {\n  opacity: 0;\n  transition: opacity 0.15s ease-in;\n  font-style: italic;\n}\n.json-formatter-dark.json-formatter-row:hover > a > .json-formatter-preview-text {\n  opacity: 0.6;\n}\n.json-formatter-dark.json-formatter-row.json-formatter-open > .json-formatter-toggler-link .json-formatter-toggler:after {\n  transform: rotate(90deg);\n}\n.json-formatter-dark.json-formatter-row.json-formatter-open > .json-formatter-children:after {\n  display: inline-block;\n}\n.json-formatter-dark.json-formatter-row.json-formatter-open > a > .json-formatter-preview-text {\n  display: none;\n}\n", "", {"version":3,"sources":["/./src/style.less","/./src/style.less"],"names":[],"mappings":"AAqGA;EAtFE,uBAAA;CCbD;ADcC;;;EACE,aAAA;EACA,sBAAA;CCVH;AD6FD;EA/EI,kBAAA;CCXH;ADeG;EACE,aAAA;EACA,kBAAA;CCbL;ADeK;EAAU,cAAA;CCZf;ADaK;EAAiB,yBAAA;CCVtB;ADWK;EAAgB,cAAA;CCRrB;AD6ED;EAhEI,aAAA;EACA,iBAAA;EACA,sBAAA;CCVH;ADwED;EA5D2B,YAAA;CCT1B;ADqED;EA3D4B,WAAA;CCP3B;ADkED;EA1DyB,eAAA;CCLxB;AD+DD;EAzD8B,eAAA;CCH7B;AD4DD;EAxD6B,eAAA;CCD5B;ADyDD;EAvDyB,sCAAA;CCCxB;ADsDD;EArDI,2BAAA;EACA,YAAA;EACA,gBAAA;CCEH;ADiDD;EAhD4B,YAAA;CCE3B;AD8CD;EA9CI,eAAA;EACA,gBAAA;CCGH;AD0CD;EA1CI,gBAAA;CCGH;ADuCD;EAtCI,oBAAA;EACA,iBAAA;EACA,uBAAA;EACA,aAAA;EACA,gBAAA;CCEH;ADAG;EACE,sBAAA;EACA,oCAAA;EACA,iBAAA;CCEL;AD2BD;EAvBI,WAAA;EACA,kCAAA;EACA,mBAAA;CCDH;ADGC;EACE,aAAA;CCDH;ADKC;EAEI,yBAAA;CCJL;ADEC;EAKI,sBAAA;CCJL;ADDC;EAQI,cAAA;CCJL;ADeD;EA3FE,uBAAA;CC+ED;AD9EC;;;EACE,aAAA;EACA,sBAAA;CCkFH;ADMD;EApFI,kBAAA;CCiFH;AD7EG;EACE,aAAA;EACA,kBAAA;CC+EL;AD7EK;EAAU,cAAA;CCgFf;AD/EK;EAAiB,yBAAA;CCkFtB;ADjFK;EAAgB,cAAA;CCoFrB;ADVD;EArEI,eAAA;EACA,iBAAA;EACA,sBAAA;CCkFH;ADfD;EAjE2B,eAAA;CCmF1B;ADlBD;EAhE4B,eAAA;CCqF3B;ADrBD;EA/DyB,eAAA;CCuFxB;ADxBD;EA9D8B,eAAA;CCyF7B;AD3BD;EA7D6B,eAAA;CC2F5B;AD9BD;EA5DyB,4CAAA;CC6FxB;ADjCD;EA1DI,2BAAA;EACA,eAAA;EACA,gBAAA;CC8FH;ADtCD;EArD4B,eAAA;CC8F3B;ADzCD;EAnDI,eAAA;EACA,gBAAA;CC+FH;AD7CD;EA/CI,gBAAA;CC+FH;ADhDD;EA3CI,oBAAA;EACA,iBAAA;EACA,uBAAA;EACA,aAAA;EACA,gBAAA;CC8FH;AD5FG;EACE,sBAAA;EACA,oCAAA;EACA,iBAAA;CC8FL;AD5DD;EA5BI,WAAA;EACA,kCAAA;EACA,mBAAA;CC2FH;ADzFC;EACE,aAAA;CC2FH;ADvFC;EAEI,yBAAA;CCwFL;AD1FC;EAKI,sBAAA;CCwFL;AD7FC;EAQI,cAAA;CCwFL","file":"style.less","sourcesContent":[".theme(\n  @default-color: black,\n  @string-color: green,\n  @number-color: blue,\n  @boolean-color: red,\n  @null-color: #855A00,\n  @undefined-color: rgb(202, 11, 105),\n  @function-color: #FF20ED,\n  @rotate-time: 100ms,\n  @toggler-opacity: 0.6,\n  @toggler-color: #45376F,\n  @bracket-color: blue,\n  @key-color: #00008B,\n  @url-color: blue ){\n\n  font-family: monospace;\n  &, a, a:hover {\n    color: @default-color;\n    text-decoration: none;\n  }\n\n  .json-formatter-row {\n    margin-left: 1rem;\n  }\n\n  .json-formatter-json-formatter-children {\n    &.empty {\n      opacity: 0.5;\n      margin-left: 1rem;\n\n      &:after { display: none; }\n      &.object:after { content: \"No properties\"; }\n      &.array:after { content: \"[]\"; }\n    }\n  }\n\n  .json-formatter-string {\n    color: @string-color;\n    white-space: pre;\n    word-wrap: break-word;\n  }\n  .json-formatter-number { color: @number-color; }\n  .json-formatter-boolean { color: @boolean-color; }\n  .json-formatter-null { color: @null-color; }\n  .json-formatter-undefined { color: @undefined-color; }\n  .json-formatter-function { color: @function-color; }\n  .json-formatter-date { background-color: fade(@default-color, 5%); }\n  .json-formatter-url {\n    text-decoration: underline;\n    color: @url-color;\n    cursor: pointer;\n  }\n\n  .json-formatter-bracket { color: @bracket-color; }\n  .json-formatter-key {\n    color: @key-color;\n    cursor: pointer;\n  }\n  .json-formatter-constructor-name {\n    cursor: pointer;\n  }\n\n  .json-formatter-toggler {\n    line-height: 1.2rem;\n    font-size: 0.8em;\n    vertical-align: middle;\n    opacity: 0.6;\n    cursor: pointer;\n\n    &:after {\n      display: inline-block;\n      transition: transform @rotate-time ease-in;\n      content: \"►\";\n    }\n  }\n\n  // Inline preview on hover (optional)\n  > a > .json-formatter-preview-text {\n    opacity: 0;\n    transition: opacity .15s ease-in;\n    font-style: italic;\n  }\n  &:hover > a > .json-formatter-preview-text {\n    opacity: 0.6;\n  }\n\n  // Open state\n  &.json-formatter-open {\n    > .json-formatter-toggler-link .json-formatter-toggler:after{\n      transform: rotate(90deg);\n    }\n    > .json-formatter-children:after {\n      display: inline-block;\n    }\n    > a > .json-formatter-preview-text {\n      display: none;\n    }\n  }\n}\n\n// Default theme\n.json-formatter-row {\n  .theme();\n}\n\n// Dark theme\n.json-formatter-dark.json-formatter-row {\n  .theme(\n    @default-color: white,\n    @string-color: #31F031,\n    @number-color: #66C2FF,\n    @boolean-color: #EC4242,\n    @null-color: #EEC97D,\n    @undefined-color: rgb(239, 143, 190),\n    @function-color: #FD48CB,\n    @rotate-time: 100ms,\n    @toggler-opacity: 0.6,\n    @toggler-color: #45376F,\n    @bracket-color: #9494FF,\n    @key-color: #23A0DB,\n    @url-color: #027BFF);\n}\n",".json-formatter-row {\n  font-family: monospace;\n}\n.json-formatter-row,\n.json-formatter-row a,\n.json-formatter-row a:hover {\n  color: black;\n  text-decoration: none;\n}\n.json-formatter-row .json-formatter-row {\n  margin-left: 1rem;\n}\n.json-formatter-row .json-formatter-json-formatter-children.empty {\n  opacity: 0.5;\n  margin-left: 1rem;\n}\n.json-formatter-row .json-formatter-json-formatter-children.empty:after {\n  display: none;\n}\n.json-formatter-row .json-formatter-json-formatter-children.empty.object:after {\n  content: \"No properties\";\n}\n.json-formatter-row .json-formatter-json-formatter-children.empty.array:after {\n  content: \"[]\";\n}\n.json-formatter-row .json-formatter-string {\n  color: green;\n  white-space: pre;\n  word-wrap: break-word;\n}\n.json-formatter-row .json-formatter-number {\n  color: blue;\n}\n.json-formatter-row .json-formatter-boolean {\n  color: red;\n}\n.json-formatter-row .json-formatter-null {\n  color: #855A00;\n}\n.json-formatter-row .json-formatter-undefined {\n  color: #ca0b69;\n}\n.json-formatter-row .json-formatter-function {\n  color: #FF20ED;\n}\n.json-formatter-row .json-formatter-date {\n  background-color: rgba(0, 0, 0, 0.05);\n}\n.json-formatter-row .json-formatter-url {\n  text-decoration: underline;\n  color: blue;\n  cursor: pointer;\n}\n.json-formatter-row .json-formatter-bracket {\n  color: blue;\n}\n.json-formatter-row .json-formatter-key {\n  color: #00008B;\n  cursor: pointer;\n}\n.json-formatter-row .json-formatter-constructor-name {\n  cursor: pointer;\n}\n.json-formatter-row .json-formatter-toggler {\n  line-height: 1.2rem;\n  font-size: 0.8em;\n  vertical-align: middle;\n  opacity: 0.6;\n  cursor: pointer;\n}\n.json-formatter-row .json-formatter-toggler:after {\n  display: inline-block;\n  transition: transform 100ms ease-in;\n  content: \"►\";\n}\n.json-formatter-row > a > .json-formatter-preview-text {\n  opacity: 0;\n  transition: opacity 0.15s ease-in;\n  font-style: italic;\n}\n.json-formatter-row:hover > a > .json-formatter-preview-text {\n  opacity: 0.6;\n}\n.json-formatter-row.json-formatter-open > .json-formatter-toggler-link .json-formatter-toggler:after {\n  transform: rotate(90deg);\n}\n.json-formatter-row.json-formatter-open > .json-formatter-children:after {\n  display: inline-block;\n}\n.json-formatter-row.json-formatter-open > a > .json-formatter-preview-text {\n  display: none;\n}\n.json-formatter-dark.json-formatter-row {\n  font-family: monospace;\n}\n.json-formatter-dark.json-formatter-row,\n.json-formatter-dark.json-formatter-row a,\n.json-formatter-dark.json-formatter-row a:hover {\n  color: white;\n  text-decoration: none;\n}\n.json-formatter-dark.json-formatter-row .json-formatter-row {\n  margin-left: 1rem;\n}\n.json-formatter-dark.json-formatter-row .json-formatter-json-formatter-children.empty {\n  opacity: 0.5;\n  margin-left: 1rem;\n}\n.json-formatter-dark.json-formatter-row .json-formatter-json-formatter-children.empty:after {\n  display: none;\n}\n.json-formatter-dark.json-formatter-row .json-formatter-json-formatter-children.empty.object:after {\n  content: \"No properties\";\n}\n.json-formatter-dark.json-formatter-row .json-formatter-json-formatter-children.empty.array:after {\n  content: \"[]\";\n}\n.json-formatter-dark.json-formatter-row .json-formatter-string {\n  color: #31F031;\n  white-space: pre;\n  word-wrap: break-word;\n}\n.json-formatter-dark.json-formatter-row .json-formatter-number {\n  color: #66C2FF;\n}\n.json-formatter-dark.json-formatter-row .json-formatter-boolean {\n  color: #EC4242;\n}\n.json-formatter-dark.json-formatter-row .json-formatter-null {\n  color: #EEC97D;\n}\n.json-formatter-dark.json-formatter-row .json-formatter-undefined {\n  color: #ef8fbe;\n}\n.json-formatter-dark.json-formatter-row .json-formatter-function {\n  color: #FD48CB;\n}\n.json-formatter-dark.json-formatter-row .json-formatter-date {\n  background-color: rgba(255, 255, 255, 0.05);\n}\n.json-formatter-dark.json-formatter-row .json-formatter-url {\n  text-decoration: underline;\n  color: #027BFF;\n  cursor: pointer;\n}\n.json-formatter-dark.json-formatter-row .json-formatter-bracket {\n  color: #9494FF;\n}\n.json-formatter-dark.json-formatter-row .json-formatter-key {\n  color: #23A0DB;\n  cursor: pointer;\n}\n.json-formatter-dark.json-formatter-row .json-formatter-constructor-name {\n  cursor: pointer;\n}\n.json-formatter-dark.json-formatter-row .json-formatter-toggler {\n  line-height: 1.2rem;\n  font-size: 0.8em;\n  vertical-align: middle;\n  opacity: 0.6;\n  cursor: pointer;\n}\n.json-formatter-dark.json-formatter-row .json-formatter-toggler:after {\n  display: inline-block;\n  transition: transform 100ms ease-in;\n  content: \"►\";\n}\n.json-formatter-dark.json-formatter-row > a > .json-formatter-preview-text {\n  opacity: 0;\n  transition: opacity 0.15s ease-in;\n  font-style: italic;\n}\n.json-formatter-dark.json-formatter-row:hover > a > .json-formatter-preview-text {\n  opacity: 0.6;\n}\n.json-formatter-dark.json-formatter-row.json-formatter-open > .json-formatter-toggler-link .json-formatter-toggler:after {\n  transform: rotate(90deg);\n}\n.json-formatter-dark.json-formatter-row.json-formatter-open > .json-formatter-children:after {\n  display: inline-block;\n}\n.json-formatter-dark.json-formatter-row.json-formatter-open > a > .json-formatter-preview-text {\n  display: none;\n}\n"],"sourceRoot":"webpack://"}]);
 	
 	// exports
 
 
 /***/ },
-/* 5 */
+/* 4 */
 /***/ function(module, exports) {
 
 	/*
@@ -512,7 +408,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 6 */
+/* 5 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/*
@@ -761,6 +657,121 @@ return /******/ (function(modules) { // webpackBootstrap
 		if(oldSrc)
 			URL.revokeObjectURL(oldSrc);
 	}
+
+
+/***/ },
+/* 6 */
+/***/ function(module, exports) {
+
+	'use strict';
+	/*
+	 * Escapes `"` charachters from string
+	 *
+	 * @param {string} str
+	 * @returns {string}
+	*/
+	function escapeString(str) {
+	    return str.replace('"', '\"');
+	}
+	/*
+	 * Determines if a value is an object
+	 *
+	 * @param {any} value
+	 *
+	 * @returns {boolean}
+	 *
+	*/
+	function isObject(value) {
+	    var type = typeof value;
+	    return !!value && (type == 'object');
+	}
+	exports.isObject = isObject;
+	/*
+	 * Gets constructor name of an object.
+	 * From http://stackoverflow.com/a/332429
+	 *
+	 * @param {object} object
+	 *
+	 * @returns {string}
+	 *
+	*/
+	function getObjectName(object) {
+	    if (object === undefined) {
+	        return '';
+	    }
+	    if (object === null) {
+	        return 'Object';
+	    }
+	    if (typeof object === 'object' && !object.constructor) {
+	        return 'Object';
+	    }
+	    var funcNameRegex = /function (.{1,})\(/;
+	    var results = (funcNameRegex).exec((object).constructor.toString());
+	    if (results && results.length > 1) {
+	        return results[1];
+	    }
+	    else {
+	        return '';
+	    }
+	}
+	exports.getObjectName = getObjectName;
+	/*
+	 * Gets type of an object. Returns "null" for null objects
+	 *
+	 * @param {object} object
+	 *
+	 * @returns {string}
+	*/
+	function getType(object) {
+	    if (object === null) {
+	        return 'null';
+	    }
+	    return typeof object;
+	}
+	exports.getType = getType;
+	/*
+	 * Generates inline preview for a JavaScript object based on a value
+	 * @param {object} object
+	 * @param {string} value
+	 *
+	 * @returns {string}
+	*/
+	function getValuePreview(object, value) {
+	    var type = getType(object);
+	    if (type === 'null' || type === 'undefined') {
+	        return type;
+	    }
+	    if (type === 'string') {
+	        value = '"' + escapeString(value) + '"';
+	    }
+	    if (type === 'function') {
+	        // Remove content of the function
+	        return object.toString()
+	            .replace(/[\r\n]/g, '')
+	            .replace(/\{.*\}/, '') + '{…}';
+	    }
+	    return value;
+	}
+	exports.getValuePreview = getValuePreview;
+	/*
+	 * Generates inline preview for a JavaScript object
+	 * @param {object} object
+	 *
+	 * @returns {string}
+	*/
+	function getPreview(object) {
+	    var value = '';
+	    if (isObject(object)) {
+	        value = getObjectName(object);
+	        if (Array.isArray(object))
+	            value += '[' + object.length + ']';
+	    }
+	    else {
+	        value = getValuePreview(object, object);
+	    }
+	    return value;
+	}
+	exports.getPreview = getPreview;
 
 
 /***/ }

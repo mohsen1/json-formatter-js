@@ -1,5 +1,7 @@
 'use strict';
 
+import './style.less';
+
 import {
   isObject,
   getObjectName,
@@ -8,14 +10,17 @@ import {
   getPreview
 } from './helpers.ts';
 
-declare var require;
-const style = require('./style.less');
-
-console.log(style);
 
 const DATE_STRING_REGEX = /(^\d{1,4}[\.|\\/|-]\d{1,2}[\.|\\/|-]\d{1,4})(\s*(?:0?[1-9]:[0-5]|1(?=[012])\d:[0-5])\d\s*[ap]m)?$/;
 const PARTIAL_DATE_REGEX = /\d{2}:\d{2}:\d{2} GMT-\d{4}/;
 const JSON_DATE_REGEX = /\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{3}Z/;
+
+/*
+ * Generates a prefixed CSS class name
+*/
+function cssClass(className:string): string {
+  return `json-formatter-${className}`;
+}
 
 /*
   * Creates a new DOM element wiht given type and class
@@ -24,7 +29,7 @@ const JSON_DATE_REGEX = /\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{3}Z/;
 function createElement(type: string, className?: string, content?: Element|string): Element {
   const el = document.createElement(type);
   if (className) {
-    el.classList.add(className);
+    el.classList.add(cssClass(className));
   }
   if (content) {
     if (content instanceof Node) {
@@ -159,7 +164,7 @@ export = class JSONFormatter {
     }
 
     if (this.element) {
-      this.element.classList.toggle('open');
+      this.element.classList.toggle(cssClass('open'));
     }
   }
 
@@ -202,7 +207,7 @@ export = class JSONFormatter {
   */
   render(): HTMLDivElement {
 
-    this.element = createElement('div', 'json-formatter-row');
+    this.element = createElement('div', 'row');
     const togglerLink = createElement('a', 'toggler-link');
 
     if (this.isObject) {
@@ -228,41 +233,44 @@ export = class JSONFormatter {
         wrapperSpan.appendChild(arrayWrapperSpan);
       }
 
+
       value.appendChild(wrapperSpan);
+      togglerLink.appendChild(value);
 
-      if (this.isObject) {
-        const value = this.isUrl ? createElement('a') : createElement('span');
-        value.classList.add(this.type);
-        if (this.isDate) {
-          value.classList.add('date');
-        }
-        if (this.isUrl) {
-          value.classList.add('url');
-          value.setAttribute('href', this.json);
-        }
-
+    // Primitive values
+    } else {
+      const value = this.isUrl ? createElement('a') : createElement('span');
+      value.classList.add(cssClass(this.type));
+      if (this.isDate) {
+        value.classList.add(cssClass('date'));
+      }
+      if (this.isUrl) {
+        value.classList.add(cssClass('url'));
+        value.setAttribute('href', this.json);
       }
 
+      const valuePreview = getValuePreview(this.json, this.json);
+      value.appendChild(document.createTextNode(valuePreview));
+      togglerLink.appendChild(value);
     }
-    togglerLink.appendChild(value);
 
     const children = createElement('div', 'children');
     if (this.isObject) {
-      children.classList.add('object');
+      children.classList.add(cssClass('object'));
     }
     if (this.isArray) {
-      children.classList.add('array');
+      children.classList.add(cssClass('array'));
     }
     if (this.isEmpty) {
-      children.classList.add('empty');
+      children.classList.add(cssClass('empty'));
     }
 
     if (this.config && this.config.theme) {
-      this.element.classList.add(`json-formatter-${this.config.theme}`);
+      this.element.classList.add(cssClass(this.config.theme));
     }
 
     if (this.isOpen) {
-      this.element.classList.add('open');
+      this.element.classList.add(cssClass('open'));
     }
 
     this.element.appendChild(togglerLink);
@@ -273,7 +281,7 @@ export = class JSONFormatter {
     }
 
     // add event listener for toggling
-    this.element.querySelector('a.toggler-link')
+    this.element.querySelector(`a.${cssClass('toggler-link')}`)
       .addEventListener('click', this.toggleOpen.bind(this));
 
     return this.element as HTMLDivElement;
@@ -284,7 +292,7 @@ export = class JSONFormatter {
    *
   */
   appendChildern() {
-    const children = this.element.querySelector('div.children');
+    const children = this.element.querySelector(`div.${cssClass('children')}`);
 
     if (!children) { return; }
 
@@ -301,8 +309,10 @@ export = class JSONFormatter {
    *
   */
   removeChildren() {
-    if (this.element.querySelector('div.children')) {
-      this.element.querySelector('div.children').innerHTML = '';
+    const children = this.element.querySelector(`div.${cssClass('children')}`);
+    if (children) {
+      // TOOD: do not use innerHTML
+      children.innerHTML = '';
     }
   }
 }

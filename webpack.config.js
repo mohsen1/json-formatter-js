@@ -20,8 +20,6 @@ module.exports = {
     loaders: [
       {
         test: /\.less$/,
-
-        // activate source maps via loader query
         loader: 'style?sourceMap!css?sourceMap!less?sourceMap'
       },
       {
