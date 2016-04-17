@@ -15,6 +15,9 @@ const DATE_STRING_REGEX = /(^\d{1,4}[\.|\\/|-]\d{1,2}[\.|\\/|-]\d{1,4})(\s*(?:0?
 const PARTIAL_DATE_REGEX = /\d{2}:\d{2}:\d{2} GMT-\d{4}/;
 const JSON_DATE_REGEX = /\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{3}Z/;
 
+// When toggleing, don't animated removal or addition of more than a few items
+const MAX_ANIMATED_TOGGLE_ITEMS = 10;
+
 const requestAnimationFrame = window.requestAnimationFrame || function(cb: ()=>void) { cb(); return 0; };
 
 /*
@@ -308,7 +311,11 @@ export = class JSONFormatter {
         index += 1;
 
         if (index < this.keys.length) {
-          requestAnimationFrame(addAChild);
+          if (index > MAX_ANIMATED_TOGGLE_ITEMS) {
+            addAChild();
+          } else {
+            requestAnimationFrame(addAChild);
+          }
         }
       };
 
@@ -332,10 +339,16 @@ export = class JSONFormatter {
     const childrenElement = this.element.querySelector(`div.${cssClass('children')}`) as HTMLDivElement;
 
     if (animated) {
+      let childrenRemoved = 0;
       const removeAChild = ()=> {
         if (childrenElement && childrenElement.children.length) {
           childrenElement.removeChild(childrenElement.children[0]);
-          requestAnimationFrame(removeAChild);
+          childrenRemoved += 1;
+          if (childrenRemoved > MAX_ANIMATED_TOGGLE_ITEMS) {
+            removeAChild();
+          } else {
+            requestAnimationFrame(removeAChild);
+          }
         }
       };
       requestAnimationFrame(removeAChild);

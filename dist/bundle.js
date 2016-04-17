@@ -67,6 +67,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	var DATE_STRING_REGEX = /(^\d{1,4}[\.|\\/|-]\d{1,2}[\.|\\/|-]\d{1,4})(\s*(?:0?[1-9]:[0-5]|1(?=[012])\d:[0-5])\d\s*[ap]m)?$/;
 	var PARTIAL_DATE_REGEX = /\d{2}:\d{2}:\d{2} GMT-\d{4}/;
 	var JSON_DATE_REGEX = /\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{3}Z/;
+	// When toggleing, don't animated removal or addition of more than a few items
+	var MAX_ANIMATED_TOGGLE_ITEMS = 10;
 	var requestAnimationFrame = window.requestAnimationFrame || function (cb) { cb(); return 0; };
 	/*
 	 * Generates a prefixed CSS class name
@@ -301,7 +303,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	                children.appendChild(formatter.render());
 	                index_1 += 1;
 	                if (index_1 < _this.keys.length) {
-	                    requestAnimationFrame(addAChild_1);
+	                    if (index_1 > MAX_ANIMATED_TOGGLE_ITEMS) {
+	                        addAChild_1();
+	                    }
+	                    else {
+	                        requestAnimationFrame(addAChild_1);
+	                    }
 	                }
 	            };
 	            requestAnimationFrame(addAChild_1);
@@ -323,10 +330,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	        if (animated === void 0) { animated = false; }
 	        var childrenElement = this.element.querySelector("div." + cssClass('children'));
 	        if (animated) {
+	            var childrenRemoved_1 = 0;
 	            var removeAChild_1 = function () {
 	                if (childrenElement && childrenElement.children.length) {
 	                    childrenElement.removeChild(childrenElement.children[0]);
-	                    requestAnimationFrame(removeAChild_1);
+	                    childrenRemoved_1 += 1;
+	                    if (childrenRemoved_1 > MAX_ANIMATED_TOGGLE_ITEMS) {
+	                        removeAChild_1();
+	                    }
+	                    else {
+	                        requestAnimationFrame(removeAChild_1);
+	                    }
 	                }
 	            };
 	            requestAnimationFrame(removeAChild_1);
