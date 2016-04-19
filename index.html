@@ -2,12 +2,67 @@
   <head>
     <script src="../dist/bundle.js"></script>
     <style type="text/css">
+    body {
+      max-width: 800px;
+      margin: 20px auto;
+      font-family: sans-serif;
+    }
+    .gh {
+      text-align: right;
+    }
     .result  h3 + div {
+      border: 1px solid lightgray;
+      border-radius: 5px;
       padding: 10px;
+    }
+    code {
+      font-size: 2em;
+    }
+    pre {
+      font-size: 1.5rem;
+      background: #efefef;
+      padding: 1em;
     }
     </style>
   </head>
   <body>
+    <div class="intro">
+      <div class="gh">
+        <iframe
+          src="http://ghbtns.com/github-btn.html?user=mohsen1&repo=json-formatter-js&type=watch&size=large&count=true"
+          frameborder="0"
+          width="170"
+          height="30"
+          scrolling="0">
+        </iframe>
+        <iframe
+          src="http://ghbtns.com/github-btn.html?user=mohsen1&repo=json-formatter-js&type=fork&size=large&count=true"
+          frameborder="0"
+          width="170"
+          height="30"
+          scrolling="0">
+        </iframe>
+      </div>
+      <h1><code>JSONFormatter</code></h1>
+      <p>
+        Render JSON objects in HTML with a <b>collapsible</b> navigation.
+      </p>
+      <p><b><a href="https://github.com/mohsen1/json-formatter-js">JSON Formatter project on GitHub</a></b></p>
+    </div>
+    <h2>Usage</h2>
+    <div class="usage">
+      <p>Simple usage in ES6</p>
+      <pre>
+import JSONFormatter from 'json-formatter-js'
+
+const myJSON = {ans: 42};
+
+const formatter = new JSONFormatter(myJSON);
+
+document.body.appendChild(formatter.render());
+      </pre>
+    </div>
+    <h2>Examples</h2>
     <div class="result"></div>
     <script>
       var complex = {
@@ -25,7 +80,7 @@
           e: 'f\"'
         },
         string: 'Hello World',
-        url: 'https://github.com/mohsen1/json-formatter',
+        url: 'https://github.com/mohsen1/json-formatter-js',
         date: 'Sun Aug 03 2014 20:46:55 GMT-0700 (PDT)',
         func: function add(a,b){return a + b; }
       };
