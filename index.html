@@ -62,8 +62,38 @@ const formatter = new JSONFormatter(myJSON);
 document.body.appendChild(formatter.render());
       </pre>
     </div>
+    <h2>Playground</h2>
+    <div class="playground">
+      <p>Updating the JOSN value in this textarea renders a new formatter on the right.</p>
+      <table>
+        <tr>
+          <td>
+            <textarea id="live" name="" id="" cols="30" rows="10">{"foo": 42}</textarea>
+          </td>
+          <td>
+            <div id="live-result"></div>
+          </td>
+        </tr>
+      </table>
+    </div>
     <h2>Examples</h2>
     <div class="result"></div>
+    <script>
+      var live = document.getElementById('live');
+
+      function render() {
+        var result = document.getElementById('live-result');
+        try {
+          var formatter = new JSONFormatter(JSON.parse(live.value));
+          result.innerHTML = '';
+          result.appendChild(formatter.render());
+        } catch(e) {
+          console.error(e);
+        }
+      }
+      live.addEventListener('keyup', render);
+      render();
+    </script>
     <script>
       var complex = {
         numbers: [
