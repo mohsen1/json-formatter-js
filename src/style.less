@@ -23,14 +23,14 @@
     margin-left: 1rem;
   }
 
-  .json-formatter-json-formatter-children {
-    &.empty {
+  .json-formatter-children {
+    &.json-formatter-empty {
       opacity: 0.5;
       margin-left: 1rem;
 
       &:after { display: none; }
-      &.object:after { content: "No properties"; }
-      &.array:after { content: "[]"; }
+      &.json-formatter-object:after { content: "No properties"; }
+      &.json-formatter-array:after { content: "[]"; }
     }
   }
 
@@ -96,6 +96,9 @@
     }
     > a > .json-formatter-preview-text {
       display: none;
+    }
+    &.json-formatter-empty:after {
+      display: block;
     }
   }
 }

@@ -351,7 +351,9 @@ export = class JSONFormatter {
     }
 
     // add event listener for toggling
-    togglerLink.addEventListener('click', this.toggleOpen.bind(this));
+    if (this.isObject) {
+      togglerLink.addEventListener('click', this.toggleOpen.bind(this));
+    }
 
     return this.element as HTMLDivElement;
   }
@@ -363,7 +365,7 @@ export = class JSONFormatter {
   appendChildern(animated: boolean = false) {
     const children = this.element.querySelector(`div.${cssClass('children')}`);
 
-    if (!children) { return; }
+    if (!children || this.isEmpty) { return; }
 
     if (animated) {
       let index = 0;
@@ -387,10 +389,8 @@ export = class JSONFormatter {
 
     } else {
       this.keys.forEach(key => {
-        requestAnimationFrame(()=>{
-          const formatter = new JSONFormatter(this.json[key], this.open - 1, this.config, key);
-          children.appendChild(formatter.render());
-        });
+        const formatter = new JSONFormatter(this.json[key], this.open - 1, this.config, key);
+        children.appendChild(formatter.render());
       });
     }
   }

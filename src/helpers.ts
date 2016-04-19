@@ -98,7 +98,7 @@ export function createElement(type: string, className?: string, content?: Elemen
   if (className) {
     el.classList.add(cssClass(className));
   }
-  if (content) {
+  if (content !== undefined) {
     if (content instanceof Node) {
       el.appendChild(content);
     } else {
