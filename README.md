@@ -1,4 +1,4 @@
-# JSON Formatter (Pure JavaScript)
+# JSON Formatter
 
 > Render JSON objects in HTML with a **collapsible** navigation.
 
@@ -12,7 +12,7 @@ Install via npm
 ```shell
 npm install --save json-formatter-js
 ```
-include `bundle.js` and `style.css` from `dist` folder in your page.
+include `bundle.js` from `dist` folder in your page.
 ```js
 import JSONFormatter from 'json-formatter-js'
 
@@ -53,7 +53,17 @@ Available configurations:
  * `theme`: a string that can be any of these options: `['dark']`. Look at [`src/style.less`](src/style.less) for making new themes.
 
 ### Development
-Install `gulp` and run `gulp serve` to start the server that serves the development version of the project.
+Install the dependencies:
+
+```
+npm install
+```
+
+Run the dev server
+
+```
+npm start
+```
 
 #### Running tests
 
@@ -63,15 +73,5 @@ Install `gulp` and run `gulp serve` to start the server that serves the developm
 npm test
 ```
 
-**Continues:**
-
-```shell
-gulp test
-```
-#### Running the demo
-
-```shell
-gulp serve
-```
 ### License
 [MIT](./LICENSE)
