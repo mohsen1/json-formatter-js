@@ -1,5 +1,7 @@
 # JSON Formatter
 
+[![Build Status](https://travis-ci.org/mohsen1/json-formatter-js.svg?branch=master)](https://travis-ci.org/mohsen1/json-formatter-js)
+
 > Render JSON objects in HTML with a **collapsible** navigation.
 
 JSON Formatter started as an [AngularJS directive](https://github.com/mohsen1/json-formatter). This is pure JavaScript implementation of the same module.
