@@ -5,7 +5,7 @@
   "main": "dist/bundle.js",
   "scripts": {
     "build": "webpack",
-    "test": "karma start --singleRun=true"
+    "test": "karma start --singleRun=true test/karma.conf.js"
   },
   "repository": {
     "type": "git",
@@ -24,12 +24,12 @@
     "chai": "^3.2.0",
     "css-loader": "^0.23.1",
     "karma": "^0.13.9",
-    "karma-babel-preprocessor": "^5.2.1",
     "karma-chai": "^0.1.0",
     "karma-chrome-launcher": "^0.2.0",
-    "karma-firefox-launcher": "^0.1.6",
     "karma-mocha": "^0.2.0",
     "karma-mocha-reporter": "^1.1.1",
+    "karma-typescript-preprocessor": "^0.2.0",
+    "karma-webpack": "^1.7.0",
     "less-loader": "^2.2.3",
     "minimist": "^1.2.0",
     "mocha": "^2.2.5",

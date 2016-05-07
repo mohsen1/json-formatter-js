@@ -1,5 +1,11 @@
 'use strict';
 
+declare const describe;
+declare const it;
+declare const expect;
+
+import JSONFormatter from '../dist/bundle.js'
+
 describe('rendering', ()=> {
   describe('null', ()=> {
     it('should render "null"', function () {
