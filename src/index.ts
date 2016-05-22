@@ -134,7 +134,7 @@ export = class JSONFormatter {
 
   /*
    * is this an object?
-   * Note: In this context objects are array as well
+   * Note: In this context arrays are object as well
   */
   private get isObject(): boolean {
     return isObject(this.json);
