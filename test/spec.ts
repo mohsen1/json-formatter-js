@@ -3,8 +3,7 @@
 declare const describe;
 declare const it;
 declare const expect;
-
-import JSONFormatter from '../dist/bundle.js'
+declare const JSONFormatter;
 
 
 describe('null', ()=> {

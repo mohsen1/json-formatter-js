@@ -77,13 +77,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    hoverPreviewFieldCount: 5,
 	    theme: null
 	};
-	/**
-	 * @class JSONFormatter
-	 *
-	 * JSONFormatter allows you to render JSON objects in HTML with a
-	 * **collapsible** navigation.
-	*/
-	var JSONFormatter = (function () {
+	module.exports = (function () {
 	    /**
 	     * @param {object} json The JSON object you want to render. It has to be an
 	     * object or array. Do NOT pass raw JSON string.
@@ -189,7 +183,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    Object.defineProperty(JSONFormatter.prototype, "isObject", {
 	        /*
 	         * is this an object?
-	         * Note: In this context objects are array as well
+	         * Note: In this context arrays are object as well
 	        */
 	        get: function () {
 	            return helpers_ts_1.isObject(this.json);
@@ -470,8 +464,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	    };
 	    return JSONFormatter;
 	}());
-	Object.defineProperty(exports, "__esModule", { value: true });
-	exports.default = JSONFormatter;
 
 
 /***/ },
