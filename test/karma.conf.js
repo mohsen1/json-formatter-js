@@ -1,3 +1,10 @@
+
+const webpackConfig = require('../webpack.config.js');
+
+webpackConfig.entry = {};
+webpackConfig.output = {};
+
+
 module.exports = function(config) {
   config.set({
 
@@ -10,13 +17,14 @@ module.exports = function(config) {
     // List of files / patterns to load in the browser
     files: [
       'dist/bundle.js',
-      'dist/style.css',
-      'test/spec.js'
+      'test/spec.ts'
     ],
 
     preprocessors: {
-      'test/**/*.js': ['babel']
+      'test/spec.ts': ['webpack']
     },
+
+    webpack: webpackConfig,
 
     // List of files to exclude
     exclude: [],
@@ -40,7 +48,7 @@ module.exports = function(config) {
     // - Safari (only Mac)
     // - PhantomJS
     // - IE (only Windows)
-    browsers: [process.env.TRAVIS ? 'Firefox' : 'Chrome'],
+    browsers: ['Chrome'],
 
     // Continuous Integration mode
     // if true, it capture browsers, run tests and exit

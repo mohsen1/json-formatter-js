@@ -15,13 +15,16 @@
       border-radius: 5px;
       padding: 10px;
     }
-    code {
+    h1 code {
       font-size: 2em;
     }
     pre {
       font-size: 1.5rem;
       background: #efefef;
       padding: 1em;
+    }
+    textarea {
+      font-family: monospace;
     }
     </style>
   </head>
@@ -74,24 +77,34 @@ document.body.appendChild(formatter.render());
             <div id="live-result"></div>
           </td>
         </tr>
+        <tr>
+          <p>
+            <input type="checkbox" id="hoverPreviewEnabled">
+            <label for="hoverPreviewEnabled"><code>hoverPreviewEnabled</code></label>
+          </p>
+        </tr>
       </table>
     </div>
     <h2>Examples</h2>
     <div class="result"></div>
     <script>
       var live = document.getElementById('live');
+      var hoverPreviewEnabledCheckbox = document.getElementById('hoverPreviewEnabled');
+
 
       function render() {
+        live.style.backgroundColor = 'transparent';
         var result = document.getElementById('live-result');
         try {
-          var formatter = new JSONFormatter(JSON.parse(live.value));
+          var formatter = new JSONFormatter(JSON.parse(live.value), 1, {hoverPreviewEnabled: hoverPreviewEnabledCheckbox.checked});
           result.innerHTML = '';
           result.appendChild(formatter.render());
         } catch(e) {
-          console.error(e);
+          live.style.backgroundColor = 'rgba(255, 87, 34, 0.35)';
         }
       }
       live.addEventListener('keyup', render);
+      hoverPreviewEnabledCheckbox.addEventListener('change', render);
       render();
     </script>
     <script>

@@ -183,7 +183,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    Object.defineProperty(JSONFormatter.prototype, "isObject", {
 	        /*
 	         * is this an object?
-	         * Note: In this context objects are array as well
+	         * Note: In this context arrays are object as well
 	        */
 	        get: function () {
 	            return helpers_ts_1.isObject(this.json);
