@@ -75,6 +75,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	    hoverPreviewEnabled: false,
 	    hoverPreviewArrayCount: 100,
 	    hoverPreviewFieldCount: 5,
+	    animateOpen: true,
+	    animateClose: true,
 	    theme: null
 	};
 	module.exports = (function () {
@@ -266,10 +268,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	    JSONFormatter.prototype.toggleOpen = function () {
 	        this.isOpen = !this.isOpen;
 	        if (this.isOpen) {
-	            this.appendChildern(true);
+	            this.appendChildern(this.config.animateOpen);
 	        }
 	        else {
-	            this.removeChildren(true);
+	            this.removeChildren(this.config.animateClose);
 	        }
 	        if (this.element) {
 	            this.element.classList.toggle(helpers_ts_1.cssClass('open'));
