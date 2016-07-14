@@ -3,12 +3,11 @@
 declare const describe;
 declare const it;
 declare const expect;
-
-import JSONFormatter from '../dist/bundle.js'
+declare const JSONFormatter;
 
 
 describe('null', ()=> {
-  it('should render "null"', function () {
+  it('should render "null"', ()=> {
     const formatter = new JSONFormatter(null);
 
     expect(formatter.render().innerText).to.contain('null');
@@ -41,11 +40,6 @@ describe('string', ()=> {
 
     expect(formatter.render().innerText).to.contain('Hello World');
   });
-
-  it('should assing date class to date string', ()=> {
-    const formatter = new JSONFormatter('2015-12-05T18:58:53.727Z');
-    expect(formatter.render().querySelector('.json-formatter-date')).not.to.be.null;
-  });
 });
 
 describe('date string', ()=> {
@@ -55,9 +49,9 @@ describe('date string', ()=> {
     expect(formatter.render().innerText).to.contain('"' + (new Date(0)).toString() + '"');
   });
 
-  it('add the "date" class', ()=> {
-
-    expect(formatter.render().querySelector('.json-formatter-date')).not.to.equal(null);
+  it('should assing date class to date string', ()=> {
+    const formatter = new JSONFormatter('2015-12-05T18:58:53.727Z');
+    expect(formatter.render().querySelector('.json-formatter-date')).not.to.be.null;
   });
 });
 

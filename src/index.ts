@@ -24,6 +24,8 @@ interface JSONFormatterConfiguration {
   hoverPreviewEnabled: boolean;
   hoverPreviewArrayCount: number;
   hoverPreviewFieldCount: number;
+  animateOpen: boolean;
+  animateClose: boolean;
   theme: string;
 };
 
@@ -31,6 +33,8 @@ const _defaultConfig: JSONFormatterConfiguration = {
   hoverPreviewEnabled: false,
   hoverPreviewArrayCount: 100,
   hoverPreviewFieldCount: 5,
+  animateOpen: true,
+  animateClose: true,
   theme: null
 };
 
@@ -134,7 +138,7 @@ export = class JSONFormatter {
 
   /*
    * is this an object?
-   * Note: In this context objects are array as well
+   * Note: In this context arrays are object as well
   */
   private get isObject(): boolean {
     return isObject(this.json);
@@ -197,9 +201,9 @@ export = class JSONFormatter {
     this.isOpen = !this.isOpen;
 
     if (this.isOpen) {
-      this.appendChildern(true);
+      this.appendChildern(this.config.animateOpen);
     } else{
-      this.removeChildren(true);
+      this.removeChildren(this.config.animateClose);
     }
 
     if (this.element) {
