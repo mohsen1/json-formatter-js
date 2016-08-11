@@ -198,7 +198,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	         * is this an empty object with no properties?
 	        */
 	        get: function () {
-	            return !this.keys.length && this.isOpen && !this.isArray;
+	            return !this.keys.length && !this.isArray;
 	        },
 	        enumerable: true,
 	        configurable: true

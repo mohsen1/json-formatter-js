@@ -148,7 +148,7 @@ export = class JSONFormatter {
    * is this an empty object with no properties?
   */
   private get isEmptyObject(): boolean {
-    return !this.keys.length && this.isOpen && !this.isArray;
+    return !this.keys.length && !this.isArray;
   }
 
   /*
