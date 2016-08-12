@@ -16,7 +16,7 @@ module.exports = function(config) {
 
     // List of files / patterns to load in the browser
     files: [
-      'dist/bundle.js',
+      'dist/json-formatter.js',
       'test/spec.ts'
     ],
 

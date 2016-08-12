@@ -15,7 +15,7 @@ Install via npm
 ```shell
 npm install --save json-formatter-js
 ```
-include `bundle.js` from `dist` folder in your page.
+include `json-formatter.js` from `dist` folder in your page.
 ```js
 import JSONFormatter from 'json-formatter-js'
 
