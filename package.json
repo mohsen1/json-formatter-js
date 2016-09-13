@@ -2,7 +2,7 @@
   "name": "json-formatter-js",
   "version": "1.1.0",
   "description": "JSON Formatter core library ",
-  "main": "dist/bundle.js",
+  "main": "dist/json-formatter.js",
   "scripts": {
     "build": "webpack",
     "test": "karma start --singleRun=true test/karma.conf.js"

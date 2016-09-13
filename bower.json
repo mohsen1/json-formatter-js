@@ -5,7 +5,7 @@
     "Mohsen Azimi <me@azimi.me>"
   ],
   "main": [
-    "dist/bundle.js",
+    "dist/json-formatter.js",
     "dist/style.css"
   ],
   "moduleType": [
