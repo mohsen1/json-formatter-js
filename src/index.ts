@@ -201,7 +201,7 @@ export = class JSONFormatter {
     this.isOpen = !this.isOpen;
 
     if (this.isOpen) {
-      this.appendChildern(this.config.animateOpen);
+      this.appendChildren(this.config.animateOpen);
     } else{
       this.removeChildren(this.config.animateClose);
     }
@@ -349,9 +349,9 @@ export = class JSONFormatter {
     this.element.appendChild(togglerLink);
     this.element.appendChild(children);
 
-    // if formatter is set to be open call appendChildern
+    // if formatter is set to be open call appendChildren
     if (this.isObject && this.isOpen) {
-      this.appendChildern();
+      this.appendChildren();
     }
 
     // add event listener for toggling
@@ -366,7 +366,7 @@ export = class JSONFormatter {
    * Appends all the children to children element
    * Animated option is used when user triggers this via a click
   */
-  appendChildern(animated: boolean = false) {
+  appendChildren(animated: boolean = false) {
     const children = this.element.querySelector(`div.${cssClass('children')}`);
 
     if (!children || this.isEmpty) { return; }
