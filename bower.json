@@ -1,11 +1,11 @@
 {
   "name": "json-formatter-js",
-  "version": "1.0.0",
+  "version": "1.2.0",
   "authors": [
     "Mohsen Azimi <me@azimi.me>"
   ],
   "main": [
-    "dist/bundle.js",
+    "dist/json-formatter.js",
     "dist/style.css"
   ],
   "moduleType": [

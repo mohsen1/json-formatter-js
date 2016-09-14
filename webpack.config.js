@@ -11,7 +11,7 @@ module.exports = {
   output: {
     path: path.join(__dirname, 'dist'),
     publicPath: 'dist',
-    filename: 'bundle.js',
+    filename: 'json-formatter.js',
     library: 'JSONFormatter',
     libraryTarget: 'umd',
     umdNamedDefine: true
