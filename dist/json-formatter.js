@@ -278,6 +278,29 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	    };
 	    /**
+	    * Open all children up to a certain depth.
+	    * Allows actions such as expand all/collapse all
+	    *
+	    */
+	    JSONFormatter.prototype.openAtDepth = function (depth) {
+	        if (depth === void 0) { depth = 1; }
+	        if (depth < 0) {
+	            return;
+	        }
+	        this.open = depth;
+	        this.isOpen = (depth !== 0);
+	        if (this.element) {
+	            this.removeChildren(false);
+	            if (depth === 0) {
+	                this.element.classList.remove(helpers_ts_1.cssClass('open'));
+	            }
+	            else {
+	                this.appendChildren(this.config.animateOpen);
+	                this.element.classList.add(helpers_ts_1.cssClass('open'));
+	            }
+	        }
+	    };
+	    /**
 	     * Generates inline preview
 	     *
 	     * @returns {string}
