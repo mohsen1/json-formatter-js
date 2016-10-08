@@ -43,7 +43,9 @@ Default:
   hoverPreviewEnabled: false,
   hoverPreviewArrayCount: 100,
   hoverPreviewFieldCount: 5,
-  theme: ''
+  theme: '',
+  animateOpen: true,
+  animateClose: true
 }
 ```
 Available configurations:
@@ -51,11 +53,13 @@ Available configurations:
 * `hoverPreviewEnabled`:  enable preview on hover.
 * `hoverPreviewArrayCount`: number of array items to show in preview Any array larger than this number will be shown as `Array[XXX]` where `XXX` is length of the array.
 * `hoverPreviewFieldCount`: number of object properties to show for object preview. Any object with more properties that thin number will be truncated.
-* `animateOpen`: enable animation when expanding json object. True by default.
-* `animateClose`: enable animation when closing json object. True by default.
 
 ##### Theme
- * `theme`: a string that can be any of these options: `['dark']`. Look at [`src/style.less`](src/style.less) for making new themes.
+* `theme`: a string that can be any of these options: `['dark']`. Look at [`src/style.less`](src/style.less) for making new themes.
+
+##### Animation
+* `animateOpen`: enable animation when expanding json object. True by default.
+* `animateClose`: enable animation when closing json object. True by default.
 
 ### Development
 Install the dependencies:
