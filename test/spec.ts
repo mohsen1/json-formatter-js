@@ -106,3 +106,35 @@ describe('openAtDepth before any rendering', ()=> {
     expect(element.outerHTML).to.not.contain('depth4');
   });
 });
+
+describe('toggleOpen after rendering', ()=> {
+
+  it('should toggle', ()=> {
+    const formatter = new JSONFormatter({depth1: {depth2: {depth3 : {depth4: 21}}}}, Infinity, {animateOpen: false, animateClose: false});
+    const element = formatter.render();
+
+    expect(element.outerHTML).to.contain('Object');
+    expect(element.outerHTML).to.contain('depth1');
+
+    formatter.toggleOpen();
+    
+    expect(element.outerHTML).to.contain('Object');
+    expect(element.outerHTML).to.not.contain('depth1');
+    expect(element.outerHTML).to.not.contain('depth2');
+    expect(element.outerHTML).to.not.contain('depth3');
+    expect(element.outerHTML).to.not.contain('depth4');
+  });
+});
+
+describe('toggleOpen before any rendering', ()=> {
+    it('should toggle', ()=> {
+      const formatter = new JSONFormatter({depth1: {depth2: {depth3 : {depth4: 21}}}}, Infinity, {animateOpen: false, animateClose: false});
+      formatter.toggleOpen();
+      const element = formatter.render();
+      expect(element.outerHTML).to.contain('Object');
+      expect(element.outerHTML).to.not.contain('depth1');
+      expect(element.outerHTML).to.not.contain('depth2');
+      expect(element.outerHTML).to.not.contain('depth3');
+      expect(element.outerHTML).to.not.contain('depth4');
+    });
+});

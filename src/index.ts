@@ -200,13 +200,12 @@ export = class JSONFormatter {
   toggleOpen() {
     this.isOpen = !this.isOpen;
 
-    if (this.isOpen) {
-      this.appendChildren(this.config.animateOpen);
-    } else{
-      this.removeChildren(this.config.animateClose);
-    }
-
     if (this.element) {
+      if (this.isOpen) {
+        this.appendChildren(this.config.animateOpen);
+      } else{
+        this.removeChildren(this.config.animateClose);
+      }
       this.element.classList.toggle(cssClass('open'));
     }
   }

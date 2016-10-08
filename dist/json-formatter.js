@@ -267,13 +267,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	    */
 	    JSONFormatter.prototype.toggleOpen = function () {
 	        this.isOpen = !this.isOpen;
-	        if (this.isOpen) {
-	            this.appendChildren(this.config.animateOpen);
-	        }
-	        else {
-	            this.removeChildren(this.config.animateClose);
-	        }
 	        if (this.element) {
+	            if (this.isOpen) {
+	                this.appendChildren(this.config.animateOpen);
+	            }
+	            else {
+	                this.removeChildren(this.config.animateClose);
+	            }
 	            this.element.classList.toggle(helpers_ts_1.cssClass('open'));
 	        }
 	    };
