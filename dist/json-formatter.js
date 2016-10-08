@@ -268,7 +268,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    JSONFormatter.prototype.toggleOpen = function () {
 	        this.isOpen = !this.isOpen;
 	        if (this.isOpen) {
-	            this.appendChildern(this.config.animateOpen);
+	            this.appendChildren(this.config.animateOpen);
 	        }
 	        else {
 	            this.removeChildren(this.config.animateClose);
@@ -389,9 +389,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	        // append toggler and children elements to root element
 	        this.element.appendChild(togglerLink);
 	        this.element.appendChild(children);
-	        // if formatter is set to be open call appendChildern
+	        // if formatter is set to be open call appendChildren
 	        if (this.isObject && this.isOpen) {
-	            this.appendChildern();
+	            this.appendChildren();
 	        }
 	        // add event listener for toggling
 	        if (this.isObject) {
@@ -403,7 +403,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	     * Appends all the children to children element
 	     * Animated option is used when user triggers this via a click
 	    */
-	    JSONFormatter.prototype.appendChildern = function (animated) {
+	    JSONFormatter.prototype.appendChildren = function (animated) {
 	        var _this = this;
 	        if (animated === void 0) { animated = false; }
 	        var children = this.element.querySelector("div." + helpers_ts_1.cssClass('children'));
