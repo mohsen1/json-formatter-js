@@ -1,10 +1,6 @@
-sudo: required
 language: node_js
 node_js: stable
 before_install:
-  - wget http://chromedriver.storage.googleapis.com/2.22/chromedriver_linux64.zip
-  - unzip chromedriver_linux64.zip
-  - sudo chmod u+x chromedriver
-  - sudo mv chromedriver /usr/bin/
+  - export CHROME_BIND=chromium-browser
   - export DISPLAY=:99.0
   - sh -e /etc/init.d/xvfb start
