@@ -200,14 +200,38 @@ export = class JSONFormatter {
   toggleOpen() {
     this.isOpen = !this.isOpen;
 
-    if (this.isOpen) {
-      this.appendChildren(this.config.animateOpen);
-    } else{
-      this.removeChildren(this.config.animateClose);
+    if (this.element) {
+      if (this.isOpen) {
+        this.appendChildren(this.config.animateOpen);
+      } else{
+        this.removeChildren(this.config.animateClose);
+      }
+      this.element.classList.toggle(cssClass('open'));
+    }
+  }
+
+  /**
+  * Open all children up to a certain depth.
+  * Allows actions such as expand all/collapse all
+  *
+  */
+  openAtDepth(depth = 1) {
+    if (depth < 0) {
+      return;
     }
 
+    this.open = depth;
+    this.isOpen = (depth !== 0);
+
     if (this.element) {
-      this.element.classList.toggle(cssClass('open'));
+      this.removeChildren(false);
+
+      if (depth === 0) {
+        this.element.classList.remove(cssClass('open'));
+      } else {
+        this.appendChildren(this.config.animateOpen);
+        this.element.classList.add(cssClass('open'));
+      }
     }
   }
 
