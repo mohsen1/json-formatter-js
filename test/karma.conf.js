@@ -5,7 +5,7 @@ webpackConfig.entry = {};
 webpackConfig.output = {};
 
 
-module.exports = function(config) {
+module.exports = function (config) {
   config.set({
 
     // Base path, that will be used to resolve files and exclude
