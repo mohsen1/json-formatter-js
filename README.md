@@ -63,6 +63,12 @@ Available configurations:
 
 #### `openAtDepth([depth])`
 
+```js
+const formatter = new Formatter({ ... });
+document.body.appendChild(formatter.render());
+formatter.openAtDepth(3);
+```
+
 ##### `depth` (`Number`)
 Default: `1`
 This number indicates up to how many levels the rendered tree should open. It allows use cases such as collapse all levels (with value `0`) or expand all levels (with value `Infinity`).
