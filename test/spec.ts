@@ -66,3 +66,75 @@ describe('url string', ()=> {
     expect(formatter.render().querySelector('a.json-formatter-url')).not.to.equal(null);
   });
 });
+
+describe('openAtDepth after rendering', ()=> {
+  const formatter = new JSONFormatter({depth1: {depth2: {depth3 : {depth4: 21}}}}, Infinity, {animateOpen: false, animateClose: false});
+  const element = formatter.render();
+
+  it('should open at depth 1', ()=> {
+    formatter.openAtDepth();
+    expect(element.outerHTML).to.contain('depth1');
+    expect(element.outerHTML).to.not.contain('depth2');
+    expect(element.outerHTML).to.not.contain('depth3');
+    expect(element.outerHTML).to.not.contain('depth4');
+  });
+
+  it('should collapses all', ()=> {
+    formatter.openAtDepth(0);
+    expect(element.outerHTML).to.not.contain('depth1');
+  });
+
+  it('should expand all', ()=> {
+    formatter.openAtDepth(Infinity);
+    expect(element.outerHTML).to.contain('depth1');
+    expect(element.outerHTML).to.contain('depth2');
+    expect(element.outerHTML).to.contain('depth3');
+    expect(element.outerHTML).to.contain('depth4');
+    expect(element.outerHTML).to.contain('21');
+  });
+});
+
+describe('openAtDepth before any rendering', ()=> {
+  const formatter = new JSONFormatter({depth1: {depth2: {depth3 : {depth4: 21}}}}, Infinity, {animateOpen: false, animateClose: false});
+
+  it('should open at depth 1', ()=> {
+    formatter.openAtDepth();
+    const element = formatter.render();
+    expect(element.outerHTML).to.contain('depth1');
+    expect(element.outerHTML).to.not.contain('depth2');
+    expect(element.outerHTML).to.not.contain('depth3');
+    expect(element.outerHTML).to.not.contain('depth4');
+  });
+});
+
+describe('toggleOpen after rendering', ()=> {
+
+  it('should toggle', ()=> {
+    const formatter = new JSONFormatter({depth1: {depth2: {depth3 : {depth4: 21}}}}, Infinity, {animateOpen: false, animateClose: false});
+    const element = formatter.render();
+
+    expect(element.outerHTML).to.contain('Object');
+    expect(element.outerHTML).to.contain('depth1');
+
+    formatter.toggleOpen();
+    
+    expect(element.outerHTML).to.contain('Object');
+    expect(element.outerHTML).to.not.contain('depth1');
+    expect(element.outerHTML).to.not.contain('depth2');
+    expect(element.outerHTML).to.not.contain('depth3');
+    expect(element.outerHTML).to.not.contain('depth4');
+  });
+});
+
+describe('toggleOpen before any rendering', ()=> {
+    it('should toggle', ()=> {
+      const formatter = new JSONFormatter({depth1: {depth2: {depth3 : {depth4: 21}}}}, Infinity, {animateOpen: false, animateClose: false});
+      formatter.toggleOpen();
+      const element = formatter.render();
+      expect(element.outerHTML).to.contain('Object');
+      expect(element.outerHTML).to.not.contain('depth1');
+      expect(element.outerHTML).to.not.contain('depth2');
+      expect(element.outerHTML).to.not.contain('depth3');
+      expect(element.outerHTML).to.not.contain('depth4');
+    });
+});

@@ -43,7 +43,9 @@ Default:
   hoverPreviewEnabled: false,
   hoverPreviewArrayCount: 100,
   hoverPreviewFieldCount: 5,
-  theme: ''
+  theme: '',
+  animateOpen: true,
+  animateClose: true
 }
 ```
 Available configurations:
@@ -51,11 +53,25 @@ Available configurations:
 * `hoverPreviewEnabled`:  enable preview on hover.
 * `hoverPreviewArrayCount`: number of array items to show in preview Any array larger than this number will be shown as `Array[XXX]` where `XXX` is length of the array.
 * `hoverPreviewFieldCount`: number of object properties to show for object preview. Any object with more properties that thin number will be truncated.
+
+##### Theme
+* `theme`: a string that can be any of these options: `['dark']`. Look at [`src/style.less`](src/style.less) for making new themes.
+
+##### Animation
 * `animateOpen`: enable animation when expanding json object. True by default.
 * `animateClose`: enable animation when closing json object. True by default.
 
-##### Theme
- * `theme`: a string that can be any of these options: `['dark']`. Look at [`src/style.less`](src/style.less) for making new themes.
+#### `openAtDepth([depth])`
+
+```js
+const formatter = new Formatter({ ... });
+document.body.appendChild(formatter.render());
+formatter.openAtDepth(3);
+```
+
+##### `depth` (`Number`)
+Default: `1`
+This number indicates up to how many levels the rendered tree should open. It allows use cases such as collapse all levels (with value `0`) or expand all levels (with value `Infinity`).
 
 ### Development
 Install the dependencies:
