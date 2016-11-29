@@ -29,7 +29,7 @@ export function getObjectName(object: Object):string {
       return 'Object';
   }
 
-  const funcNameRegex = /function (.{1,})\(/;
+  const funcNameRegex = /function ([^(]*)/;
   const results = (funcNameRegex).exec((object).constructor.toString());
   if (results && results.length > 1) {
     return results[1];

@@ -873,7 +873,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    if (typeof object === 'object' && !object.constructor) {
 	        return 'Object';
 	    }
-	    var funcNameRegex = /function (.{1,})\(/;
+	    var funcNameRegex = /function ([^(]*)/;
 	    var results = (funcNameRegex).exec((object).constructor.toString());
 	    if (results && results.length > 1) {
 	        return results[1];

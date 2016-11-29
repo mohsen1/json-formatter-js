@@ -30,6 +30,7 @@
     "karma-mocha-reporter": "^2.1.0",
     "karma-typescript-preprocessor": "^0.2.0",
     "karma-webpack": "^1.7.0",
+    "less": "^2.7.1",
     "less-loader": "^2.2.3",
     "minimist": "^1.2.0",
     "mocha": "^3.0.2",
