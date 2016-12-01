@@ -47,7 +47,7 @@ const _defaultConfig: JSONFormatterConfiguration = {
 export = class JSONFormatter {
 
   // Hold the open state after the toggler is used
-  private _isOpen : any= null;
+  private _isOpen : boolean = null;
 
   // A reference to the element that we render to
   private element: Element;
