@@ -20,7 +20,7 @@ module.exports = {
     loaders: [
       {
         test: /\.less$/,
-        loader: 'style?sourceMap!css?sourceMap!less?sourceMap'
+        loader: "style!css!less"
       },
       {
         test: /\.ts$/,
