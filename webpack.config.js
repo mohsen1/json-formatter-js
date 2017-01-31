@@ -20,12 +20,21 @@ module.exports = {
     loaders: [
       {
         test: /\.less$/,
-        loader: "style!css!less"
+        loader: "style-loader!css-loader!less-loader"
       },
       {
         test: /\.ts$/,
         loader: 'ts-loader'
       }
     ]
-  }
+  },
+  plugins: [
+    new webpack.optimize.UglifyJsPlugin({
+      beautify: true,
+      compress: false,
+      dead_code: true,
+      sourceMap: true,
+      mangle: false
+    })
+  ]
 };
