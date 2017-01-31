@@ -1,453 +1,236 @@
-(function webpackUniversalModuleDefinition(root, factory) {
-    if (typeof exports === "object" && typeof module === "object") module.exports = factory(); else if (typeof define === "function" && define.amd) define("JSONFormatter", [], factory); else if (typeof exports === "object") exports["JSONFormatter"] = factory(); else root["JSONFormatter"] = factory();
-})(this, function() {
+!function(root, factory) {
+    "object" == typeof exports && "object" == typeof module ? module.exports = factory() : "function" == typeof define && define.amd ? define("JSONFormatter", [], factory) : "object" == typeof exports ? exports.JSONFormatter = factory() : root.JSONFormatter = factory();
+}(this, function() {
     return function(modules) {
-        var installedModules = {};
         function __webpack_require__(moduleId) {
             if (installedModules[moduleId]) return installedModules[moduleId].exports;
             var module = installedModules[moduleId] = {
                 i: moduleId,
-                l: false,
+                l: !1,
                 exports: {}
             };
-            modules[moduleId].call(module.exports, module, module.exports, __webpack_require__);
-            module.l = true;
-            return module.exports;
+            return modules[moduleId].call(module.exports, module, module.exports, __webpack_require__), 
+            module.l = !0, module.exports;
         }
-        __webpack_require__.m = modules;
-        __webpack_require__.c = installedModules;
+        var installedModules = {};
+        return __webpack_require__.m = modules, __webpack_require__.c = installedModules, 
         __webpack_require__.i = function(value) {
             return value;
-        };
-        __webpack_require__.d = function(exports, name, getter) {
-            if (!__webpack_require__.o(exports, name)) {
-                Object.defineProperty(exports, name, {
-                    configurable: false,
-                    enumerable: true,
-                    get: getter
-                });
-            }
-        };
-        __webpack_require__.n = function(module) {
-            var getter = module && module.__esModule ? function getDefault() {
-                return module["default"];
-            } : function getModuleExports() {
+        }, __webpack_require__.d = function(exports, name, getter) {
+            __webpack_require__.o(exports, name) || Object.defineProperty(exports, name, {
+                configurable: !1,
+                enumerable: !0,
+                get: getter
+            });
+        }, __webpack_require__.n = function(module) {
+            var getter = module && module.__esModule ? function() {
+                return module.default;
+            } : function() {
                 return module;
             };
-            __webpack_require__.d(getter, "a", getter);
-            return getter;
-        };
-        __webpack_require__.o = function(object, property) {
+            return __webpack_require__.d(getter, "a", getter), getter;
+        }, __webpack_require__.o = function(object, property) {
             return Object.prototype.hasOwnProperty.call(object, property);
-        };
-        __webpack_require__.p = "dist";
-        return __webpack_require__(__webpack_require__.s = 6);
+        }, __webpack_require__.p = "dist", __webpack_require__(__webpack_require__.s = 6);
     }([ function(module, exports, __webpack_require__) {
         "use strict";
         __webpack_require__(4);
-        var helpers_ts_1 = __webpack_require__(5);
-        var DATE_STRING_REGEX = /(^\d{1,4}[\.|\\/|-]\d{1,2}[\.|\\/|-]\d{1,4})(\s*(?:0?[1-9]:[0-5]|1(?=[012])\d:[0-5])\d\s*[ap]m)?$/;
-        var PARTIAL_DATE_REGEX = /\d{2}:\d{2}:\d{2} GMT-\d{4}/;
-        var JSON_DATE_REGEX = /\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{3}Z/;
-        var MAX_ANIMATED_TOGGLE_ITEMS = 10;
-        var requestAnimationFrame = window.requestAnimationFrame || function(cb) {
-            cb();
-            return 0;
-        };
-        var _defaultConfig = {
-            hoverPreviewEnabled: false,
+        var helpers_ts_1 = __webpack_require__(5), DATE_STRING_REGEX = /(^\d{1,4}[\.|\\/|-]\d{1,2}[\.|\\/|-]\d{1,4})(\s*(?:0?[1-9]:[0-5]|1(?=[012])\d:[0-5])\d\s*[ap]m)?$/, PARTIAL_DATE_REGEX = /\d{2}:\d{2}:\d{2} GMT-\d{4}/, JSON_DATE_REGEX = /\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{3}Z/, MAX_ANIMATED_TOGGLE_ITEMS = 10, requestAnimationFrame = window.requestAnimationFrame || function(cb) {
+            return cb(), 0;
+        }, _defaultConfig = {
+            hoverPreviewEnabled: !1,
             hoverPreviewArrayCount: 100,
             hoverPreviewFieldCount: 5,
-            animateOpen: true,
-            animateClose: true,
+            animateOpen: !0,
+            animateClose: !0,
             theme: null
         };
         module.exports = function() {
             function JSONFormatter(json, open, config, key) {
-                if (open === void 0) {
-                    open = 1;
-                }
-                if (config === void 0) {
-                    config = _defaultConfig;
-                }
-                this.json = json;
-                this.open = open;
-                this.config = config;
-                this.key = key;
-                this._isOpen = null;
-                if (this.config.hoverPreviewEnabled === undefined) {
-                    this.config.hoverPreviewEnabled = _defaultConfig.hoverPreviewEnabled;
-                }
-                if (this.config.hoverPreviewArrayCount === undefined) {
-                    this.config.hoverPreviewArrayCount = _defaultConfig.hoverPreviewArrayCount;
-                }
-                if (this.config.hoverPreviewFieldCount === undefined) {
-                    this.config.hoverPreviewFieldCount = _defaultConfig.hoverPreviewFieldCount;
-                }
+                void 0 === open && (open = 1), void 0 === config && (config = _defaultConfig), this.json = json, 
+                this.open = open, this.config = config, this.key = key, this._isOpen = null, void 0 === this.config.hoverPreviewEnabled && (this.config.hoverPreviewEnabled = _defaultConfig.hoverPreviewEnabled), 
+                void 0 === this.config.hoverPreviewArrayCount && (this.config.hoverPreviewArrayCount = _defaultConfig.hoverPreviewArrayCount), 
+                void 0 === this.config.hoverPreviewFieldCount && (this.config.hoverPreviewFieldCount = _defaultConfig.hoverPreviewFieldCount);
             }
-            Object.defineProperty(JSONFormatter.prototype, "isOpen", {
+            return Object.defineProperty(JSONFormatter.prototype, "isOpen", {
                 get: function() {
-                    if (this._isOpen !== null) {
-                        return this._isOpen;
-                    } else {
-                        return this.open > 0;
-                    }
+                    return null !== this._isOpen ? this._isOpen : this.open > 0;
                 },
                 set: function(value) {
                     this._isOpen = value;
                 },
-                enumerable: true,
-                configurable: true
-            });
-            Object.defineProperty(JSONFormatter.prototype, "isDate", {
+                enumerable: !0,
+                configurable: !0
+            }), Object.defineProperty(JSONFormatter.prototype, "isDate", {
                 get: function() {
-                    return this.type === "string" && (DATE_STRING_REGEX.test(this.json) || JSON_DATE_REGEX.test(this.json) || PARTIAL_DATE_REGEX.test(this.json));
+                    return "string" === this.type && (DATE_STRING_REGEX.test(this.json) || JSON_DATE_REGEX.test(this.json) || PARTIAL_DATE_REGEX.test(this.json));
                 },
-                enumerable: true,
-                configurable: true
-            });
-            Object.defineProperty(JSONFormatter.prototype, "isUrl", {
+                enumerable: !0,
+                configurable: !0
+            }), Object.defineProperty(JSONFormatter.prototype, "isUrl", {
                 get: function() {
-                    return this.type === "string" && this.json.indexOf("http") === 0;
+                    return "string" === this.type && 0 === this.json.indexOf("http");
                 },
-                enumerable: true,
-                configurable: true
-            });
-            Object.defineProperty(JSONFormatter.prototype, "isArray", {
+                enumerable: !0,
+                configurable: !0
+            }), Object.defineProperty(JSONFormatter.prototype, "isArray", {
                 get: function() {
                     return Array.isArray(this.json);
                 },
-                enumerable: true,
-                configurable: true
-            });
-            Object.defineProperty(JSONFormatter.prototype, "isObject", {
+                enumerable: !0,
+                configurable: !0
+            }), Object.defineProperty(JSONFormatter.prototype, "isObject", {
                 get: function() {
                     return helpers_ts_1.isObject(this.json);
                 },
-                enumerable: true,
-                configurable: true
-            });
-            Object.defineProperty(JSONFormatter.prototype, "isEmptyObject", {
+                enumerable: !0,
+                configurable: !0
+            }), Object.defineProperty(JSONFormatter.prototype, "isEmptyObject", {
                 get: function() {
                     return !this.keys.length && !this.isArray;
                 },
-                enumerable: true,
-                configurable: true
-            });
-            Object.defineProperty(JSONFormatter.prototype, "isEmpty", {
+                enumerable: !0,
+                configurable: !0
+            }), Object.defineProperty(JSONFormatter.prototype, "isEmpty", {
                 get: function() {
                     return this.isEmptyObject || this.keys && !this.keys.length && this.isArray;
                 },
-                enumerable: true,
-                configurable: true
-            });
-            Object.defineProperty(JSONFormatter.prototype, "hasKey", {
+                enumerable: !0,
+                configurable: !0
+            }), Object.defineProperty(JSONFormatter.prototype, "hasKey", {
                 get: function() {
-                    return typeof this.key !== "undefined";
+                    return "undefined" != typeof this.key;
                 },
-                enumerable: true,
-                configurable: true
-            });
-            Object.defineProperty(JSONFormatter.prototype, "constructorName", {
+                enumerable: !0,
+                configurable: !0
+            }), Object.defineProperty(JSONFormatter.prototype, "constructorName", {
                 get: function() {
                     return helpers_ts_1.getObjectName(this.json);
                 },
-                enumerable: true,
-                configurable: true
-            });
-            Object.defineProperty(JSONFormatter.prototype, "type", {
+                enumerable: !0,
+                configurable: !0
+            }), Object.defineProperty(JSONFormatter.prototype, "type", {
                 get: function() {
                     return helpers_ts_1.getType(this.json);
                 },
-                enumerable: true,
-                configurable: true
-            });
-            Object.defineProperty(JSONFormatter.prototype, "keys", {
+                enumerable: !0,
+                configurable: !0
+            }), Object.defineProperty(JSONFormatter.prototype, "keys", {
                 get: function() {
-                    if (this.isObject) {
-                        return Object.keys(this.json).map(function(key) {
-                            return key ? key : '""';
-                        });
-                    } else {
-                        return [];
-                    }
+                    return this.isObject ? Object.keys(this.json).map(function(key) {
+                        return key ? key : '""';
+                    }) : [];
                 },
-                enumerable: true,
-                configurable: true
-            });
-            JSONFormatter.prototype.toggleOpen = function() {
-                this.isOpen = !this.isOpen;
-                if (this.element) {
-                    if (this.isOpen) {
-                        this.appendChildren(this.config.animateOpen);
-                    } else {
-                        this.removeChildren(this.config.animateClose);
-                    }
-                    this.element.classList.toggle(helpers_ts_1.cssClass("open"));
-                }
-            };
-            JSONFormatter.prototype.openAtDepth = function(depth) {
-                if (depth === void 0) {
-                    depth = 1;
-                }
-                if (depth < 0) {
-                    return;
-                }
-                this.open = depth;
-                this.isOpen = depth !== 0;
-                if (this.element) {
-                    this.removeChildren(false);
-                    if (depth === 0) {
-                        this.element.classList.remove(helpers_ts_1.cssClass("open"));
-                    } else {
-                        this.appendChildren(this.config.animateOpen);
-                        this.element.classList.add(helpers_ts_1.cssClass("open"));
-                    }
-                }
-            };
-            JSONFormatter.prototype.getInlinepreview = function() {
+                enumerable: !0,
+                configurable: !0
+            }), JSONFormatter.prototype.toggleOpen = function() {
+                this.isOpen = !this.isOpen, this.element && (this.isOpen ? this.appendChildren(this.config.animateOpen) : this.removeChildren(this.config.animateClose), 
+                this.element.classList.toggle(helpers_ts_1.cssClass("open")));
+            }, JSONFormatter.prototype.openAtDepth = function(depth) {
+                void 0 === depth && (depth = 1), depth < 0 || (this.open = depth, this.isOpen = 0 !== depth, 
+                this.element && (this.removeChildren(!1), 0 === depth ? this.element.classList.remove(helpers_ts_1.cssClass("open")) : (this.appendChildren(this.config.animateOpen), 
+                this.element.classList.add(helpers_ts_1.cssClass("open")))));
+            }, JSONFormatter.prototype.getInlinepreview = function() {
                 var _this = this;
-                if (this.isArray) {
-                    if (this.json.length > this.config.hoverPreviewArrayCount) {
-                        return "Array[" + this.json.length + "]";
-                    } else {
-                        return "[" + this.json.map(helpers_ts_1.getPreview).join(", ") + "]";
-                    }
-                } else {
-                    var keys = this.keys;
-                    var narrowKeys = keys.slice(0, this.config.hoverPreviewFieldCount);
-                    var kvs = narrowKeys.map(function(key) {
-                        return key + ":" + helpers_ts_1.getPreview(_this.json[key]);
-                    });
-                    var ellipsis = keys.length >= this.config.hoverPreviewFieldCount ? "…" : "";
-                    return "{" + kvs.join(", ") + ellipsis + "}";
-                }
-            };
-            JSONFormatter.prototype.render = function() {
+                if (this.isArray) return this.json.length > this.config.hoverPreviewArrayCount ? "Array[" + this.json.length + "]" : "[" + this.json.map(helpers_ts_1.getPreview).join(", ") + "]";
+                var keys = this.keys, narrowKeys = keys.slice(0, this.config.hoverPreviewFieldCount), kvs = narrowKeys.map(function(key) {
+                    return key + ":" + helpers_ts_1.getPreview(_this.json[key]);
+                }), ellipsis = keys.length >= this.config.hoverPreviewFieldCount ? "…" : "";
+                return "{" + kvs.join(", ") + ellipsis + "}";
+            }, JSONFormatter.prototype.render = function() {
                 this.element = helpers_ts_1.createElement("div", "row");
                 var togglerLink = helpers_ts_1.createElement("a", "toggler-link");
-                if (this.isObject) {
-                    togglerLink.appendChild(helpers_ts_1.createElement("span", "toggler"));
-                }
-                if (this.hasKey) {
-                    togglerLink.appendChild(helpers_ts_1.createElement("span", "key", this.key + ":"));
-                }
-                if (this.isObject) {
-                    var value = helpers_ts_1.createElement("span", "value");
-                    var objectWrapperSpan = helpers_ts_1.createElement("span");
-                    var constructorName = helpers_ts_1.createElement("span", "constructor-name", this.constructorName);
-                    objectWrapperSpan.appendChild(constructorName);
-                    if (this.isArray) {
+                if (this.isObject && togglerLink.appendChild(helpers_ts_1.createElement("span", "toggler")), 
+                this.hasKey && togglerLink.appendChild(helpers_ts_1.createElement("span", "key", this.key + ":")), 
+                this.isObject) {
+                    var value = helpers_ts_1.createElement("span", "value"), objectWrapperSpan = helpers_ts_1.createElement("span"), constructorName = helpers_ts_1.createElement("span", "constructor-name", this.constructorName);
+                    if (objectWrapperSpan.appendChild(constructorName), this.isArray) {
                         var arrayWrapperSpan = helpers_ts_1.createElement("span");
-                        arrayWrapperSpan.appendChild(helpers_ts_1.createElement("span", "bracket", "["));
-                        arrayWrapperSpan.appendChild(helpers_ts_1.createElement("span", "number", this.json.length));
-                        arrayWrapperSpan.appendChild(helpers_ts_1.createElement("span", "bracket", "]"));
+                        arrayWrapperSpan.appendChild(helpers_ts_1.createElement("span", "bracket", "[")), 
+                        arrayWrapperSpan.appendChild(helpers_ts_1.createElement("span", "number", this.json.length)), 
+                        arrayWrapperSpan.appendChild(helpers_ts_1.createElement("span", "bracket", "]")), 
                         objectWrapperSpan.appendChild(arrayWrapperSpan);
                     }
-                    value.appendChild(objectWrapperSpan);
-                    togglerLink.appendChild(value);
+                    value.appendChild(objectWrapperSpan), togglerLink.appendChild(value);
                 } else {
                     var value = this.isUrl ? helpers_ts_1.createElement("a") : helpers_ts_1.createElement("span");
-                    value.classList.add(helpers_ts_1.cssClass(this.type));
-                    if (this.isDate) {
-                        value.classList.add(helpers_ts_1.cssClass("date"));
-                    }
-                    if (this.isUrl) {
-                        value.classList.add(helpers_ts_1.cssClass("url"));
-                        value.setAttribute("href", this.json);
-                    }
+                    value.classList.add(helpers_ts_1.cssClass(this.type)), this.isDate && value.classList.add(helpers_ts_1.cssClass("date")), 
+                    this.isUrl && (value.classList.add(helpers_ts_1.cssClass("url")), value.setAttribute("href", this.json));
                     var valuePreview = helpers_ts_1.getValuePreview(this.json, this.json);
-                    value.appendChild(document.createTextNode(valuePreview));
-                    togglerLink.appendChild(value);
+                    value.appendChild(document.createTextNode(valuePreview)), togglerLink.appendChild(value);
                 }
                 if (this.isObject && this.config.hoverPreviewEnabled) {
                     var preview = helpers_ts_1.createElement("span", "preview-text");
-                    preview.appendChild(document.createTextNode(this.getInlinepreview()));
-                    togglerLink.appendChild(preview);
+                    preview.appendChild(document.createTextNode(this.getInlinepreview())), togglerLink.appendChild(preview);
                 }
                 var children = helpers_ts_1.createElement("div", "children");
-                if (this.isObject) {
-                    children.classList.add(helpers_ts_1.cssClass("object"));
-                }
-                if (this.isArray) {
-                    children.classList.add(helpers_ts_1.cssClass("array"));
-                }
-                if (this.isEmpty) {
-                    children.classList.add(helpers_ts_1.cssClass("empty"));
-                }
-                if (this.config && this.config.theme) {
-                    this.element.classList.add(helpers_ts_1.cssClass(this.config.theme));
-                }
-                if (this.isOpen) {
-                    this.element.classList.add(helpers_ts_1.cssClass("open"));
-                }
-                this.element.appendChild(togglerLink);
-                this.element.appendChild(children);
-                if (this.isObject && this.isOpen) {
-                    this.appendChildren();
-                }
-                if (this.isObject) {
-                    togglerLink.addEventListener("click", this.toggleOpen.bind(this));
-                }
-                return this.element;
-            };
-            JSONFormatter.prototype.appendChildren = function(animated) {
+                return this.isObject && children.classList.add(helpers_ts_1.cssClass("object")), 
+                this.isArray && children.classList.add(helpers_ts_1.cssClass("array")), this.isEmpty && children.classList.add(helpers_ts_1.cssClass("empty")), 
+                this.config && this.config.theme && this.element.classList.add(helpers_ts_1.cssClass(this.config.theme)), 
+                this.isOpen && this.element.classList.add(helpers_ts_1.cssClass("open")), this.element.appendChild(togglerLink), 
+                this.element.appendChild(children), this.isObject && this.isOpen && this.appendChildren(), 
+                this.isObject && togglerLink.addEventListener("click", this.toggleOpen.bind(this)), 
+                this.element;
+            }, JSONFormatter.prototype.appendChildren = function(animated) {
                 var _this = this;
-                if (animated === void 0) {
-                    animated = false;
-                }
+                void 0 === animated && (animated = !1);
                 var children = this.element.querySelector("div." + helpers_ts_1.cssClass("children"));
-                if (!children || this.isEmpty) {
-                    return;
-                }
-                if (animated) {
-                    var index_1 = 0;
-                    var addAChild_1 = function() {
-                        var key = _this.keys[index_1];
-                        var formatter = new JSONFormatter(_this.json[key], _this.open - 1, _this.config, key);
-                        children.appendChild(formatter.render());
-                        index_1 += 1;
-                        if (index_1 < _this.keys.length) {
-                            if (index_1 > MAX_ANIMATED_TOGGLE_ITEMS) {
-                                addAChild_1();
-                            } else {
-                                requestAnimationFrame(addAChild_1);
-                            }
-                        }
+                if (children && !this.isEmpty) if (animated) {
+                    var index_1 = 0, addAChild_1 = function() {
+                        var key = _this.keys[index_1], formatter = new JSONFormatter(_this.json[key], _this.open - 1, _this.config, key);
+                        children.appendChild(formatter.render()), index_1 += 1, index_1 < _this.keys.length && (index_1 > MAX_ANIMATED_TOGGLE_ITEMS ? addAChild_1() : requestAnimationFrame(addAChild_1));
                     };
                     requestAnimationFrame(addAChild_1);
-                } else {
-                    this.keys.forEach(function(key) {
-                        var formatter = new JSONFormatter(_this.json[key], _this.open - 1, _this.config, key);
-                        children.appendChild(formatter.render());
-                    });
-                }
-            };
-            JSONFormatter.prototype.removeChildren = function(animated) {
-                if (animated === void 0) {
-                    animated = false;
-                }
+                } else this.keys.forEach(function(key) {
+                    var formatter = new JSONFormatter(_this.json[key], _this.open - 1, _this.config, key);
+                    children.appendChild(formatter.render());
+                });
+            }, JSONFormatter.prototype.removeChildren = function(animated) {
+                void 0 === animated && (animated = !1);
                 var childrenElement = this.element.querySelector("div." + helpers_ts_1.cssClass("children"));
                 if (animated) {
-                    var childrenRemoved_1 = 0;
-                    var removeAChild_1 = function() {
-                        if (childrenElement && childrenElement.children.length) {
-                            childrenElement.removeChild(childrenElement.children[0]);
-                            childrenRemoved_1 += 1;
-                            if (childrenRemoved_1 > MAX_ANIMATED_TOGGLE_ITEMS) {
-                                removeAChild_1();
-                            } else {
-                                requestAnimationFrame(removeAChild_1);
-                            }
-                        }
+                    var childrenRemoved_1 = 0, removeAChild_1 = function() {
+                        childrenElement && childrenElement.children.length && (childrenElement.removeChild(childrenElement.children[0]), 
+                        childrenRemoved_1 += 1, childrenRemoved_1 > MAX_ANIMATED_TOGGLE_ITEMS ? removeAChild_1() : requestAnimationFrame(removeAChild_1));
                     };
                     requestAnimationFrame(removeAChild_1);
-                } else {
-                    if (childrenElement) {
-                        childrenElement.innerHTML = "";
-                    }
-                }
-            };
-            return JSONFormatter;
+                } else childrenElement && (childrenElement.innerHTML = "");
+            }, JSONFormatter;
         }();
     }, function(module, exports, __webpack_require__) {
-        exports = module.exports = __webpack_require__(2)();
-        exports.push([ module.i, '.json-formatter-row {\n  font-family: monospace;\n}\n.json-formatter-row,\n.json-formatter-row a,\n.json-formatter-row a:hover {\n  color: black;\n  text-decoration: none;\n}\n.json-formatter-row .json-formatter-row {\n  margin-left: 1rem;\n}\n.json-formatter-row .json-formatter-children.json-formatter-empty {\n  opacity: 0.5;\n  margin-left: 1rem;\n}\n.json-formatter-row .json-formatter-children.json-formatter-empty:after {\n  display: none;\n}\n.json-formatter-row .json-formatter-children.json-formatter-empty.json-formatter-object:after {\n  content: "No properties";\n}\n.json-formatter-row .json-formatter-children.json-formatter-empty.json-formatter-array:after {\n  content: "[]";\n}\n.json-formatter-row .json-formatter-string {\n  color: green;\n  white-space: pre;\n  word-wrap: break-word;\n}\n.json-formatter-row .json-formatter-number {\n  color: blue;\n}\n.json-formatter-row .json-formatter-boolean {\n  color: red;\n}\n.json-formatter-row .json-formatter-null {\n  color: #855A00;\n}\n.json-formatter-row .json-formatter-undefined {\n  color: #ca0b69;\n}\n.json-formatter-row .json-formatter-function {\n  color: #FF20ED;\n}\n.json-formatter-row .json-formatter-date {\n  background-color: rgba(0, 0, 0, 0.05);\n}\n.json-formatter-row .json-formatter-url {\n  text-decoration: underline;\n  color: blue;\n  cursor: pointer;\n}\n.json-formatter-row .json-formatter-bracket {\n  color: blue;\n}\n.json-formatter-row .json-formatter-key {\n  color: #00008B;\n  cursor: pointer;\n  padding-right: 0.2rem;\n}\n.json-formatter-row .json-formatter-constructor-name {\n  cursor: pointer;\n}\n.json-formatter-row .json-formatter-toggler {\n  line-height: 1.2rem;\n  font-size: 0.7rem;\n  vertical-align: middle;\n  opacity: 0.6;\n  cursor: pointer;\n  padding-right: 0.2rem;\n}\n.json-formatter-row .json-formatter-toggler:after {\n  display: inline-block;\n  transition: transform 100ms ease-in;\n  content: "\\25BA";\n}\n.json-formatter-row > a > .json-formatter-preview-text {\n  opacity: 0;\n  transition: opacity 0.15s ease-in;\n  font-style: italic;\n}\n.json-formatter-row:hover > a > .json-formatter-preview-text {\n  opacity: 0.6;\n}\n.json-formatter-row.json-formatter-open > .json-formatter-toggler-link .json-formatter-toggler:after {\n  transform: rotate(90deg);\n}\n.json-formatter-row.json-formatter-open > .json-formatter-children:after {\n  display: inline-block;\n}\n.json-formatter-row.json-formatter-open > a > .json-formatter-preview-text {\n  display: none;\n}\n.json-formatter-row.json-formatter-open.json-formatter-empty:after {\n  display: block;\n}\n.json-formatter-dark.json-formatter-row {\n  font-family: monospace;\n}\n.json-formatter-dark.json-formatter-row,\n.json-formatter-dark.json-formatter-row a,\n.json-formatter-dark.json-formatter-row a:hover {\n  color: white;\n  text-decoration: none;\n}\n.json-formatter-dark.json-formatter-row .json-formatter-row {\n  margin-left: 1rem;\n}\n.json-formatter-dark.json-formatter-row .json-formatter-children.json-formatter-empty {\n  opacity: 0.5;\n  margin-left: 1rem;\n}\n.json-formatter-dark.json-formatter-row .json-formatter-children.json-formatter-empty:after {\n  display: none;\n}\n.json-formatter-dark.json-formatter-row .json-formatter-children.json-formatter-empty.json-formatter-object:after {\n  content: "No properties";\n}\n.json-formatter-dark.json-formatter-row .json-formatter-children.json-formatter-empty.json-formatter-array:after {\n  content: "[]";\n}\n.json-formatter-dark.json-formatter-row .json-formatter-string {\n  color: #31F031;\n  white-space: pre;\n  word-wrap: break-word;\n}\n.json-formatter-dark.json-formatter-row .json-formatter-number {\n  color: #66C2FF;\n}\n.json-formatter-dark.json-formatter-row .json-formatter-boolean {\n  color: #EC4242;\n}\n.json-formatter-dark.json-formatter-row .json-formatter-null {\n  color: #EEC97D;\n}\n.json-formatter-dark.json-formatter-row .json-formatter-undefined {\n  color: #ef8fbe;\n}\n.json-formatter-dark.json-formatter-row .json-formatter-function {\n  color: #FD48CB;\n}\n.json-formatter-dark.json-formatter-row .json-formatter-date {\n  background-color: rgba(255, 255, 255, 0.05);\n}\n.json-formatter-dark.json-formatter-row .json-formatter-url {\n  text-decoration: underline;\n  color: #027BFF;\n  cursor: pointer;\n}\n.json-formatter-dark.json-formatter-row .json-formatter-bracket {\n  color: #9494FF;\n}\n.json-formatter-dark.json-formatter-row .json-formatter-key {\n  color: #23A0DB;\n  cursor: pointer;\n  padding-right: 0.2rem;\n}\n.json-formatter-dark.json-formatter-row .json-formatter-constructor-name {\n  cursor: pointer;\n}\n.json-formatter-dark.json-formatter-row .json-formatter-toggler {\n  line-height: 1.2rem;\n  font-size: 0.7rem;\n  vertical-align: middle;\n  opacity: 0.6;\n  cursor: pointer;\n  padding-right: 0.2rem;\n}\n.json-formatter-dark.json-formatter-row .json-formatter-toggler:after {\n  display: inline-block;\n  transition: transform 100ms ease-in;\n  content: "\\25BA";\n}\n.json-formatter-dark.json-formatter-row > a > .json-formatter-preview-text {\n  opacity: 0;\n  transition: opacity 0.15s ease-in;\n  font-style: italic;\n}\n.json-formatter-dark.json-formatter-row:hover > a > .json-formatter-preview-text {\n  opacity: 0.6;\n}\n.json-formatter-dark.json-formatter-row.json-formatter-open > .json-formatter-toggler-link .json-formatter-toggler:after {\n  transform: rotate(90deg);\n}\n.json-formatter-dark.json-formatter-row.json-formatter-open > .json-formatter-children:after {\n  display: inline-block;\n}\n.json-formatter-dark.json-formatter-row.json-formatter-open > a > .json-formatter-preview-text {\n  display: none;\n}\n.json-formatter-dark.json-formatter-row.json-formatter-open.json-formatter-empty:after {\n  display: block;\n}\n', "" ]);
+        exports = module.exports = __webpack_require__(2)(), exports.push([ module.i, '.json-formatter-row {\n  font-family: monospace;\n}\n.json-formatter-row,\n.json-formatter-row a,\n.json-formatter-row a:hover {\n  color: black;\n  text-decoration: none;\n}\n.json-formatter-row .json-formatter-row {\n  margin-left: 1rem;\n}\n.json-formatter-row .json-formatter-children.json-formatter-empty {\n  opacity: 0.5;\n  margin-left: 1rem;\n}\n.json-formatter-row .json-formatter-children.json-formatter-empty:after {\n  display: none;\n}\n.json-formatter-row .json-formatter-children.json-formatter-empty.json-formatter-object:after {\n  content: "No properties";\n}\n.json-formatter-row .json-formatter-children.json-formatter-empty.json-formatter-array:after {\n  content: "[]";\n}\n.json-formatter-row .json-formatter-string {\n  color: green;\n  white-space: pre;\n  word-wrap: break-word;\n}\n.json-formatter-row .json-formatter-number {\n  color: blue;\n}\n.json-formatter-row .json-formatter-boolean {\n  color: red;\n}\n.json-formatter-row .json-formatter-null {\n  color: #855A00;\n}\n.json-formatter-row .json-formatter-undefined {\n  color: #ca0b69;\n}\n.json-formatter-row .json-formatter-function {\n  color: #FF20ED;\n}\n.json-formatter-row .json-formatter-date {\n  background-color: rgba(0, 0, 0, 0.05);\n}\n.json-formatter-row .json-formatter-url {\n  text-decoration: underline;\n  color: blue;\n  cursor: pointer;\n}\n.json-formatter-row .json-formatter-bracket {\n  color: blue;\n}\n.json-formatter-row .json-formatter-key {\n  color: #00008B;\n  cursor: pointer;\n  padding-right: 0.2rem;\n}\n.json-formatter-row .json-formatter-constructor-name {\n  cursor: pointer;\n}\n.json-formatter-row .json-formatter-toggler {\n  line-height: 1.2rem;\n  font-size: 0.7rem;\n  vertical-align: middle;\n  opacity: 0.6;\n  cursor: pointer;\n  padding-right: 0.2rem;\n}\n.json-formatter-row .json-formatter-toggler:after {\n  display: inline-block;\n  transition: transform 100ms ease-in;\n  content: "\\25BA";\n}\n.json-formatter-row > a > .json-formatter-preview-text {\n  opacity: 0;\n  transition: opacity 0.15s ease-in;\n  font-style: italic;\n}\n.json-formatter-row:hover > a > .json-formatter-preview-text {\n  opacity: 0.6;\n}\n.json-formatter-row.json-formatter-open > .json-formatter-toggler-link .json-formatter-toggler:after {\n  transform: rotate(90deg);\n}\n.json-formatter-row.json-formatter-open > .json-formatter-children:after {\n  display: inline-block;\n}\n.json-formatter-row.json-formatter-open > a > .json-formatter-preview-text {\n  display: none;\n}\n.json-formatter-row.json-formatter-open.json-formatter-empty:after {\n  display: block;\n}\n.json-formatter-dark.json-formatter-row {\n  font-family: monospace;\n}\n.json-formatter-dark.json-formatter-row,\n.json-formatter-dark.json-formatter-row a,\n.json-formatter-dark.json-formatter-row a:hover {\n  color: white;\n  text-decoration: none;\n}\n.json-formatter-dark.json-formatter-row .json-formatter-row {\n  margin-left: 1rem;\n}\n.json-formatter-dark.json-formatter-row .json-formatter-children.json-formatter-empty {\n  opacity: 0.5;\n  margin-left: 1rem;\n}\n.json-formatter-dark.json-formatter-row .json-formatter-children.json-formatter-empty:after {\n  display: none;\n}\n.json-formatter-dark.json-formatter-row .json-formatter-children.json-formatter-empty.json-formatter-object:after {\n  content: "No properties";\n}\n.json-formatter-dark.json-formatter-row .json-formatter-children.json-formatter-empty.json-formatter-array:after {\n  content: "[]";\n}\n.json-formatter-dark.json-formatter-row .json-formatter-string {\n  color: #31F031;\n  white-space: pre;\n  word-wrap: break-word;\n}\n.json-formatter-dark.json-formatter-row .json-formatter-number {\n  color: #66C2FF;\n}\n.json-formatter-dark.json-formatter-row .json-formatter-boolean {\n  color: #EC4242;\n}\n.json-formatter-dark.json-formatter-row .json-formatter-null {\n  color: #EEC97D;\n}\n.json-formatter-dark.json-formatter-row .json-formatter-undefined {\n  color: #ef8fbe;\n}\n.json-formatter-dark.json-formatter-row .json-formatter-function {\n  color: #FD48CB;\n}\n.json-formatter-dark.json-formatter-row .json-formatter-date {\n  background-color: rgba(255, 255, 255, 0.05);\n}\n.json-formatter-dark.json-formatter-row .json-formatter-url {\n  text-decoration: underline;\n  color: #027BFF;\n  cursor: pointer;\n}\n.json-formatter-dark.json-formatter-row .json-formatter-bracket {\n  color: #9494FF;\n}\n.json-formatter-dark.json-formatter-row .json-formatter-key {\n  color: #23A0DB;\n  cursor: pointer;\n  padding-right: 0.2rem;\n}\n.json-formatter-dark.json-formatter-row .json-formatter-constructor-name {\n  cursor: pointer;\n}\n.json-formatter-dark.json-formatter-row .json-formatter-toggler {\n  line-height: 1.2rem;\n  font-size: 0.7rem;\n  vertical-align: middle;\n  opacity: 0.6;\n  cursor: pointer;\n  padding-right: 0.2rem;\n}\n.json-formatter-dark.json-formatter-row .json-formatter-toggler:after {\n  display: inline-block;\n  transition: transform 100ms ease-in;\n  content: "\\25BA";\n}\n.json-formatter-dark.json-formatter-row > a > .json-formatter-preview-text {\n  opacity: 0;\n  transition: opacity 0.15s ease-in;\n  font-style: italic;\n}\n.json-formatter-dark.json-formatter-row:hover > a > .json-formatter-preview-text {\n  opacity: 0.6;\n}\n.json-formatter-dark.json-formatter-row.json-formatter-open > .json-formatter-toggler-link .json-formatter-toggler:after {\n  transform: rotate(90deg);\n}\n.json-formatter-dark.json-formatter-row.json-formatter-open > .json-formatter-children:after {\n  display: inline-block;\n}\n.json-formatter-dark.json-formatter-row.json-formatter-open > a > .json-formatter-preview-text {\n  display: none;\n}\n.json-formatter-dark.json-formatter-row.json-formatter-open.json-formatter-empty:after {\n  display: block;\n}\n', "" ]);
     }, function(module, exports) {
         module.exports = function() {
             var list = [];
-            list.toString = function toString() {
-                var result = [];
-                for (var i = 0; i < this.length; i++) {
+            return list.toString = function() {
+                for (var result = [], i = 0; i < this.length; i++) {
                     var item = this[i];
-                    if (item[2]) {
-                        result.push("@media " + item[2] + "{" + item[1] + "}");
-                    } else {
-                        result.push(item[1]);
-                    }
+                    item[2] ? result.push("@media " + item[2] + "{" + item[1] + "}") : result.push(item[1]);
                 }
                 return result.join("");
-            };
-            list.i = function(modules, mediaQuery) {
-                if (typeof modules === "string") modules = [ [ null, modules, "" ] ];
-                var alreadyImportedModules = {};
-                for (var i = 0; i < this.length; i++) {
+            }, list.i = function(modules, mediaQuery) {
+                "string" == typeof modules && (modules = [ [ null, modules, "" ] ]);
+                for (var alreadyImportedModules = {}, i = 0; i < this.length; i++) {
                     var id = this[i][0];
-                    if (typeof id === "number") alreadyImportedModules[id] = true;
+                    "number" == typeof id && (alreadyImportedModules[id] = !0);
                 }
                 for (i = 0; i < modules.length; i++) {
                     var item = modules[i];
-                    if (typeof item[0] !== "number" || !alreadyImportedModules[item[0]]) {
-                        if (mediaQuery && !item[2]) {
-                            item[2] = mediaQuery;
-                        } else if (mediaQuery) {
-                            item[2] = "(" + item[2] + ") and (" + mediaQuery + ")";
-                        }
-                        list.push(item);
-                    }
+                    "number" == typeof item[0] && alreadyImportedModules[item[0]] || (mediaQuery && !item[2] ? item[2] = mediaQuery : mediaQuery && (item[2] = "(" + item[2] + ") and (" + mediaQuery + ")"), 
+                    list.push(item));
                 }
-            };
-            return list;
+            }, list;
         };
     }, function(module, exports) {
-        var stylesInDom = {}, memoize = function(fn) {
-            var memo;
-            return function() {
-                if (typeof memo === "undefined") memo = fn.apply(this, arguments);
-                return memo;
-            };
-        }, isOldIE = memoize(function() {
-            return /msie [6-9]\b/.test(window.navigator.userAgent.toLowerCase());
-        }), getHeadElement = memoize(function() {
-            return document.head || document.getElementsByTagName("head")[0];
-        }), singletonElement = null, singletonCounter = 0, styleElementsInsertedAtTop = [];
-        module.exports = function(list, options) {
-            if (typeof DEBUG !== "undefined" && DEBUG) {
-                if (typeof document !== "object") throw new Error("The style-loader cannot be used in a non-browser environment");
-            }
-            options = options || {};
-            if (typeof options.singleton === "undefined") options.singleton = isOldIE();
-            if (typeof options.insertAt === "undefined") options.insertAt = "bottom";
-            var styles = listToStyles(list);
-            addStylesToDom(styles, options);
-            return function update(newList) {
-                var mayRemove = [];
-                for (var i = 0; i < styles.length; i++) {
-                    var item = styles[i];
-                    var domStyle = stylesInDom[item.id];
-                    domStyle.refs--;
-                    mayRemove.push(domStyle);
-                }
-                if (newList) {
-                    var newStyles = listToStyles(newList);
-                    addStylesToDom(newStyles, options);
-                }
-                for (var i = 0; i < mayRemove.length; i++) {
-                    var domStyle = mayRemove[i];
-                    if (domStyle.refs === 0) {
-                        for (var j = 0; j < domStyle.parts.length; j++) domStyle.parts[j]();
-                        delete stylesInDom[domStyle.id];
-                    }
-                }
-            };
-        };
         function addStylesToDom(styles, options) {
             for (var i = 0; i < styles.length; i++) {
-                var item = styles[i];
-                var domStyle = stylesInDom[item.id];
+                var item = styles[i], domStyle = stylesInDom[item.id];
                 if (domStyle) {
                     domStyle.refs++;
-                    for (var j = 0; j < domStyle.parts.length; j++) {
-                        domStyle.parts[j](item.parts[j]);
-                    }
-                    for (;j < item.parts.length; j++) {
-                        domStyle.parts.push(addStyle(item.parts[j], options));
-                    }
+                    for (var j = 0; j < domStyle.parts.length; j++) domStyle.parts[j](item.parts[j]);
+                    for (;j < item.parts.length; j++) domStyle.parts.push(addStyle(item.parts[j], options));
                 } else {
-                    var parts = [];
-                    for (var j = 0; j < item.parts.length; j++) {
-                        parts.push(addStyle(item.parts[j], options));
-                    }
+                    for (var parts = [], j = 0; j < item.parts.length; j++) parts.push(addStyle(item.parts[j], options));
                     stylesInDom[item.id] = {
                         id: item.id,
                         refs: 1,
@@ -457,161 +240,128 @@
             }
         }
         function listToStyles(list) {
-            var styles = [];
-            var newStyles = {};
-            for (var i = 0; i < list.length; i++) {
-                var item = list[i];
-                var id = item[0];
-                var css = item[1];
-                var media = item[2];
-                var sourceMap = item[3];
-                var part = {
+            for (var styles = [], newStyles = {}, i = 0; i < list.length; i++) {
+                var item = list[i], id = item[0], css = item[1], media = item[2], sourceMap = item[3], part = {
                     css: css,
                     media: media,
                     sourceMap: sourceMap
                 };
-                if (!newStyles[id]) styles.push(newStyles[id] = {
+                newStyles[id] ? newStyles[id].parts.push(part) : styles.push(newStyles[id] = {
                     id: id,
                     parts: [ part ]
-                }); else newStyles[id].parts.push(part);
+                });
             }
             return styles;
         }
         function insertStyleElement(options, styleElement) {
-            var head = getHeadElement();
-            var lastStyleElementInsertedAtTop = styleElementsInsertedAtTop[styleElementsInsertedAtTop.length - 1];
-            if (options.insertAt === "top") {
-                if (!lastStyleElementInsertedAtTop) {
-                    head.insertBefore(styleElement, head.firstChild);
-                } else if (lastStyleElementInsertedAtTop.nextSibling) {
-                    head.insertBefore(styleElement, lastStyleElementInsertedAtTop.nextSibling);
-                } else {
-                    head.appendChild(styleElement);
-                }
-                styleElementsInsertedAtTop.push(styleElement);
-            } else if (options.insertAt === "bottom") {
+            var head = getHeadElement(), lastStyleElementInsertedAtTop = styleElementsInsertedAtTop[styleElementsInsertedAtTop.length - 1];
+            if ("top" === options.insertAt) lastStyleElementInsertedAtTop ? lastStyleElementInsertedAtTop.nextSibling ? head.insertBefore(styleElement, lastStyleElementInsertedAtTop.nextSibling) : head.appendChild(styleElement) : head.insertBefore(styleElement, head.firstChild), 
+            styleElementsInsertedAtTop.push(styleElement); else {
+                if ("bottom" !== options.insertAt) throw new Error("Invalid value for parameter 'insertAt'. Must be 'top' or 'bottom'.");
                 head.appendChild(styleElement);
-            } else {
-                throw new Error("Invalid value for parameter 'insertAt'. Must be 'top' or 'bottom'.");
             }
         }
         function removeStyleElement(styleElement) {
             styleElement.parentNode.removeChild(styleElement);
             var idx = styleElementsInsertedAtTop.indexOf(styleElement);
-            if (idx >= 0) {
-                styleElementsInsertedAtTop.splice(idx, 1);
-            }
+            idx >= 0 && styleElementsInsertedAtTop.splice(idx, 1);
         }
         function createStyleElement(options) {
             var styleElement = document.createElement("style");
-            styleElement.type = "text/css";
-            insertStyleElement(options, styleElement);
-            return styleElement;
+            return styleElement.type = "text/css", insertStyleElement(options, styleElement), 
+            styleElement;
         }
         function createLinkElement(options) {
             var linkElement = document.createElement("link");
-            linkElement.rel = "stylesheet";
-            insertStyleElement(options, linkElement);
-            return linkElement;
+            return linkElement.rel = "stylesheet", insertStyleElement(options, linkElement), 
+            linkElement;
         }
         function addStyle(obj, options) {
             var styleElement, update, remove;
             if (options.singleton) {
                 var styleIndex = singletonCounter++;
-                styleElement = singletonElement || (singletonElement = createStyleElement(options));
-                update = applyToSingletonTag.bind(null, styleElement, styleIndex, false);
-                remove = applyToSingletonTag.bind(null, styleElement, styleIndex, true);
-            } else if (obj.sourceMap && typeof URL === "function" && typeof URL.createObjectURL === "function" && typeof URL.revokeObjectURL === "function" && typeof Blob === "function" && typeof btoa === "function") {
-                styleElement = createLinkElement(options);
-                update = updateLink.bind(null, styleElement);
-                remove = function() {
-                    removeStyleElement(styleElement);
-                    if (styleElement.href) URL.revokeObjectURL(styleElement.href);
-                };
-            } else {
-                styleElement = createStyleElement(options);
-                update = applyToTag.bind(null, styleElement);
-                remove = function() {
-                    removeStyleElement(styleElement);
-                };
-            }
-            update(obj);
-            return function updateStyle(newObj) {
+                styleElement = singletonElement || (singletonElement = createStyleElement(options)), 
+                update = applyToSingletonTag.bind(null, styleElement, styleIndex, !1), remove = applyToSingletonTag.bind(null, styleElement, styleIndex, !0);
+            } else obj.sourceMap && "function" == typeof URL && "function" == typeof URL.createObjectURL && "function" == typeof URL.revokeObjectURL && "function" == typeof Blob && "function" == typeof btoa ? (styleElement = createLinkElement(options), 
+            update = updateLink.bind(null, styleElement), remove = function() {
+                removeStyleElement(styleElement), styleElement.href && URL.revokeObjectURL(styleElement.href);
+            }) : (styleElement = createStyleElement(options), update = applyToTag.bind(null, styleElement), 
+            remove = function() {
+                removeStyleElement(styleElement);
+            });
+            return update(obj), function(newObj) {
                 if (newObj) {
                     if (newObj.css === obj.css && newObj.media === obj.media && newObj.sourceMap === obj.sourceMap) return;
                     update(obj = newObj);
-                } else {
-                    remove();
-                }
+                } else remove();
             };
         }
-        var replaceText = function() {
-            var textStore = [];
-            return function(index, replacement) {
-                textStore[index] = replacement;
-                return textStore.filter(Boolean).join("\n");
-            };
-        }();
         function applyToSingletonTag(styleElement, index, remove, obj) {
             var css = remove ? "" : obj.css;
-            if (styleElement.styleSheet) {
-                styleElement.styleSheet.cssText = replaceText(index, css);
-            } else {
-                var cssNode = document.createTextNode(css);
-                var childNodes = styleElement.childNodes;
-                if (childNodes[index]) styleElement.removeChild(childNodes[index]);
-                if (childNodes.length) {
-                    styleElement.insertBefore(cssNode, childNodes[index]);
-                } else {
-                    styleElement.appendChild(cssNode);
-                }
+            if (styleElement.styleSheet) styleElement.styleSheet.cssText = replaceText(index, css); else {
+                var cssNode = document.createTextNode(css), childNodes = styleElement.childNodes;
+                childNodes[index] && styleElement.removeChild(childNodes[index]), childNodes.length ? styleElement.insertBefore(cssNode, childNodes[index]) : styleElement.appendChild(cssNode);
             }
         }
         function applyToTag(styleElement, obj) {
-            var css = obj.css;
-            var media = obj.media;
-            if (media) {
-                styleElement.setAttribute("media", media);
-            }
-            if (styleElement.styleSheet) {
-                styleElement.styleSheet.cssText = css;
-            } else {
-                while (styleElement.firstChild) {
-                    styleElement.removeChild(styleElement.firstChild);
-                }
+            var css = obj.css, media = obj.media;
+            if (media && styleElement.setAttribute("media", media), styleElement.styleSheet) styleElement.styleSheet.cssText = css; else {
+                for (;styleElement.firstChild; ) styleElement.removeChild(styleElement.firstChild);
                 styleElement.appendChild(document.createTextNode(css));
             }
         }
         function updateLink(linkElement, obj) {
-            var css = obj.css;
-            var sourceMap = obj.sourceMap;
-            if (sourceMap) {
-                css += "\n/*# sourceMappingURL=data:application/json;base64," + btoa(unescape(encodeURIComponent(JSON.stringify(sourceMap)))) + " */";
-            }
+            var css = obj.css, sourceMap = obj.sourceMap;
+            sourceMap && (css += "\n/*# sourceMappingURL=data:application/json;base64," + btoa(unescape(encodeURIComponent(JSON.stringify(sourceMap)))) + " */");
             var blob = new Blob([ css ], {
                 type: "text/css"
-            });
-            var oldSrc = linkElement.href;
-            linkElement.href = URL.createObjectURL(blob);
-            if (oldSrc) URL.revokeObjectURL(oldSrc);
+            }), oldSrc = linkElement.href;
+            linkElement.href = URL.createObjectURL(blob), oldSrc && URL.revokeObjectURL(oldSrc);
         }
+        var stylesInDom = {}, memoize = function(fn) {
+            var memo;
+            return function() {
+                return "undefined" == typeof memo && (memo = fn.apply(this, arguments)), memo;
+            };
+        }, isOldIE = memoize(function() {
+            return /msie [6-9]\b/.test(window.navigator.userAgent.toLowerCase());
+        }), getHeadElement = memoize(function() {
+            return document.head || document.getElementsByTagName("head")[0];
+        }), singletonElement = null, singletonCounter = 0, styleElementsInsertedAtTop = [];
+        module.exports = function(list, options) {
+            if ("undefined" != typeof DEBUG && DEBUG && "object" != typeof document) throw new Error("The style-loader cannot be used in a non-browser environment");
+            options = options || {}, "undefined" == typeof options.singleton && (options.singleton = isOldIE()), 
+            "undefined" == typeof options.insertAt && (options.insertAt = "bottom");
+            var styles = listToStyles(list);
+            return addStylesToDom(styles, options), function(newList) {
+                for (var mayRemove = [], i = 0; i < styles.length; i++) {
+                    var item = styles[i], domStyle = stylesInDom[item.id];
+                    domStyle.refs--, mayRemove.push(domStyle);
+                }
+                if (newList) {
+                    var newStyles = listToStyles(newList);
+                    addStylesToDom(newStyles, options);
+                }
+                for (var i = 0; i < mayRemove.length; i++) {
+                    var domStyle = mayRemove[i];
+                    if (0 === domStyle.refs) {
+                        for (var j = 0; j < domStyle.parts.length; j++) domStyle.parts[j]();
+                        delete stylesInDom[domStyle.id];
+                    }
+                }
+            };
+        };
+        var replaceText = function() {
+            var textStore = [];
+            return function(index, replacement) {
+                return textStore[index] = replacement, textStore.filter(Boolean).join("\n");
+            };
+        }();
     }, function(module, exports, __webpack_require__) {
         var content = __webpack_require__(1);
-        if (typeof content === "string") content = [ [ module.i, content, "" ] ];
-        var update = __webpack_require__(3)(content, {});
-        if (content.locals) module.exports = content.locals;
-        if (false) {
-            if (!content.locals) {
-                module.hot.accept("!!./../node_modules/css-loader/index.js!./../node_modules/less-loader/index.js!./style.less", function() {
-                    var newContent = require("!!./../node_modules/css-loader/index.js!./../node_modules/less-loader/index.js!./style.less");
-                    if (typeof newContent === "string") newContent = [ [ module.id, newContent, "" ] ];
-                    update(newContent);
-                });
-            }
-            module.hot.dispose(function() {
-                update();
-            });
-        }
+        "string" == typeof content && (content = [ [ module.i, content, "" ] ]);
+        __webpack_require__(3)(content, {});
+        content.locals && (module.exports = content.locals);
     }, function(module, exports, __webpack_require__) {
         "use strict";
         function escapeString(str) {
@@ -619,78 +369,38 @@
         }
         function isObject(value) {
             var type = typeof value;
-            return !!value && type == "object";
+            return !!value && "object" == type;
         }
-        exports.isObject = isObject;
         function getObjectName(object) {
-            if (object === undefined) {
-                return "";
-            }
-            if (object === null) {
-                return "Object";
-            }
-            if (typeof object === "object" && !object.constructor) {
-                return "Object";
-            }
-            var funcNameRegex = /function ([^(]*)/;
-            var results = funcNameRegex.exec(object.constructor.toString());
-            if (results && results.length > 1) {
-                return results[1];
-            } else {
-                return "";
-            }
+            if (void 0 === object) return "";
+            if (null === object) return "Object";
+            if ("object" == typeof object && !object.constructor) return "Object";
+            var funcNameRegex = /function ([^(]*)/, results = funcNameRegex.exec(object.constructor.toString());
+            return results && results.length > 1 ? results[1] : "";
         }
-        exports.getObjectName = getObjectName;
         function getType(object) {
-            if (object === null) {
-                return "null";
-            }
-            return typeof object;
+            return null === object ? "null" : typeof object;
         }
-        exports.getType = getType;
         function getValuePreview(object, value) {
             var type = getType(object);
-            if (type === "null" || type === "undefined") {
-                return type;
-            }
-            if (type === "string") {
-                value = '"' + escapeString(value) + '"';
-            }
-            if (type === "function") {
-                return object.toString().replace(/[\r\n]/g, "").replace(/\{.*\}/, "") + "{…}";
-            }
-            return value;
+            return "null" === type || "undefined" === type ? type : ("string" === type && (value = '"' + escapeString(value) + '"'), 
+            "function" === type ? object.toString().replace(/[\r\n]/g, "").replace(/\{.*\}/, "") + "{…}" : value);
         }
-        exports.getValuePreview = getValuePreview;
         function getPreview(object) {
             var value = "";
-            if (isObject(object)) {
-                value = getObjectName(object);
-                if (Array.isArray(object)) value += "[" + object.length + "]";
-            } else {
-                value = getValuePreview(object, object);
-            }
-            return value;
+            return isObject(object) ? (value = getObjectName(object), Array.isArray(object) && (value += "[" + object.length + "]")) : value = getValuePreview(object, object), 
+            value;
         }
-        exports.getPreview = getPreview;
         function cssClass(className) {
             return "json-formatter-" + className;
         }
-        exports.cssClass = cssClass;
         function createElement(type, className, content) {
             var el = document.createElement(type);
-            if (className) {
-                el.classList.add(cssClass(className));
-            }
-            if (content !== undefined) {
-                if (content instanceof Node) {
-                    el.appendChild(content);
-                } else {
-                    el.appendChild(document.createTextNode(String(content)));
-                }
-            }
-            return el;
+            return className && el.classList.add(cssClass(className)), void 0 !== content && (content instanceof Node ? el.appendChild(content) : el.appendChild(document.createTextNode(String(content)))), 
+            el;
         }
+        exports.isObject = isObject, exports.getObjectName = getObjectName, exports.getType = getType, 
+        exports.getValuePreview = getValuePreview, exports.getPreview = getPreview, exports.cssClass = cssClass, 
         exports.createElement = createElement;
     }, function(module, exports, __webpack_require__) {
         module.exports = __webpack_require__(0);
