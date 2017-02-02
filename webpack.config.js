@@ -17,10 +17,14 @@ module.exports = {
     umdNamedDefine: true
   },
   module: {
-    loaders: [
+    rules: [
       {
         test: /\.less$/,
-        loader: "style-loader!css-loader!less-loader"
+        use: [
+          "style-loader",
+          "css-loader",
+          "less-loader"
+        ]
       },
       {
         test: /\.ts$/,
