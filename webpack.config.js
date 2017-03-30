@@ -17,15 +17,29 @@ module.exports = {
     umdNamedDefine: true
   },
   module: {
-    loaders: [
+    rules: [
       {
         test: /\.less$/,
-        loader: 'style?sourceMap!css?sourceMap!less?sourceMap'
+        use: [
+          "style-loader",
+          "css-loader",
+          "less-loader"
+        ]
       },
       {
         test: /\.ts$/,
         loader: 'ts-loader'
       }
     ]
-  }
+  },
+  plugins: [
+    new webpack.optimize.UglifyJsPlugin({
+      beautify: true,
+      compress: {
+        dead_code: true
+      },
+      sourceMap: true,
+      mangle: false
+    })
+  ]
 };
