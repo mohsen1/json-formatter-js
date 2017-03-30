@@ -1,16 +1,11 @@
 'use strict';
-
-declare const describe;
-declare const it;
-declare const expect;
-declare const JSONFormatter;
-
+import { default as JSONFormatter } from '../src/index';
 
 describe('null', () => {
     it('should render "null"', () => {
         const formatter = new JSONFormatter(null);
-
-        expect(formatter.render().innerText).to.contain('null');
+        const el = formatter.render();
+        expect(el.textContent).toContain('null');
     });
 });
 
@@ -18,7 +13,7 @@ describe('undefined', () => {
     it('should render "undefined"', () => {
         const formatter = new JSONFormatter(undefined);
 
-        expect(formatter.render().innerText).to.contain('undefined');
+        expect(formatter.render().textContent).toContain('undefined');
     });
 });
 
@@ -29,14 +24,14 @@ describe('object function constructor', () => {
         const obj = new Format();
 
         const formatter = new JSONFormatter(obj);
-        expect(formatter.constructorName).to.equal('Format');
+        expect(formatter['constructorName']).toEqual('Format');
     });
 
     it('should output "BrokenFormat"', () => {
         const failConstructor = 'function BrokenFormat() {Object.assign(}';
         const funcNameRegex = /function ([^(]*)/;
         const results = (funcNameRegex).exec(failConstructor.toString());
-        expect(results[1]).to.equal('BrokenFormat');
+        expect(results[1]).toEqual('BrokenFormat');
     });
 });
 
@@ -46,12 +41,12 @@ describe('function', () => {
         const formatter = new JSONFormatter(function add(a, b) {
             return a + b;
         });
-        const elementText = formatter.render().innerText;
+        const elementText = formatter.render().textContent;
 
-        expect(elementText).to.contain('function');
-        expect(elementText).to.contain('add');
-        expect(elementText).to.contain('(a, b)');
-        expect(elementText.trim().match(/function\s[^\(]*\([^\)]*\)\s*(.*)/)[1]).to.equal('{…}');
+        expect(elementText).toContain('function');
+        expect(elementText).toContain('add');
+        expect(elementText).toContain('(a, b)');
+        expect(elementText.trim().match(/function\s[^\(]*\([^\)]*\)\s*(.*)/)[1]).toEqual('{…}');
     });
 });
 
@@ -59,7 +54,7 @@ describe('string', () => {
     it('should render "Hello World!"', () => {
         const formatter = new JSONFormatter('Hello World!');
 
-        expect(formatter.render().innerText).to.contain('Hello World');
+        expect(formatter.render().textContent).toContain('Hello World');
     });
 });
 
@@ -67,12 +62,12 @@ describe('date string', () => {
     const formatter = new JSONFormatter(new Date(0).toString());
 
     it('should render "' + (new Date(0)).toString() + '"', () => {
-        expect(formatter.render().innerText).to.contain('"' + (new Date(0)).toString() + '"');
+        expect(formatter.render().textContent).toContain('"' + (new Date(0)).toString() + '"');
     });
 
     it('should assing date class to date string', () => {
         const formatter = new JSONFormatter('2015-12-05T18:58:53.727Z');
-        expect(formatter.render().querySelector('.json-formatter-date')).not.to.be.null;
+        expect(formatter.render().querySelector('.json-formatter-date')).not.toBeNull();
     });
 });
 
@@ -80,11 +75,11 @@ describe('url string', () => {
     const formatter = new JSONFormatter('https://example.com');
 
     it('should render "https://example.com"', () => {
-        expect(formatter.render().innerText).to.contain('"https://example.com"');
+        expect(formatter.render().textContent).toContain('"https://example.com"');
     });
 
     it('should make a link and add class "url"', () => {
-        expect(formatter.render().querySelector('a.json-formatter-url')).not.to.equal(null);
+        expect(formatter.render().querySelector('a.json-formatter-url')).not.toEqual(null);
     });
 });
 
@@ -97,24 +92,24 @@ describe('openAtDepth after rendering', () => {
 
     it('should open at depth 1', () => {
         formatter.openAtDepth();
-        expect(element.outerHTML).to.contain('depth1');
-        expect(element.outerHTML).to.not.contain('depth2');
-        expect(element.outerHTML).to.not.contain('depth3');
-        expect(element.outerHTML).to.not.contain('depth4');
+        expect(element.outerHTML).toContain('depth1');
+        expect(element.outerHTML).not.toContain('depth2');
+        expect(element.outerHTML).not.toContain('depth3');
+        expect(element.outerHTML).not.toContain('depth4');
     });
 
     it('should collapses all', () => {
         formatter.openAtDepth(0);
-        expect(element.outerHTML).to.not.contain('depth1');
+        expect(element.outerHTML).not.toContain('depth1');
     });
 
     it('should expand all', () => {
         formatter.openAtDepth(Infinity);
-        expect(element.outerHTML).to.contain('depth1');
-        expect(element.outerHTML).to.contain('depth2');
-        expect(element.outerHTML).to.contain('depth3');
-        expect(element.outerHTML).to.contain('depth4');
-        expect(element.outerHTML).to.contain('21');
+        expect(element.outerHTML).toContain('depth1');
+        expect(element.outerHTML).toContain('depth2');
+        expect(element.outerHTML).toContain('depth3');
+        expect(element.outerHTML).toContain('depth4');
+        expect(element.outerHTML).toContain('21');
     });
 });
 
@@ -127,10 +122,10 @@ describe('openAtDepth before any rendering', () => {
     it('should open at depth 1', () => {
         formatter.openAtDepth();
         const element = formatter.render();
-        expect(element.outerHTML).to.contain('depth1');
-        expect(element.outerHTML).to.not.contain('depth2');
-        expect(element.outerHTML).to.not.contain('depth3');
-        expect(element.outerHTML).to.not.contain('depth4');
+        expect(element.outerHTML).toContain('depth1');
+        expect(element.outerHTML).not.toContain('depth2');
+        expect(element.outerHTML).not.toContain('depth3');
+        expect(element.outerHTML).not.toContain('depth4');
     });
 });
 
@@ -143,16 +138,16 @@ describe('toggleOpen after rendering', () => {
         });
         const element = formatter.render();
 
-        expect(element.outerHTML).to.contain('Object');
-        expect(element.outerHTML).to.contain('depth1');
+        expect(element.outerHTML).toContain('Object');
+        expect(element.outerHTML).toContain('depth1');
 
         formatter.toggleOpen();
 
-        expect(element.outerHTML).to.contain('Object');
-        expect(element.outerHTML).to.not.contain('depth1');
-        expect(element.outerHTML).to.not.contain('depth2');
-        expect(element.outerHTML).to.not.contain('depth3');
-        expect(element.outerHTML).to.not.contain('depth4');
+        expect(element.outerHTML).toContain('Object');
+        expect(element.outerHTML).not.toContain('depth1');
+        expect(element.outerHTML).not.toContain('depth2');
+        expect(element.outerHTML).not.toContain('depth3');
+        expect(element.outerHTML).not.toContain('depth4');
     });
 });
 
@@ -164,10 +159,10 @@ describe('toggleOpen before any rendering', () => {
         });
         formatter.toggleOpen();
         const element = formatter.render();
-        expect(element.outerHTML).to.contain('Object');
-        expect(element.outerHTML).to.not.contain('depth1');
-        expect(element.outerHTML).to.not.contain('depth2');
-        expect(element.outerHTML).to.not.contain('depth3');
-        expect(element.outerHTML).to.not.contain('depth4');
+        expect(element.outerHTML).toContain('Object');
+        expect(element.outerHTML).not.toContain('depth1');
+        expect(element.outerHTML).not.toContain('depth2');
+        expect(element.outerHTML).not.toContain('depth3');
+        expect(element.outerHTML).not.toContain('depth4');
     });
 });

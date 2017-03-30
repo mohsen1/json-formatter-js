@@ -13,8 +13,11 @@ module.exports = {
     publicPath: 'dist',
     filename: 'json-formatter.js',
     library: 'JSONFormatter',
-    libraryTarget: 'umd',
+    libraryTarget: 'commonjs2',
     umdNamedDefine: true
+  },
+  resolve: {
+    extensions: ['.ts', '.less']
   },
   module: {
     rules: [

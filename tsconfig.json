@@ -1,7 +1,17 @@
 {
     "compilerOptions": {
         "target": "es5",
-        "module": "commonjs",
-        "allowJs": true
+        "module": "es2015",
+        "allowJs": true,
+        "allowSyntheticDefaultImports": false,
+        "moduleResolution": "node",
+        "sourceMap": true,
+        "lib": [
+            "dom",
+            "es2015"
+        ],
+        "types": [
+            "jest"
+        ]
     }
 }

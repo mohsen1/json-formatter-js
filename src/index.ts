@@ -1,5 +1,3 @@
-import './style.less';
-
 import {
   isObject,
   getObjectName,
@@ -8,8 +6,9 @@ import {
   getPreview,
   cssClass,
   createElement
-} from './helpers.ts';
+} from './helpers';
 
+import * as style from './style.less';
 
 const DATE_STRING_REGEX = /(^\d{1,4}[\.|\\/|-]\d{1,2}[\.|\\/|-]\d{1,4})(\s*(?:0?[1-9]:[0-5]|1(?=[012])\d:[0-5])\d\s*[ap]m)?$/;
 const PARTIAL_DATE_REGEX = /\d{2}:\d{2}:\d{2} GMT-\d{4}/;
@@ -21,12 +20,12 @@ const MAX_ANIMATED_TOGGLE_ITEMS = 10;
 const requestAnimationFrame = window.requestAnimationFrame || function(cb: ()=>void) { cb(); return 0; };
 
 interface JSONFormatterConfiguration {
-  hoverPreviewEnabled: boolean;
-  hoverPreviewArrayCount: number;
-  hoverPreviewFieldCount: number;
-  animateOpen: boolean;
-  animateClose: boolean;
-  theme: string;
+  hoverPreviewEnabled?: boolean;
+  hoverPreviewArrayCount?: number;
+  hoverPreviewFieldCount?: number;
+  animateOpen?: boolean;
+  animateClose?: boolean;
+  theme?: string;
 };
 
 const _defaultConfig: JSONFormatterConfiguration = {
@@ -38,13 +37,14 @@ const _defaultConfig: JSONFormatterConfiguration = {
   theme: null
 };
 
+
 /**
  * @class JSONFormatter
  *
  * JSONFormatter allows you to render JSON objects in HTML with a
  * **collapsible** navigation.
 */
-export = class JSONFormatter {
+export default class JSONFormatter {
 
   // Hold the open state after the toggler is used
   private _isOpen : boolean = null;
