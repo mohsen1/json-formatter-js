@@ -1,6 +1,6 @@
 {
   "name": "json-formatter-js",
-  "version": "1.3.0",
+  "version": "2.0.0",
   "authors": [
     "Mohsen Azimi <me@azimi.me>"
   ],
@@ -9,9 +9,6 @@
     "dist/style.css"
   ],
   "moduleType": [
-    "amd",
-    "es6",
-    "globals",
     "node"
   ],
   "keywords": [
