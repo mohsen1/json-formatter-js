@@ -1,3 +1,75 @@
+/******/ (function(modules) { // webpackBootstrap
+/******/ 	// The module cache
+/******/ 	var installedModules = {};
+/******/
+/******/ 	// The require function
+/******/ 	function __webpack_require__(moduleId) {
+/******/
+/******/ 		// Check if module is in cache
+/******/ 		if(installedModules[moduleId])
+/******/ 			return installedModules[moduleId].exports;
+/******/
+/******/ 		// Create a new module (and put it into the cache)
+/******/ 		var module = installedModules[moduleId] = {
+/******/ 			i: moduleId,
+/******/ 			l: false,
+/******/ 			exports: {}
+/******/ 		};
+/******/
+/******/ 		// Execute the module function
+/******/ 		modules[moduleId].call(module.exports, module, module.exports, __webpack_require__);
+/******/
+/******/ 		// Flag the module as loaded
+/******/ 		module.l = true;
+/******/
+/******/ 		// Return the exports of the module
+/******/ 		return module.exports;
+/******/ 	}
+/******/
+/******/
+/******/ 	// expose the modules object (__webpack_modules__)
+/******/ 	__webpack_require__.m = modules;
+/******/
+/******/ 	// expose the module cache
+/******/ 	__webpack_require__.c = installedModules;
+/******/
+/******/ 	// identity function for calling harmony imports with the correct context
+/******/ 	__webpack_require__.i = function(value) { return value; };
+/******/
+/******/ 	// define getter function for harmony exports
+/******/ 	__webpack_require__.d = function(exports, name, getter) {
+/******/ 		if(!__webpack_require__.o(exports, name)) {
+/******/ 			Object.defineProperty(exports, name, {
+/******/ 				configurable: false,
+/******/ 				enumerable: true,
+/******/ 				get: getter
+/******/ 			});
+/******/ 		}
+/******/ 	};
+/******/
+/******/ 	// getDefaultExport function for compatibility with non-harmony modules
+/******/ 	__webpack_require__.n = function(module) {
+/******/ 		var getter = module && module.__esModule ?
+/******/ 			function getDefault() { return module['default']; } :
+/******/ 			function getModuleExports() { return module; };
+/******/ 		__webpack_require__.d(getter, 'a', getter);
+/******/ 		return getter;
+/******/ 	};
+/******/
+/******/ 	// Object.prototype.hasOwnProperty.call
+/******/ 	__webpack_require__.o = function(object, property) { return Object.prototype.hasOwnProperty.call(object, property); };
+/******/
+/******/ 	// __webpack_public_path__
+/******/ 	__webpack_require__.p = "";
+/******/
+/******/ 	// Load entry module and return exports
+/******/ 	return __webpack_require__(__webpack_require__.s = 1);
+/******/ })
+/************************************************************************/
+/******/ ([
+/* 0 */
+/***/ (function(module, exports) {
+
 module.exports = function(modules) {
     function __webpack_require__(moduleId) {
         if (installedModules[moduleId]) return installedModules[moduleId].exports;
@@ -408,3 +480,96 @@ module.exports = function(modules) {
     module.exports = __webpack_require__(0);
 } ]);
 //# sourceMappingURL=json-formatter.js.map
+
+/***/ }),
+/* 1 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var JSONFormatter = __webpack_require__(0).default;
+
+var live = document.getElementById('live');
+var hoverPreviewEnabledCheckbox = document.getElementById('hoverPreviewEnabled');
+
+function render() {
+    live.style.backgroundColor = 'transparent';
+    var result = document.getElementById('live-result');
+    try {
+        var formatter = new JSONFormatter(JSON.parse(live.value), 1, { hoverPreviewEnabled: hoverPreviewEnabledCheckbox.checked });
+        result.innerHTML = '';
+        result.appendChild(formatter.render());
+    } catch (e) {
+        live.style.backgroundColor = 'rgba(255, 87, 34, 0.35)';
+    }
+}
+live.addEventListener('keyup', render);
+hoverPreviewEnabledCheckbox.addEventListener('change', render);
+render();
+
+
+var complex = {
+    numbers: [
+        1,
+        2,
+        3
+    ],
+    boolean: true,
+    'null': null,
+    number: 123,
+    anObject: {
+        a: 'b',
+        c: 'd',
+        e: 'f\"'
+    },
+    string: 'Hello World',
+    url: 'https://github.com/mohsen1/json-formatter-js',
+    date: 'Sun Aug 03 2014 20:46:55 GMT-0700 (PDT)',
+    func: function add(a, b) { return a + b; }
+};
+
+var deep = { a: { b: { c: { d: {} } } } };
+
+var examples = [
+    { title: 'Complex', json: complex },
+    { title: 'Number', json: 42 },
+    { title: 'null', json: null },
+    { title: 'Empty Object', json: Object.create(null) },
+    { title: 'Empty Array', json: [] },
+    { title: 'Deep', json: deep },
+    { title: 'Dark', json: complex, config: { theme: 'dark' } }
+];
+
+var result = document.querySelector('.result');
+
+examples.forEach(function (example) {
+    var title = document.createElement('h3');
+    var formatter = new JSONFormatter(example.json, 1, example.config);
+
+    title.innerText = example.title;
+
+    result.appendChild(title)
+    var el = formatter.render();
+
+    if (example.config && example.config.theme === 'dark') {
+        el.style.backgroundColor = '#1E1E1E';
+    }
+
+    result.appendChild(el);
+});
+
+fetch('demo/giant.json').then(function (resp) {
+    resp.json().then(function (giant) {
+        var giantFormatter = new JSONFormatter(giant, 2, { hoverPreviewEnabled: true });
+        var title = document.createElement('h3');
+
+        title.innerText = 'Giant JSON';
+        result.appendChild(title);
+
+        console.time('Rendering giant JSON');
+        result.appendChild(giantFormatter.render());
+        console.timeEnd('Rendering giant JSON');
+    });
+})
+
+/***/ })
+/******/ ]);
+//# sourceMappingURL=index.js.map

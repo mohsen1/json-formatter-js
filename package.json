@@ -4,7 +4,7 @@
   "description": "JSON Formatter core library ",
   "main": "dist/json-formatter.js",
   "scripts": {
-    "build": "webpack",
+    "build": "webpack && webpack --config demo/webpack.config.js",
     "test": "jest"
   },
   "jest": {
