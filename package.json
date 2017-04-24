@@ -3,6 +3,7 @@
   "version": "2.1.0",
   "description": "JSON Formatter core library ",
   "main": "dist/json-formatter.js",
+  "types": "dist/src/index.d.js",
   "scripts": {
     "build": "webpack && webpack --config demo/webpack.config.js",
     "test": "jest"
