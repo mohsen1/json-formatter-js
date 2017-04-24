@@ -19,7 +19,7 @@ const MAX_ANIMATED_TOGGLE_ITEMS = 10;
 
 const requestAnimationFrame = window.requestAnimationFrame || function(cb: ()=>void) { cb(); return 0; };
 
-interface JSONFormatterConfiguration {
+export interface JSONFormatterConfiguration {
   hoverPreviewEnabled?: boolean;
   hoverPreviewArrayCount?: number;
   hoverPreviewFieldCount?: number;
