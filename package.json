@@ -12,7 +12,10 @@
     "transform": {
       ".(ts|tsx)": "<rootDir>/node_modules/ts-jest/preprocessor.js"
     },
-    "testRegex": "(test/.*|\\.(test|spec))\\.(ts|tsx|js)$",
+    "testRegex": "test/spec.ts",
+    "moduleNameMapper": {
+      ".*\\.less$": "<rootDir>/mocks/less.ts"
+    },
     "moduleFileExtensions": [
       "ts",
       "tsx",
