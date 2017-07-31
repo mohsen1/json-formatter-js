@@ -141,6 +141,13 @@ describe('toggleOpen after rendering', () => {
         expect(element.outerHTML).toContain('Object');
         expect(element.outerHTML).toContain('depth1');
 
+        const openedPaths = formatter.getOpenedPaths();
+        expect(openedPaths.length).toBe(1);
+        expect(openedPaths[0].length).toBe(3);
+        expect(openedPaths[0][0]).toBe('depth1');
+        expect(openedPaths[0][1]).toBe('depth2');
+        expect(openedPaths[0][2]).toBe('depth3');
+
         formatter.toggleOpen();
 
         expect(element.outerHTML).toContain('Object');
@@ -148,6 +155,9 @@ describe('toggleOpen after rendering', () => {
         expect(element.outerHTML).not.toContain('depth2');
         expect(element.outerHTML).not.toContain('depth3');
         expect(element.outerHTML).not.toContain('depth4');
+
+        const openedPathsClosed = formatter.getOpenedPaths();
+        expect(openedPathsClosed.length).toBe(0);
     });
 });
 
@@ -165,4 +175,39 @@ describe('toggleOpen before any rendering', () => {
         expect(element.outerHTML).not.toContain('depth3');
         expect(element.outerHTML).not.toContain('depth4');
     });
+});
+
+describe('openPaths', () => {
+  it('should open paths', () => {
+    const formatter = new JSONFormatter({
+      elem1: {
+        part1: 1,
+        part2: 2
+      },
+      elem2: [
+        {part3: 3},
+        {part4: 4}
+      ]
+    }, 1, {
+      animateOpen: false,
+      animateClose: false
+    });
+
+    const element = formatter.render();
+
+    formatter.openPaths([
+      ['elem1'],
+      ['elem2', '1']
+    ]);
+
+    expect(element.outerHTML).toContain('Object');
+    expect(element.outerHTML).toContain('elem1');
+    expect(element.outerHTML).toContain('part1');
+    expect(element.outerHTML).toContain('part2');
+
+    expect(element.outerHTML).toContain('elem2');
+    expect(element.outerHTML).not.toContain('part3');
+    expect(element.outerHTML).toContain('part4');
+
+  });
 });

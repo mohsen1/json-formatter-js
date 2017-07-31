@@ -93,7 +93,7 @@ export function cssClass(className:string): string {
   * Creates a new DOM element wiht given type and class
   * TODO: move me to helpers
 */
-export function createElement(type: string, className?: string, content?: Element|string): Element {
+export function createElement(type: string, className?: string, content?: Node|string): Element {
   const el = document.createElement(type);
   if (className) {
     el.classList.add(cssClass(className));
@@ -106,4 +106,34 @@ export function createElement(type: string, className?: string, content?: Elemen
     }
   }
   return el;
+}
+
+export function findPathsForTerm(json, term, basePath = []): string[][] {
+  const searchTerm = term.toLowerCase();
+  const containsTerm = (text) => {
+    text = `${text}`;
+    return text.toLowerCase().indexOf(searchTerm) !== -1;
+  };
+  const paths = [];
+  if(searchTerm === '') {
+    return paths;
+  }
+  if(isObject(json)) {
+    const keys = Object.keys(json);
+    keys.forEach(key => {
+      if(containsTerm(key) && paths.indexOf(basePath) === -1) {
+        paths.push(basePath);
+      }
+      const path = basePath.slice();
+      path.push(key);
+      paths.push(...findPathsForTerm(json[key], term, path));
+    });
+
+  } else {
+    const value = getValuePreview(json, json);
+    if(containsTerm(value)) {
+      paths.push(basePath);
+    }
+  }
+  return paths;
 }

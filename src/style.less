@@ -11,6 +11,9 @@
   @toggler-color: #45376F,
   @bracket-color: blue,
   @key-color: #00008B,
+  @border-color: #bfbfbf,
+  @button-hover: #dedede,
+  @highlight-color: #ffed00,
   @url-color: blue ){
 
   font-family: monospace;
@@ -76,6 +79,22 @@
     }
   }
 
+  .json-formatter-expand-link {
+    margin: 0 0.5em;
+    border: 1px solid @border-color;
+    font-style: normal;
+    font-family: sans-serif;
+    padding: 0 0.3em;
+    font-size: 0.7em;
+    &:hover {
+      background: @button-hover;
+    }
+  }
+
+  .json-formatter-highlight {
+    background: @highlight-color;
+  }
+
   // Inline preview on hover (optional)
   > a > .json-formatter-preview-text {
     opacity: 0;
@@ -122,6 +141,8 @@
     @toggler-opacity: 0.6,
     @toggler-color: #45376F,
     @bracket-color: #9494FF,
+    @border-color: #bfbfbf,
+    @button-hover: #727272,
     @key-color: #23A0DB,
     @url-color: #027BFF);
 }

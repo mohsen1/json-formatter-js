@@ -5,7 +5,8 @@ import {
   getValuePreview,
   getPreview,
   cssClass,
-  createElement
+  createElement,
+  findPathsForTerm
 } from './helpers';
 
 import './style.less';
@@ -26,7 +27,9 @@ export interface JSONFormatterConfiguration {
   animateOpen?: boolean;
   animateClose?: boolean;
   theme?: string;
-};
+  expandButtonsEnabled?: boolean;
+  expandButtonText?: string;
+}
 
 const _defaultConfig: JSONFormatterConfiguration = {
   hoverPreviewEnabled: false,
@@ -34,7 +37,9 @@ const _defaultConfig: JSONFormatterConfiguration = {
   hoverPreviewFieldCount: 5,
   animateOpen: true,
   animateClose: true,
-  theme: null
+  theme: null,
+  expandButtonsEnabled: false,
+  expandButtonText: 'Expand all'
 };
 
 
@@ -51,6 +56,17 @@ export default class JSONFormatter {
 
   // A reference to the element that we render to
   private element: Element;
+
+  // A reference to the expand link
+  private expandLink: HTMLAnchorElement;
+
+  // List of opened JSONFormatter children
+  private children: JSONFormatter[] = [];
+
+  /**
+   * In case of a search, this text should be highlighted in values and keys
+   */
+  private highlightedText = '';
 
   /**
    * @param {object} json The JSON object you want to render. It has to be an
@@ -91,6 +107,12 @@ export default class JSONFormatter {
     }
     if (this.config.hoverPreviewFieldCount === undefined) {
       this.config.hoverPreviewFieldCount = _defaultConfig.hoverPreviewFieldCount;
+    }
+    if (this.config.expandButtonsEnabled === undefined) {
+      this.config.expandButtonsEnabled = _defaultConfig.expandButtonsEnabled;
+    }
+    if (this.config.expandButtonText === undefined) {
+      this.config.expandButtonText = _defaultConfig.expandButtonText;
     }
   }
 
@@ -198,16 +220,71 @@ export default class JSONFormatter {
    *
   */
   toggleOpen() {
-    this.isOpen = !this.isOpen;
-
-    if (this.element) {
-      if (this.isOpen) {
-        this.appendChildren(this.config.animateOpen);
-      } else{
-        this.removeChildren(this.config.animateClose);
-      }
-      this.element.classList.toggle(cssClass('open'));
+    if(this.isOpen) {
+      this.doClose();
+    } else {
+      this.doOpen();
     }
+  }
+
+  doOpen(finished: Function = null) {
+    if(this.isOpen) {
+      if(finished) {
+        finished();
+      }
+      return;
+    }
+    this.isOpen = true;
+    if(!this.element) {
+      if(finished) {
+        finished();
+      }
+      return;
+    }
+    this.appendChildren(this.config.animateOpen, finished);
+    this.element.classList.add(cssClass('open'));
+    if(this.expandLink) {
+      this.expandLink.style.display = 'none';
+    }
+  }
+
+  doClose(finished: Function = null) {
+    if(!this.isOpen) {
+      if(finished) {
+        finished();
+      }
+      return;
+    }
+    this.isOpen = false;
+    if(!this.element) {
+      if(finished) {
+        finished();
+      }
+      return;
+    }
+    this.removeChildren(this.config.animateClose, finished);
+    this.element.classList.remove(cssClass('open'));
+    if(this.expandLink) {
+      this.expandLink.style.display = '';
+    }
+  }
+
+  /**
+   * Expands the element and its children
+   *
+   */
+  doExpand() {
+    if(!this.isOpen) {
+      if(this.expandLink) {
+        this.expandLink.style.display = 'none';
+      }
+      this.isOpen = false;
+      const open = this.open;
+      this.open = 100;
+      this.doOpen();
+      this.open = open;
+    }
+
   }
 
   /**
@@ -273,6 +350,7 @@ export default class JSONFormatter {
    * @returns {HTMLDivElement}
   */
   render(): HTMLDivElement {
+    this.children = [];
 
     // construct the root element and assign it to this.element
     this.element = createElement('div', 'row');
@@ -287,7 +365,7 @@ export default class JSONFormatter {
 
     // if this is child of a parent formatter we need to append the key
     if (this.hasKey) {
-      togglerLink.appendChild(createElement('span', 'key', `${this.key}:`));
+      togglerLink.appendChild(createElement('span', 'key', this.renderHighlighted(`${this.key}:`)));
     }
 
     // Value for objects and arrays
@@ -300,7 +378,7 @@ export default class JSONFormatter {
       const objectWrapperSpan = createElement('span');
 
       // get constructor name and append it to wrapper span
-      var constructorName = createElement('span', 'constructor-name', this.constructorName);
+      const constructorName = createElement('span', 'constructor-name', this.constructorName);
       objectWrapperSpan.appendChild(constructorName);
 
       // if it's an array append the array specific elements like brackets and length
@@ -334,7 +412,7 @@ export default class JSONFormatter {
 
       // Append value content to value element
       const valuePreview = getValuePreview(this.json, this.json);
-      value.appendChild(document.createTextNode(valuePreview));
+      value.appendChild(this.renderHighlighted(valuePreview));
 
       // append the value element to toggler link
       togglerLink.appendChild(value);
@@ -371,6 +449,18 @@ export default class JSONFormatter {
 
     // append toggler and children elements to root element
     this.element.appendChild(togglerLink);
+
+    if(this.config.expandButtonsEnabled && this.isObject) {
+      this.expandLink = createElement('a', 'expand-link', this.config.expandButtonText) as HTMLAnchorElement;
+      this.expandLink.href = 'javascript:';
+      this.expandLink.addEventListener('click', this.doExpand.bind(this));
+      if(this.isOpen) {
+        this.expandLink.style.display = 'none';
+      }
+      this.element.appendChild(this.expandLink);
+
+    }
+
     this.element.appendChild(children);
 
     // if formatter is set to be open call appendChildren
@@ -380,26 +470,64 @@ export default class JSONFormatter {
 
     // add event listener for toggling
     if (this.isObject) {
+      togglerLink.addEventListener('mousedown', function(e) {
+        e.preventDefault();
+      });
       togglerLink.addEventListener('click', this.toggleOpen.bind(this));
+      togglerLink.addEventListener('dblclick', this.doExpand.bind(this));
     }
 
     return this.element as HTMLDivElement;
+  }
+
+  private renderHighlighted(text): Node {
+    text = `${text}`;
+    if(this.highlightedText === '' || !this.highlightedText) {
+      return document.createTextNode(text);
+    }
+    const highlightPart = this.highlightedText.toLowerCase();
+    const fullText = text.toLowerCase();
+    const container = document.createDocumentFragment();
+    let start = 0;
+    do {
+      const index = fullText.indexOf(highlightPart, start);
+      if(index === -1) {
+        container.appendChild(document.createTextNode(text.substring(start)));
+        break;
+      } else {
+        container.appendChild(document.createTextNode(text.substring(start, index)));
+        const hText = document.createElement('span');
+        hText.className = cssClass('highlight');
+        hText.appendChild(document.createTextNode(text.substr(index, highlightPart.length)));
+        container.appendChild(hText);
+        start = index + highlightPart.length;
+      }
+
+    } while(true);
+    return container;
   }
 
   /**
    * Appends all the children to children element
    * Animated option is used when user triggers this via a click
   */
-  appendChildren(animated: boolean = false) {
+  appendChildren(animated: boolean = false, finishedCallback: Function = null) {
     const children = this.element.querySelector(`div.${cssClass('children')}`);
 
-    if (!children || this.isEmpty) { return; }
+    if (!children || this.isEmpty) {
+      if(finishedCallback) {
+        finishedCallback();
+      }
+      return;
+    }
 
     if (animated) {
       let index = 0;
       const addAChild = ()=> {
         const key = this.keys[index];
         const formatter = new JSONFormatter(this.json[key], this.open - 1, this.config, key);
+        formatter.highlightedText = this.highlightedText;
+        this.children.push(formatter);
         children.appendChild(formatter.render());
 
         index += 1;
@@ -410,6 +538,8 @@ export default class JSONFormatter {
           } else {
             requestAnimationFrame(addAChild);
           }
+        } else if(finishedCallback) {
+          finishedCallback();
         }
       };
 
@@ -418,8 +548,13 @@ export default class JSONFormatter {
     } else {
       this.keys.forEach(key => {
         const formatter = new JSONFormatter(this.json[key], this.open - 1, this.config, key);
+        formatter.highlightedText = this.highlightedText;
+        this.children.push(formatter);
         children.appendChild(formatter.render());
       });
+      if(finishedCallback) {
+        finishedCallback();
+      }
     }
   }
 
@@ -427,7 +562,8 @@ export default class JSONFormatter {
    * Removes all the children from children element
    * Animated option is used when user triggers this via a click
   */
-  removeChildren(animated: boolean = false) {
+  removeChildren(animated: boolean = false, finishedCallback: Function = null) {
+    this.children = [];
     const childrenElement = this.element.querySelector(`div.${cssClass('children')}`) as HTMLDivElement;
 
     if (animated) {
@@ -441,6 +577,8 @@ export default class JSONFormatter {
           } else {
             requestAnimationFrame(removeAChild);
           }
+        } else if(finishedCallback) {
+          finishedCallback();
         }
       };
       requestAnimationFrame(removeAChild);
@@ -448,6 +586,106 @@ export default class JSONFormatter {
       if (childrenElement) {
         childrenElement.innerHTML = '';
       }
+      if(finishedCallback) {
+        finishedCallback();
+      }
     }
   }
+
+  /**
+   * Returns a list of all opened paths
+   */
+  getOpenedPaths(parentPath = []) {
+    const paths = [];
+    if(!this.isObject) {
+      if(parentPath.length) {
+        paths.push(parentPath);
+      }
+      return paths;
+    }
+    const keys = Object.keys(this.json);
+    this.children.forEach((child, i) => {
+      const keyPath = parentPath.slice();
+      keyPath.push(keys[i]);
+      if(child.isObject) {
+        paths.push(...child.getOpenedPaths(keyPath));
+      }
+    });
+    if(this.children.length && !paths.length && parentPath.length) {
+      paths.push(parentPath);
+    }
+    return paths;
+  }
+
+  /**
+   * Opens a set of paths in the tree
+   */
+  openPaths(paths = [], finished: Function = null) {
+    let index = 0;
+    const openPath = () => {
+      const path = paths[index++];
+      this.openPath(path, () => {
+        if(index < paths.length) {
+          openPath();
+        } else if(finished) {
+          finished();
+        }
+      });
+    };
+    if(paths.length) {
+      openPath();
+    } else if(finished) {
+      finished();
+    }
+  }
+
+  /**
+   * Opens a specified path in the tree
+   */
+  openPath(path = [], finished: Function = null) {
+    if(!this.isObject) {
+      if(finished) {
+        finished();
+      }
+      return;
+    }
+    path = path.slice();
+    const keyName = path.shift();
+    const keys = Object.keys(this.json);
+    const childIndex = keys.indexOf(keyName);
+    if(childIndex !== -1 && this.children[childIndex]) {
+      const child = this.children[childIndex];
+      child.doOpen(() => {
+        if(path.length) {
+          child.openPath(path, finished);
+        } else if(finished) {
+          finished();
+        }
+      });
+    } else if(finished) {
+      finished();
+    }
+  }
+
+  private reRender() {
+    const currentElement = this.element;
+    this.render();
+    if(currentElement.parentNode) {
+      currentElement.parentNode.replaceChild(this.element, currentElement);
+    }
+  }
+
+  /**
+   * Search the tree for a certain term (case insensitive).
+   * The term will be highlighted at all found positions
+   */
+  searchTerm(term) {
+    this.highlightedText = term;
+    this.reRender();
+
+    const paths = findPathsForTerm(this.json, term);
+    this.openPaths(paths);
+
+  }
+
 }
