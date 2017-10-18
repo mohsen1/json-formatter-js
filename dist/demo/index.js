@@ -6,9 +6,9 @@
 /******/ 	function __webpack_require__(moduleId) {
 /******/
 /******/ 		// Check if module is in cache
-/******/ 		if(installedModules[moduleId])
+/******/ 		if(installedModules[moduleId]) {
 /******/ 			return installedModules[moduleId].exports;
-/******/
+/******/ 		}
 /******/ 		// Create a new module (and put it into the cache)
 /******/ 		var module = installedModules[moduleId] = {
 /******/ 			i: moduleId,
@@ -115,13 +115,18 @@ module.exports = function(modules) {
         hoverPreviewFieldCount: 5,
         animateOpen: !0,
         animateClose: !0,
-        theme: null
+        theme: null,
+        expandButtonsEnabled: !1,
+        expandButtonText: "Expand all"
     }, JSONFormatter = function() {
         function JSONFormatter(json, open, config, key) {
             void 0 === open && (open = 1), void 0 === config && (config = _defaultConfig), this.json = json, 
-            this.open = open, this.config = config, this.key = key, this._isOpen = null, void 0 === this.config.hoverPreviewEnabled && (this.config.hoverPreviewEnabled = _defaultConfig.hoverPreviewEnabled), 
+            this.open = open, this.config = config, this.key = key, this._isOpen = null, this.children = [], 
+            this.highlightedText = "", void 0 === this.config.hoverPreviewEnabled && (this.config.hoverPreviewEnabled = _defaultConfig.hoverPreviewEnabled), 
             void 0 === this.config.hoverPreviewArrayCount && (this.config.hoverPreviewArrayCount = _defaultConfig.hoverPreviewArrayCount), 
-            void 0 === this.config.hoverPreviewFieldCount && (this.config.hoverPreviewFieldCount = _defaultConfig.hoverPreviewFieldCount);
+            void 0 === this.config.hoverPreviewFieldCount && (this.config.hoverPreviewFieldCount = _defaultConfig.hoverPreviewFieldCount), 
+            void 0 === this.config.expandButtonsEnabled && (this.config.expandButtonsEnabled = _defaultConfig.expandButtonsEnabled), 
+            void 0 === this.config.expandButtonText && (this.config.expandButtonText = _defaultConfig.expandButtonText);
         }
         return Object.defineProperty(JSONFormatter.prototype, "isOpen", {
             get: function() {
@@ -195,8 +200,21 @@ module.exports = function(modules) {
             enumerable: !0,
             configurable: !0
         }), JSONFormatter.prototype.toggleOpen = function() {
-            this.isOpen = !this.isOpen, this.element && (this.isOpen ? this.appendChildren(this.config.animateOpen) : this.removeChildren(this.config.animateClose), 
-            this.element.classList.toggle(__webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__helpers__.d)("open")));
+            this.isOpen ? this.doClose() : this.doOpen();
+        }, JSONFormatter.prototype.doOpen = function(finished) {
+            return void 0 === finished && (finished = null), this.isOpen ? void (finished && finished()) : (this.isOpen = !0, 
+            this.element ? (this.appendChildren(this.config.animateOpen, finished), this.element.classList.add(__webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__helpers__.d)("open")), 
+            void (this.expandLink && (this.expandLink.style.display = "none"))) : void (finished && finished()));
+        }, JSONFormatter.prototype.doClose = function(finished) {
+            return void 0 === finished && (finished = null), this.isOpen ? (this.isOpen = !1, 
+            this.element ? (this.removeChildren(this.config.animateClose, finished), this.element.classList.remove(__webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__helpers__.d)("open")), 
+            void (this.expandLink && (this.expandLink.style.display = ""))) : void (finished && finished())) : void (finished && finished());
+        }, JSONFormatter.prototype.doExpand = function() {
+            if (!this.isOpen) {
+                this.expandLink && (this.expandLink.style.display = "none"), this.isOpen = !1;
+                var open_1 = this.open;
+                this.open = 100, this.doOpen(), this.open = open_1;
+            }
         }, JSONFormatter.prototype.openAtDepth = function(depth) {
             void 0 === depth && (depth = 1), depth < 0 || (this.open = depth, this.isOpen = 0 !== depth, 
             this.element && (this.removeChildren(!1), 0 === depth ? this.element.classList.remove(__webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__helpers__.d)("open")) : (this.appendChildren(this.config.animateOpen), 
@@ -209,10 +227,10 @@ module.exports = function(modules) {
             }), ellipsis = keys.length >= this.config.hoverPreviewFieldCount ? "…" : "";
             return "{" + kvs.join(", ") + ellipsis + "}";
         }, JSONFormatter.prototype.render = function() {
-            this.element = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__helpers__.f)("div", "row");
+            this.children = [], this.element = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__helpers__.f)("div", "row");
             var togglerLink = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__helpers__.f)("a", "toggler-link");
             if (this.isObject && togglerLink.appendChild(__webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__helpers__.f)("span", "toggler")), 
-            this.hasKey && togglerLink.appendChild(__webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__helpers__.f)("span", "key", this.key + ":")), 
+            this.hasKey && togglerLink.appendChild(__webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__helpers__.f)("span", "key", this.renderHighlighted(this.key + ":"))), 
             this.isObject) {
                 var value = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__helpers__.f)("span", "value"), objectWrapperSpan = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__helpers__.f)("span"), constructorName = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__helpers__.f)("span", "constructor-name", this.constructorName);
                 if (objectWrapperSpan.appendChild(constructorName), this.isArray) {
@@ -230,7 +248,7 @@ module.exports = function(modules) {
                 this.isUrl && (value.classList.add(__webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__helpers__.d)("url")), 
                 value.setAttribute("href", this.json));
                 var valuePreview = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__helpers__.g)(this.json, this.json);
-                value.appendChild(document.createTextNode(valuePreview)), togglerLink.appendChild(value);
+                value.appendChild(this.renderHighlighted(valuePreview)), togglerLink.appendChild(value);
             }
             if (this.isObject && this.config.hoverPreviewEnabled) {
                 var preview = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__helpers__.f)("span", "preview-text");
@@ -242,38 +260,99 @@ module.exports = function(modules) {
             this.isEmpty && children.classList.add(__webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__helpers__.d)("empty")), 
             this.config && this.config.theme && this.element.classList.add(__webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__helpers__.d)(this.config.theme)), 
             this.isOpen && this.element.classList.add(__webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__helpers__.d)("open")), 
-            this.element.appendChild(togglerLink), this.element.appendChild(children), this.isObject && this.isOpen && this.appendChildren(), 
-            this.isObject && togglerLink.addEventListener("click", this.toggleOpen.bind(this)), 
+            this.element.appendChild(togglerLink), this.config.expandButtonsEnabled && this.isObject && (this.expandLink = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__helpers__.f)("a", "expand-link", this.config.expandButtonText), 
+            this.expandLink.href = "javascript:", this.expandLink.addEventListener("click", this.doExpand.bind(this)), 
+            this.isOpen && (this.expandLink.style.display = "none"), this.element.appendChild(this.expandLink)), 
+            this.element.appendChild(children), this.isObject && this.isOpen && this.appendChildren(), 
+            this.isObject && (togglerLink.addEventListener("mousedown", function(e) {
+                e.preventDefault();
+            }), togglerLink.addEventListener("click", this.toggleOpen.bind(this)), togglerLink.addEventListener("dblclick", this.doExpand.bind(this))), 
             this.element;
-        }, JSONFormatter.prototype.appendChildren = function(animated) {
+        }, JSONFormatter.prototype.renderHighlighted = function(text) {
+            if (text = "" + text, "" === this.highlightedText || !this.highlightedText) return document.createTextNode(text);
+            for (var highlightPart = this.highlightedText.toLowerCase(), fullText = text.toLowerCase(), container = document.createDocumentFragment(), start = 0; ;) {
+                var index = fullText.indexOf(highlightPart, start);
+                if (-1 === index) {
+                    container.appendChild(document.createTextNode(text.substring(start)));
+                    break;
+                }
+                container.appendChild(document.createTextNode(text.substring(start, index)));
+                var hText = document.createElement("span");
+                hText.className = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__helpers__.d)("highlight"), 
+                hText.appendChild(document.createTextNode(text.substr(index, highlightPart.length))), 
+                container.appendChild(hText), start = index + highlightPart.length;
+            }
+            return container;
+        }, JSONFormatter.prototype.appendChildren = function(animated, finishedCallback) {
             var _this = this;
-            void 0 === animated && (animated = !1);
+            void 0 === animated && (animated = !1), void 0 === finishedCallback && (finishedCallback = null);
             var children = this.element.querySelector("div." + __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__helpers__.d)("children"));
-            if (children && !this.isEmpty) if (animated) {
+            if (!children || this.isEmpty) return void (finishedCallback && finishedCallback());
+            if (animated) {
                 var index_1 = 0, addAChild_1 = function() {
                     var key = _this.keys[index_1], formatter = new JSONFormatter(_this.json[key], _this.open - 1, _this.config, key);
-                    children.appendChild(formatter.render()), (index_1 += 1) < _this.keys.length && (index_1 > 10 ? addAChild_1() : requestAnimationFrame(addAChild_1));
+                    formatter.highlightedText = _this.highlightedText, _this.children.push(formatter), 
+                    children.appendChild(formatter.render()), index_1 += 1, index_1 < _this.keys.length ? index_1 > 10 ? addAChild_1() : requestAnimationFrame(addAChild_1) : finishedCallback && finishedCallback();
                 };
                 requestAnimationFrame(addAChild_1);
             } else this.keys.forEach(function(key) {
                 var formatter = new JSONFormatter(_this.json[key], _this.open - 1, _this.config, key);
+                formatter.highlightedText = _this.highlightedText, _this.children.push(formatter), 
                 children.appendChild(formatter.render());
-            });
-        }, JSONFormatter.prototype.removeChildren = function(animated) {
-            void 0 === animated && (animated = !1);
+            }), finishedCallback && finishedCallback();
+        }, JSONFormatter.prototype.removeChildren = function(animated, finishedCallback) {
+            void 0 === animated && (animated = !1), void 0 === finishedCallback && (finishedCallback = null), 
+            this.children = [];
             var childrenElement = this.element.querySelector("div." + __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__helpers__.d)("children"));
             if (animated) {
                 var childrenRemoved_1 = 0, removeAChild_1 = function() {
-                    childrenElement && childrenElement.children.length && (childrenElement.removeChild(childrenElement.children[0]), 
-                    childrenRemoved_1 += 1, childrenRemoved_1 > 10 ? removeAChild_1() : requestAnimationFrame(removeAChild_1));
+                    childrenElement && childrenElement.children.length ? (childrenElement.removeChild(childrenElement.children[0]), 
+                    childrenRemoved_1 += 1, childrenRemoved_1 > 10 ? removeAChild_1() : requestAnimationFrame(removeAChild_1)) : finishedCallback && finishedCallback();
                 };
                 requestAnimationFrame(removeAChild_1);
-            } else childrenElement && (childrenElement.innerHTML = "");
+            } else childrenElement && (childrenElement.innerHTML = ""), finishedCallback && finishedCallback();
+        }, JSONFormatter.prototype.getOpenedPaths = function(parentPath) {
+            void 0 === parentPath && (parentPath = []);
+            var paths = [];
+            if (!this.isObject) return parentPath.length && paths.push(parentPath), paths;
+            var keys = Object.keys(this.json);
+            return this.children.forEach(function(child, i) {
+                var keyPath = parentPath.slice();
+                keyPath.push(keys[i]), child.isObject && paths.push.apply(paths, child.getOpenedPaths(keyPath));
+            }), this.children.length && !paths.length && parentPath.length && paths.push(parentPath), 
+            paths;
+        }, JSONFormatter.prototype.openPaths = function(paths, finished) {
+            var _this = this;
+            void 0 === paths && (paths = []), void 0 === finished && (finished = null);
+            var index = 0, openPath = function() {
+                var path = paths[index++];
+                _this.openPath(path, function() {
+                    index < paths.length ? openPath() : finished && finished();
+                });
+            };
+            paths.length ? openPath() : finished && finished();
+        }, JSONFormatter.prototype.openPath = function(path, finished) {
+            if (void 0 === path && (path = []), void 0 === finished && (finished = null), !this.isObject) return void (finished && finished());
+            path = path.slice();
+            var keyName = path.shift(), keys = Object.keys(this.json), childIndex = keys.indexOf(keyName);
+            if (-1 !== childIndex && this.children[childIndex]) {
+                var child_1 = this.children[childIndex];
+                child_1.doOpen(function() {
+                    path.length ? child_1.openPath(path, finished) : finished && finished();
+                });
+            } else finished && finished();
+        }, JSONFormatter.prototype.reRender = function() {
+            var currentElement = this.element;
+            this.render(), currentElement.parentNode && currentElement.parentNode.replaceChild(this.element, currentElement);
+        }, JSONFormatter.prototype.searchTerm = function(term) {
+            this.highlightedText = term, this.reRender();
+            var paths = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__helpers__.h)(this.json, term);
+            this.openPaths(paths);
         }, JSONFormatter;
     }();
     __webpack_exports__.default = JSONFormatter;
 }, function(module, exports, __webpack_require__) {
-    exports = module.exports = __webpack_require__(2)(), exports.push([ module.i, '.json-formatter-row {\n  font-family: monospace;\n}\n.json-formatter-row,\n.json-formatter-row a,\n.json-formatter-row a:hover {\n  color: black;\n  text-decoration: none;\n}\n.json-formatter-row .json-formatter-row {\n  margin-left: 1rem;\n}\n.json-formatter-row .json-formatter-children.json-formatter-empty {\n  opacity: 0.5;\n  margin-left: 1rem;\n}\n.json-formatter-row .json-formatter-children.json-formatter-empty:after {\n  display: none;\n}\n.json-formatter-row .json-formatter-children.json-formatter-empty.json-formatter-object:after {\n  content: "No properties";\n}\n.json-formatter-row .json-formatter-children.json-formatter-empty.json-formatter-array:after {\n  content: "[]";\n}\n.json-formatter-row .json-formatter-string {\n  color: green;\n  white-space: pre;\n  word-wrap: break-word;\n}\n.json-formatter-row .json-formatter-number {\n  color: blue;\n}\n.json-formatter-row .json-formatter-boolean {\n  color: red;\n}\n.json-formatter-row .json-formatter-null {\n  color: #855A00;\n}\n.json-formatter-row .json-formatter-undefined {\n  color: #ca0b69;\n}\n.json-formatter-row .json-formatter-function {\n  color: #FF20ED;\n}\n.json-formatter-row .json-formatter-date {\n  background-color: rgba(0, 0, 0, 0.05);\n}\n.json-formatter-row .json-formatter-url {\n  text-decoration: underline;\n  color: blue;\n  cursor: pointer;\n}\n.json-formatter-row .json-formatter-bracket {\n  color: blue;\n}\n.json-formatter-row .json-formatter-key {\n  color: #00008B;\n  cursor: pointer;\n  padding-right: 0.2rem;\n}\n.json-formatter-row .json-formatter-constructor-name {\n  cursor: pointer;\n}\n.json-formatter-row .json-formatter-toggler {\n  line-height: 1.2rem;\n  font-size: 0.7rem;\n  vertical-align: middle;\n  opacity: 0.6;\n  cursor: pointer;\n  padding-right: 0.2rem;\n}\n.json-formatter-row .json-formatter-toggler:after {\n  display: inline-block;\n  transition: transform 100ms ease-in;\n  content: "\\25BA";\n}\n.json-formatter-row > a > .json-formatter-preview-text {\n  opacity: 0;\n  transition: opacity 0.15s ease-in;\n  font-style: italic;\n}\n.json-formatter-row:hover > a > .json-formatter-preview-text {\n  opacity: 0.6;\n}\n.json-formatter-row.json-formatter-open > .json-formatter-toggler-link .json-formatter-toggler:after {\n  transform: rotate(90deg);\n}\n.json-formatter-row.json-formatter-open > .json-formatter-children:after {\n  display: inline-block;\n}\n.json-formatter-row.json-formatter-open > a > .json-formatter-preview-text {\n  display: none;\n}\n.json-formatter-row.json-formatter-open.json-formatter-empty:after {\n  display: block;\n}\n.json-formatter-dark.json-formatter-row {\n  font-family: monospace;\n}\n.json-formatter-dark.json-formatter-row,\n.json-formatter-dark.json-formatter-row a,\n.json-formatter-dark.json-formatter-row a:hover {\n  color: white;\n  text-decoration: none;\n}\n.json-formatter-dark.json-formatter-row .json-formatter-row {\n  margin-left: 1rem;\n}\n.json-formatter-dark.json-formatter-row .json-formatter-children.json-formatter-empty {\n  opacity: 0.5;\n  margin-left: 1rem;\n}\n.json-formatter-dark.json-formatter-row .json-formatter-children.json-formatter-empty:after {\n  display: none;\n}\n.json-formatter-dark.json-formatter-row .json-formatter-children.json-formatter-empty.json-formatter-object:after {\n  content: "No properties";\n}\n.json-formatter-dark.json-formatter-row .json-formatter-children.json-formatter-empty.json-formatter-array:after {\n  content: "[]";\n}\n.json-formatter-dark.json-formatter-row .json-formatter-string {\n  color: #31F031;\n  white-space: pre;\n  word-wrap: break-word;\n}\n.json-formatter-dark.json-formatter-row .json-formatter-number {\n  color: #66C2FF;\n}\n.json-formatter-dark.json-formatter-row .json-formatter-boolean {\n  color: #EC4242;\n}\n.json-formatter-dark.json-formatter-row .json-formatter-null {\n  color: #EEC97D;\n}\n.json-formatter-dark.json-formatter-row .json-formatter-undefined {\n  color: #ef8fbe;\n}\n.json-formatter-dark.json-formatter-row .json-formatter-function {\n  color: #FD48CB;\n}\n.json-formatter-dark.json-formatter-row .json-formatter-date {\n  background-color: rgba(255, 255, 255, 0.05);\n}\n.json-formatter-dark.json-formatter-row .json-formatter-url {\n  text-decoration: underline;\n  color: #027BFF;\n  cursor: pointer;\n}\n.json-formatter-dark.json-formatter-row .json-formatter-bracket {\n  color: #9494FF;\n}\n.json-formatter-dark.json-formatter-row .json-formatter-key {\n  color: #23A0DB;\n  cursor: pointer;\n  padding-right: 0.2rem;\n}\n.json-formatter-dark.json-formatter-row .json-formatter-constructor-name {\n  cursor: pointer;\n}\n.json-formatter-dark.json-formatter-row .json-formatter-toggler {\n  line-height: 1.2rem;\n  font-size: 0.7rem;\n  vertical-align: middle;\n  opacity: 0.6;\n  cursor: pointer;\n  padding-right: 0.2rem;\n}\n.json-formatter-dark.json-formatter-row .json-formatter-toggler:after {\n  display: inline-block;\n  transition: transform 100ms ease-in;\n  content: "\\25BA";\n}\n.json-formatter-dark.json-formatter-row > a > .json-formatter-preview-text {\n  opacity: 0;\n  transition: opacity 0.15s ease-in;\n  font-style: italic;\n}\n.json-formatter-dark.json-formatter-row:hover > a > .json-formatter-preview-text {\n  opacity: 0.6;\n}\n.json-formatter-dark.json-formatter-row.json-formatter-open > .json-formatter-toggler-link .json-formatter-toggler:after {\n  transform: rotate(90deg);\n}\n.json-formatter-dark.json-formatter-row.json-formatter-open > .json-formatter-children:after {\n  display: inline-block;\n}\n.json-formatter-dark.json-formatter-row.json-formatter-open > a > .json-formatter-preview-text {\n  display: none;\n}\n.json-formatter-dark.json-formatter-row.json-formatter-open.json-formatter-empty:after {\n  display: block;\n}\n', "" ]);
+    exports = module.exports = __webpack_require__(2)(), exports.push([ module.i, '.json-formatter-row {\n  font-family: monospace;\n}\n.json-formatter-row,\n.json-formatter-row a,\n.json-formatter-row a:hover {\n  color: black;\n  text-decoration: none;\n}\n.json-formatter-row .json-formatter-row {\n  margin-left: 1rem;\n}\n.json-formatter-row .json-formatter-children.json-formatter-empty {\n  opacity: 0.5;\n  margin-left: 1rem;\n}\n.json-formatter-row .json-formatter-children.json-formatter-empty:after {\n  display: none;\n}\n.json-formatter-row .json-formatter-children.json-formatter-empty.json-formatter-object:after {\n  content: "No properties";\n}\n.json-formatter-row .json-formatter-children.json-formatter-empty.json-formatter-array:after {\n  content: "[]";\n}\n.json-formatter-row .json-formatter-string {\n  color: green;\n  white-space: pre;\n  word-wrap: break-word;\n}\n.json-formatter-row .json-formatter-number {\n  color: blue;\n}\n.json-formatter-row .json-formatter-boolean {\n  color: red;\n}\n.json-formatter-row .json-formatter-null {\n  color: #855A00;\n}\n.json-formatter-row .json-formatter-undefined {\n  color: #ca0b69;\n}\n.json-formatter-row .json-formatter-function {\n  color: #FF20ED;\n}\n.json-formatter-row .json-formatter-date {\n  background-color: rgba(0, 0, 0, 0.05);\n}\n.json-formatter-row .json-formatter-url {\n  text-decoration: underline;\n  color: blue;\n  cursor: pointer;\n}\n.json-formatter-row .json-formatter-bracket {\n  color: blue;\n}\n.json-formatter-row .json-formatter-key {\n  color: #00008B;\n  cursor: pointer;\n  padding-right: 0.2rem;\n}\n.json-formatter-row .json-formatter-constructor-name {\n  cursor: pointer;\n}\n.json-formatter-row .json-formatter-toggler {\n  line-height: 1.2rem;\n  font-size: 0.7rem;\n  vertical-align: middle;\n  opacity: 0.6;\n  cursor: pointer;\n  padding-right: 0.2rem;\n}\n.json-formatter-row .json-formatter-toggler:after {\n  display: inline-block;\n  transition: transform 100ms ease-in;\n  content: "\\25BA";\n}\n.json-formatter-row .json-formatter-expand-link {\n  margin: 0 0.5em;\n  border: 1px solid #bfbfbf;\n  font-style: normal;\n  font-family: sans-serif;\n  padding: 0 0.3em;\n  font-size: 0.7em;\n}\n.json-formatter-row .json-formatter-expand-link:hover {\n  background: #dedede;\n}\n.json-formatter-row .json-formatter-highlight {\n  background: #ffed00;\n}\n.json-formatter-row > a > .json-formatter-preview-text {\n  opacity: 0;\n  transition: opacity 0.15s ease-in;\n  font-style: italic;\n}\n.json-formatter-row:hover > a > .json-formatter-preview-text {\n  opacity: 0.6;\n}\n.json-formatter-row.json-formatter-open > .json-formatter-toggler-link .json-formatter-toggler:after {\n  transform: rotate(90deg);\n}\n.json-formatter-row.json-formatter-open > .json-formatter-children:after {\n  display: inline-block;\n}\n.json-formatter-row.json-formatter-open > a > .json-formatter-preview-text {\n  display: none;\n}\n.json-formatter-row.json-formatter-open.json-formatter-empty:after {\n  display: block;\n}\n.json-formatter-dark.json-formatter-row {\n  font-family: monospace;\n}\n.json-formatter-dark.json-formatter-row,\n.json-formatter-dark.json-formatter-row a,\n.json-formatter-dark.json-formatter-row a:hover {\n  color: white;\n  text-decoration: none;\n}\n.json-formatter-dark.json-formatter-row .json-formatter-row {\n  margin-left: 1rem;\n}\n.json-formatter-dark.json-formatter-row .json-formatter-children.json-formatter-empty {\n  opacity: 0.5;\n  margin-left: 1rem;\n}\n.json-formatter-dark.json-formatter-row .json-formatter-children.json-formatter-empty:after {\n  display: none;\n}\n.json-formatter-dark.json-formatter-row .json-formatter-children.json-formatter-empty.json-formatter-object:after {\n  content: "No properties";\n}\n.json-formatter-dark.json-formatter-row .json-formatter-children.json-formatter-empty.json-formatter-array:after {\n  content: "[]";\n}\n.json-formatter-dark.json-formatter-row .json-formatter-string {\n  color: #31F031;\n  white-space: pre;\n  word-wrap: break-word;\n}\n.json-formatter-dark.json-formatter-row .json-formatter-number {\n  color: #66C2FF;\n}\n.json-formatter-dark.json-formatter-row .json-formatter-boolean {\n  color: #EC4242;\n}\n.json-formatter-dark.json-formatter-row .json-formatter-null {\n  color: #EEC97D;\n}\n.json-formatter-dark.json-formatter-row .json-formatter-undefined {\n  color: #ef8fbe;\n}\n.json-formatter-dark.json-formatter-row .json-formatter-function {\n  color: #FD48CB;\n}\n.json-formatter-dark.json-formatter-row .json-formatter-date {\n  background-color: rgba(255, 255, 255, 0.05);\n}\n.json-formatter-dark.json-formatter-row .json-formatter-url {\n  text-decoration: underline;\n  color: #027BFF;\n  cursor: pointer;\n}\n.json-formatter-dark.json-formatter-row .json-formatter-bracket {\n  color: #9494FF;\n}\n.json-formatter-dark.json-formatter-row .json-formatter-key {\n  color: #23A0DB;\n  cursor: pointer;\n  padding-right: 0.2rem;\n}\n.json-formatter-dark.json-formatter-row .json-formatter-constructor-name {\n  cursor: pointer;\n}\n.json-formatter-dark.json-formatter-row .json-formatter-toggler {\n  line-height: 1.2rem;\n  font-size: 0.7rem;\n  vertical-align: middle;\n  opacity: 0.6;\n  cursor: pointer;\n  padding-right: 0.2rem;\n}\n.json-formatter-dark.json-formatter-row .json-formatter-toggler:after {\n  display: inline-block;\n  transition: transform 100ms ease-in;\n  content: "\\25BA";\n}\n.json-formatter-dark.json-formatter-row .json-formatter-expand-link {\n  margin: 0 0.5em;\n  border: 1px solid #bfbfbf;\n  font-style: normal;\n  font-family: sans-serif;\n  padding: 0 0.3em;\n  font-size: 0.7em;\n}\n.json-formatter-dark.json-formatter-row .json-formatter-expand-link:hover {\n  background: #727272;\n}\n.json-formatter-dark.json-formatter-row .json-formatter-highlight {\n  background: #ffed00;\n}\n.json-formatter-dark.json-formatter-row > a > .json-formatter-preview-text {\n  opacity: 0;\n  transition: opacity 0.15s ease-in;\n  font-style: italic;\n}\n.json-formatter-dark.json-formatter-row:hover > a > .json-formatter-preview-text {\n  opacity: 0.6;\n}\n.json-formatter-dark.json-formatter-row.json-formatter-open > .json-formatter-toggler-link .json-formatter-toggler:after {\n  transform: rotate(90deg);\n}\n.json-formatter-dark.json-formatter-row.json-formatter-open > .json-formatter-children:after {\n  display: inline-block;\n}\n.json-formatter-dark.json-formatter-row.json-formatter-open > a > .json-formatter-preview-text {\n  display: none;\n}\n.json-formatter-dark.json-formatter-row.json-formatter-open.json-formatter-empty:after {\n  display: block;\n}\n', "" ]);
 }, function(module, exports) {
     module.exports = function() {
         var list = [];
@@ -399,7 +478,7 @@ module.exports = function(modules) {
             return void 0 === memo && (memo = fn.apply(this, arguments)), memo;
         };
     }, isOldIE = memoize(function() {
-        return /msie [6-9]\b/.test(window.navigator.userAgent.toLowerCase());
+        return /msie [6-9]\b/.test(self.navigator.userAgent.toLowerCase());
     }), getHeadElement = memoize(function() {
         return document.head || document.getElementsByTagName("head")[0];
     }), singletonElement = null, singletonCounter = 0, styleElementsInsertedAtTop = [];
@@ -473,9 +552,27 @@ module.exports = function(modules) {
         return className && el.classList.add(cssClass(className)), void 0 !== content && (content instanceof Node ? el.appendChild(content) : el.appendChild(document.createTextNode(String(content)))), 
         el;
     }
+    function findPathsForTerm(json, term, basePath) {
+        void 0 === basePath && (basePath = []);
+        var searchTerm = term.toLowerCase(), containsTerm = function(text) {
+            return text = "" + text, -1 !== text.toLowerCase().indexOf(searchTerm);
+        }, paths = [];
+        if ("" === searchTerm) return paths;
+        if (isObject(json)) {
+            Object.keys(json).forEach(function(key) {
+                containsTerm(key) && -1 === paths.indexOf(basePath) && paths.push(basePath);
+                var path = basePath.slice();
+                path.push(key), paths.push.apply(paths, findPathsForTerm(json[key], term, path));
+            });
+        } else {
+            var value = getValuePreview(json, json);
+            containsTerm(value) && paths.push(basePath);
+        }
+        return paths;
+    }
     __webpack_exports__.a = isObject, __webpack_exports__.b = getObjectName, __webpack_exports__.c = getType, 
     __webpack_exports__.g = getValuePreview, __webpack_exports__.e = getPreview, __webpack_exports__.d = cssClass, 
-    __webpack_exports__.f = createElement;
+    __webpack_exports__.f = createElement, __webpack_exports__.h = findPathsForTerm;
 }, function(module, exports, __webpack_require__) {
     module.exports = __webpack_require__(0);
 } ]);
@@ -529,13 +626,13 @@ var complex = {
 var deep = { a: { b: { c: { d: {} } } } };
 
 var examples = [
-    { title: 'Complex', json: complex },
+    { title: 'Complex', json: complex, config: { expandButtonsEnabled: true } },
     { title: 'Number', json: 42 },
     { title: 'null', json: null },
     { title: 'Empty Object', json: Object.create(null) },
     { title: 'Empty Array', json: [] },
     { title: 'Deep', json: deep },
-    { title: 'Dark', json: complex, config: { theme: 'dark' } }
+    { title: 'Dark', json: complex, config: { theme: 'dark',  expandButtonsEnabled: true } }
 ];
 
 var result = document.querySelector('.result');
@@ -555,6 +652,53 @@ examples.forEach(function (example) {
 
     result.appendChild(el);
 });
+
+(function(){
+  var data = {
+    elem1: {
+      part1: 1,
+      part2: {
+        partA: 'hello term text',
+        partB: 'comm'
+      }
+    },
+    elem2: [
+      {part3: 3},
+      {part4: 'text'},
+      {text: 342},
+      {zzzText: 342}
+    ]
+  };
+  var title = document.createElement('h3');
+  var formatter = new JSONFormatter(data, 1, { expandButtonsEnabled: true });
+
+  title.innerText = 'Open paths example';
+  result.appendChild(title);
+  var el = formatter.render();
+  result.appendChild(el);
+
+  var openButton = document.createElement('a');
+  openButton.href = 'javascript:';
+  openButton.innerText = 'Open path elem2 -> 1';
+  openButton.addEventListener('click', function(){
+    formatter.openPaths([
+      ['elem2', '1']
+    ]);
+  });
+  result.appendChild(openButton);
+
+  var searchBox = document.createElement('div');
+  var searchField = document.createElement('input');
+  searchField.type = 'text';
+  searchField.placeholder = 'Search term';
+  searchField.addEventListener('keyup', () => {
+    formatter.searchTerm(searchField.value);
+  });
+  searchBox.appendChild(searchField);
+  result.appendChild(searchBox);
+
+})();
+
 
 fetch('demo/giant.json').then(function (resp) {
     resp.json().then(function (giant) {

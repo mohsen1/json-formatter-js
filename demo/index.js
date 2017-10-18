@@ -42,13 +42,13 @@ var complex = {
 var deep = { a: { b: { c: { d: {} } } } };
 
 var examples = [
-    { title: 'Complex', json: complex },
+    { title: 'Complex', json: complex, config: { expandButtonsEnabled: true } },
     { title: 'Number', json: 42 },
     { title: 'null', json: null },
     { title: 'Empty Object', json: Object.create(null) },
     { title: 'Empty Array', json: [] },
     { title: 'Deep', json: deep },
-    { title: 'Dark', json: complex, config: { theme: 'dark' } }
+    { title: 'Dark', json: complex, config: { theme: 'dark',  expandButtonsEnabled: true } }
 ];
 
 var result = document.querySelector('.result');
@@ -68,6 +68,53 @@ examples.forEach(function (example) {
 
     result.appendChild(el);
 });
+
+(function(){
+  var data = {
+    elem1: {
+      part1: 1,
+      part2: {
+        partA: 'hello term text',
+        partB: 'comm'
+      }
+    },
+    elem2: [
+      {part3: 3},
+      {part4: 'text'},
+      {text: 342},
+      {zzzText: 342}
+    ]
+  };
+  var title = document.createElement('h3');
+  var formatter = new JSONFormatter(data, 1, { expandButtonsEnabled: true });
+
+  title.innerText = 'Open paths example';
+  result.appendChild(title);
+  var el = formatter.render();
+  result.appendChild(el);
+
+  var openButton = document.createElement('a');
+  openButton.href = 'javascript:';
+  openButton.innerText = 'Open path elem2 -> 1';
+  openButton.addEventListener('click', function(){
+    formatter.openPaths([
+      ['elem2', '1']
+    ]);
+  });
+  result.appendChild(openButton);
+
+  var searchBox = document.createElement('div');
+  var searchField = document.createElement('input');
+  searchField.type = 'text';
+  searchField.placeholder = 'Search term';
+  searchField.addEventListener('keyup', () => {
+    formatter.searchTerm(searchField.value);
+  });
+  searchBox.appendChild(searchField);
+  result.appendChild(searchBox);
+
+})();
+
 
 fetch('demo/giant.json').then(function (resp) {
     resp.json().then(function (giant) {

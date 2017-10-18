@@ -6,6 +6,8 @@ export interface JSONFormatterConfiguration {
     animateOpen?: boolean;
     animateClose?: boolean;
     theme?: string;
+    expandButtonsEnabled?: boolean;
+    expandButtonText?: string;
 }
 /**
  * @class JSONFormatter
@@ -20,6 +22,12 @@ export default class JSONFormatter {
     private key;
     private _isOpen;
     private element;
+    private expandLink;
+    private children;
+    /**
+     * In case of a search, this text should be highlighted in values and keys
+     */
+    private highlightedText;
     /**
      * @param {object} json The JSON object you want to render. It has to be an
      * object or array. Do NOT pass raw JSON string.
@@ -65,6 +73,13 @@ export default class JSONFormatter {
      *
     */
     toggleOpen(): void;
+    doOpen(finished?: Function): void;
+    doClose(finished?: Function): void;
+    /**
+     * Expands the element and its children
+     *
+     */
+    doExpand(): void;
     /**
     * Open all children up to a certain depth.
     * Allows actions such as expand all/collapse all
@@ -83,14 +98,33 @@ export default class JSONFormatter {
      * @returns {HTMLDivElement}
     */
     render(): HTMLDivElement;
+    private renderHighlighted(text);
     /**
      * Appends all the children to children element
      * Animated option is used when user triggers this via a click
     */
-    appendChildren(animated?: boolean): void;
+    appendChildren(animated?: boolean, finishedCallback?: Function): void;
     /**
      * Removes all the children from children element
      * Animated option is used when user triggers this via a click
     */
-    removeChildren(animated?: boolean): void;
+    removeChildren(animated?: boolean, finishedCallback?: Function): void;
+    /**
+     * Returns a list of all opened paths
+     */
+    getOpenedPaths(parentPath?: any[]): any[];
+    /**
+     * Opens a set of paths in the tree
+     */
+    openPaths(paths?: any[], finished?: Function): void;
+    /**
+     * Opens a specified path in the tree
+     */
+    openPath(path?: any[], finished?: Function): void;
+    private reRender();
+    /**
+     * Search the tree for a certain term (case insensitive).
+     * The term will be highlighted at all found positions
+     */
+    searchTerm(term: any): void;
 }
