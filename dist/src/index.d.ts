@@ -6,6 +6,7 @@ export interface JSONFormatterConfiguration {
     animateOpen?: boolean;
     animateClose?: boolean;
     theme?: string;
+    useToJSON?: boolean;
 }
 /**
  * @class JSONFormatter
@@ -56,6 +57,7 @@ export default class JSONFormatter {
     private readonly isObject;
     private readonly isEmptyObject;
     private readonly isEmpty;
+    private readonly hasToJSONMethod;
     private readonly hasKey;
     private readonly constructorName;
     private readonly type;

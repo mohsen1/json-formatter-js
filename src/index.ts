@@ -1,7 +1,6 @@
 import {
   isObject,
   getObjectName,
-  getType,
   getValuePreview,
   getPreview,
   cssClass,
@@ -26,6 +25,7 @@ export interface JSONFormatterConfiguration {
   animateOpen?: boolean;
   animateClose?: boolean;
   theme?: string;
+  useToJSON?: boolean;
 };
 
 const _defaultConfig: JSONFormatterConfiguration = {
@@ -34,7 +34,8 @@ const _defaultConfig: JSONFormatterConfiguration = {
   hoverPreviewFieldCount: 5,
   animateOpen: true,
   animateClose: true,
-  theme: null
+  theme: null,
+  useToJSON: true
 };
 
 
@@ -92,6 +93,9 @@ export default class JSONFormatter {
     if (this.config.hoverPreviewFieldCount === undefined) {
       this.config.hoverPreviewFieldCount = _defaultConfig.hoverPreviewFieldCount;
     }
+    if (this.config.useToJSON === undefined) {
+      this.config.useToJSON = _defaultConfig.useToJSON;
+    }
   }
 
   /*
@@ -116,10 +120,11 @@ export default class JSONFormatter {
    * is this a date string?
   */
   private get isDate(): boolean {
-    return (this.type === 'string') &&
-      (DATE_STRING_REGEX.test(this.json) ||
-      JSON_DATE_REGEX.test(this.json) ||
-      PARTIAL_DATE_REGEX.test(this.json));
+    return ((this.json instanceof Date) ||
+      ((this.type === 'string') &&
+        (DATE_STRING_REGEX.test(this.json) ||
+        JSON_DATE_REGEX.test(this.json) ||
+        PARTIAL_DATE_REGEX.test(this.json))));
   }
 
   /*
@@ -159,6 +164,14 @@ export default class JSONFormatter {
   }
 
   /*
+   * does this has a `toJSON` method and is it configured to be used?
+   * This means that it has it's own renderer for JSON.stringify (Date, Mongo's ObjectID, etc.)
+  */
+  private get useToJSON(): boolean {
+    return this.config.useToJSON && this.type === 'stringifiable';
+  }
+
+  /*
    * did we recieve a key argument?
    * This means that the formatter was called as a sub formatter of a parent formatter
   */
@@ -174,11 +187,13 @@ export default class JSONFormatter {
   }
 
   /*
-   * get type of this value
+   * get type of this value. Returns "null" for null objects
    * Possible values: all JavaScript primitive types plus "array" and "null"
   */
   private get type(): string {
-    return getType(this.json);
+    if (this.json === null) { return 'null'; }
+    if (this.config.useToJSON && this.json && this.json['toJSON']) { return 'stringifiable'; }
+    return typeof this.json;
   }
 
   /*
@@ -257,7 +272,7 @@ export default class JSONFormatter {
       const narrowKeys = keys.slice(0, this.config.hoverPreviewFieldCount);
 
       // json value schematic information
-      const kvs = narrowKeys.map(key => `${key}:${getPreview(this.json[key])}`);
+      const kvs = narrowKeys.map(key => `${key}:${getPreview(this.type, this.json[key])}`);
 
       // if keys count greater then 5 then show ellipsis
       const ellipsis = keys.length >= this.config.hoverPreviewFieldCount ? '…' : '';
@@ -281,7 +296,7 @@ export default class JSONFormatter {
     const togglerLink = createElement('a', 'toggler-link');
 
     // if this is an object we need a wrapper span (toggler)
-    if (this.isObject) {
+    if (this.isObject && !this.useToJSON) {
       togglerLink.appendChild(createElement('span', 'toggler'));
     }
 
@@ -291,7 +306,7 @@ export default class JSONFormatter {
     }
 
     // Value for objects and arrays
-    if (this.isObject) {
+    if (this.isObject && !this.useToJSON) {
 
       // construct the value holder element
       const value = createElement('span', 'value');
@@ -333,7 +348,7 @@ export default class JSONFormatter {
       }
 
       // Append value content to value element
-      const valuePreview = getValuePreview(this.json, this.json);
+      const valuePreview = getValuePreview(this.type, this.json, this.useToJSON ? this.json.toJSON() : this.json);
       value.appendChild(document.createTextNode(valuePreview));
 
       // append the value element to toggler link
@@ -379,7 +394,7 @@ export default class JSONFormatter {
     }
 
     // add event listener for toggling
-    if (this.isObject) {
+    if (this.isObject && !this.useToJSON) {
       togglerLink.addEventListener('click', this.toggleOpen.bind(this));
     }
 
