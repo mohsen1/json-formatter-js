@@ -30,8 +30,8 @@ var complex = {
     number: 123,
     anObject: {
         a: 'b',
-        c: 'd',
-        e: 'f\"'
+        e: 'd',
+        c: 'f\"'
     },
     string: 'Hello World',
     url: 'https://github.com/mohsen1/json-formatter-js',
@@ -48,7 +48,8 @@ var examples = [
     { title: 'Empty Object', json: Object.create(null) },
     { title: 'Empty Array', json: [] },
     { title: 'Deep', json: deep },
-    { title: 'Dark', json: complex, config: { theme: 'dark' } }
+    { title: 'Dark', json: complex, config: { theme: 'dark' } },
+    { title: 'Sorted Keys', json: complex, config: { sortPropertiesBy: (a, b) => a > b } }
 ];
 
 var result = document.querySelector('.result');
