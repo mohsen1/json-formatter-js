@@ -71,6 +71,24 @@ describe('date string', () => {
     });
 });
 
+describe('date', () => {
+    const date = new Date();
+    const formatter = new JSONFormatter(date);
+
+    it('should assing date class to date string', () => {
+        expect(formatter.render().querySelector('.json-formatter-date')).not.toBeNull();
+    });
+
+    it('should render "' + date.toJSON() + '" if useToJSON is true', () => {
+        expect(formatter.render().textContent).toContain('"' + date.toJSON() + '"');
+    });
+
+    it('should render "No properties" if useToJSON is false', () => {
+        const formatter = new JSONFormatter(date, 1, { useToJSON: false });
+        expect(formatter.render().textContent).toContain('Date');
+    });
+});
+
 describe('url string', () => {
     const formatter = new JSONFormatter('https://example.com');
 
