@@ -26,6 +26,7 @@ export interface JSONFormatterConfiguration {
   animateClose?: boolean;
   theme?: string;
   useToJSON?: boolean;
+  sortPropertiesBy?: (a: string, b: string) => number;
 };
 
 const _defaultConfig: JSONFormatterConfiguration = {
@@ -35,7 +36,8 @@ const _defaultConfig: JSONFormatterConfiguration = {
   animateOpen: true,
   animateClose: true,
   theme: null,
-  useToJSON: true
+  useToJSON: true,
+  sortPropertiesBy: null
 };
 
 
@@ -202,7 +204,10 @@ export default class JSONFormatter {
   */
   private get keys(): string[] {
     if (this.isObject) {
-      return Object.keys(this.json).map((key)=> key ? key : '""');
+      const keys = Object.keys(this.json).map((key)=> key ? key : '""')
+      return (!this.isArray && this.config.sortPropertiesBy)
+        ? keys.sort(this.config.sortPropertiesBy)
+        : keys;
     } else {
       return [];
     }

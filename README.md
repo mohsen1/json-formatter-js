@@ -65,6 +65,8 @@ Available configurations:
 ##### Rendering Options
 * `useToJSON`: use the toJSON method to render an object as a string as available. Usefull for objects like Date or Mongo's ObjectID that migh make more sense as a strign than as empty objects. True by default.
 
+* `sortPropertiesBy`: use the given sorting function to deeply sort the object properties.
+
 #### `openAtDepth([depth])`
 
 ```js
