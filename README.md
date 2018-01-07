@@ -45,7 +45,8 @@ Default:
   hoverPreviewFieldCount: 5,
   theme: '',
   animateOpen: true,
-  animateClose: true
+  animateClose: true,
+  useToJSON: true
 }
 ```
 Available configurations:
@@ -60,6 +61,9 @@ Available configurations:
 ##### Animation
 * `animateOpen`: enable animation when expanding json object. True by default.
 * `animateClose`: enable animation when closing json object. True by default.
+
+##### Rendering Options
+* `useToJSON`: use the toJSON method to render an object as a string as available. Usefull for objects like Date or Mongo's ObjectID that migh make more sense as a strign than as empty objects. True by default.
 
 #### `openAtDepth([depth])`
 

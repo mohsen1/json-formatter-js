@@ -35,7 +35,7 @@ var complex = {
     },
     string: 'Hello World',
     url: 'https://github.com/mohsen1/json-formatter-js',
-    date: 'Sun Aug 03 2014 20:46:55 GMT-0700 (PDT)',
+    date: new Date(),
     func: function add(a, b) { return a + b; }
 };
 

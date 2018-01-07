@@ -39,22 +39,12 @@ export function getObjectName(object: Object):string {
 }
 
 /*
- * Gets type of an object. Returns "null" for null objects
+ * Generates inline preview for a JavaScript object based on a type and value
 */
-export function getType(object: Object): string {
-  if (object === null) { return 'null'; }
-  return typeof object;
-}
-
-/*
- * Generates inline preview for a JavaScript object based on a value
-*/
-export function getValuePreview (object: Object, value: string): string {
-  var type = getType(object);
-
+export function getValuePreview (type: string, object: Object, value: string): string {
   if (type === 'null' || type === 'undefined') { return type; }
 
-  if (type === 'string') {
+  if (type === 'string' || type === 'stringifiable') {
     value = '"' + escapeString(value) + '"';
   }
   if (type === 'function'){
@@ -70,14 +60,14 @@ export function getValuePreview (object: Object, value: string): string {
 /*
  * Generates inline preview for a JavaScript object
 */
-export function getPreview(object: string): string {
+export function getPreview(type: string, object: string): string {
   let value = '';
   if (isObject(object)) {
     value = getObjectName(object);
     if (Array.isArray(object))
       value += '[' + object.length + ']';
   } else {
-    value = getValuePreview(object, object);
+    value = getValuePreview(type, object, object);
   }
   return value;
 }
