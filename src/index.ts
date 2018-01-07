@@ -278,7 +278,7 @@ export default class JSONFormatter {
     this.element = createElement('div', 'row');
 
     // construct the toggler link
-    const togglerLink = createElement('a', 'toggler-link');
+    const togglerLink = this.isObject ? createElement('a', 'toggler-link') : createElement('span');
 
     // if this is an object we need a wrapper span (toggler)
     if (this.isObject) {
