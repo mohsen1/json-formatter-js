@@ -2,7 +2,7 @@
  * Escapes `"` charachters from string
 */
 function escapeString(str: string): string {
-  return str.replace('"', '\"');
+  return str.replace(/"/g, '\\"');
 }
 
 /*
