@@ -27,6 +27,8 @@ export interface JSONFormatterConfiguration {
   theme?: string;
   useToJSON?: boolean;
   sortPropertiesBy?: (a: string, b: string) => number;
+  overrideName?: (obj: any) => string;
+  showProperty?: (obj: any, key: string) => boolean;
 };
 
 const _defaultConfig: JSONFormatterConfiguration = {
@@ -37,7 +39,9 @@ const _defaultConfig: JSONFormatterConfiguration = {
   animateClose: true,
   theme: null,
   useToJSON: true,
-  sortPropertiesBy: null
+  sortPropertiesBy: null,
+  overrideName: null,
+  showProperty: null
 };
 
 
@@ -185,6 +189,9 @@ export default class JSONFormatter {
    * if this is an object, get constructor function name
   */
   private get constructorName(): string {
+    if (this.config.overrideName) {
+      return this.config.overrideName(this.json) || getObjectName(this.json);
+    }
     return getObjectName(this.json);
   }
 
@@ -437,8 +444,10 @@ export default class JSONFormatter {
 
     } else {
       this.keys.forEach(key => {
-        const formatter = new JSONFormatter(this.json[key], this.open - 1, this.config, key);
-        children.appendChild(formatter.render());
+        if (!this.config.showProperty || this.config.showProperty(this.json, key)) {
+          const formatter = new JSONFormatter(this.json[key], this.open - 1, this.config, key);
+          children.appendChild(formatter.render());
+        }
       });
     }
   }

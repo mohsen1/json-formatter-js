@@ -184,3 +184,35 @@ describe('toggleOpen before any rendering', () => {
         expect(element.outerHTML).not.toContain('depth4');
     });
 });
+
+describe('overrideName', () => {
+    it('should override the displayed object name', () => {
+        const formatter = new JSONFormatter([{type: 'apple'}, {type: 'orange'}, {noType: 'banana'}], Infinity, {
+            animateOpen: false,
+            animateClose: false,
+            overrideName: function(obj) { return obj.type; }
+        });
+        const element = formatter.render();
+        expect(element.querySelectorAll('.json-formatter-constructor-name')[1].textContent).toContain('apple');
+        expect(element.querySelectorAll('.json-formatter-constructor-name')[2].textContent).toContain('orange');
+        expect(element.querySelectorAll('.json-formatter-constructor-name')[3].textContent).toContain('Object');
+    });
+});
+
+describe('showProperty', () => {
+    it('should hide properties', () => {
+        const formatter = new JSONFormatter([{type: 'apple', hidden: 'one'}, {type: 'orange', hidden: 'two'}], Infinity, {
+            animateOpen: false,
+            animateClose: false,
+            showProperty: function(obj, key) { return key !== 'hidden'; }
+        });
+        const element = formatter.render();
+        expect(element.outerHTML).toContain('type');
+        expect(element.outerHTML).toContain('apple');
+        expect(element.outerHTML).toContain('orange');
+        expect(element.outerHTML).not.toContain('hidden');
+        expect(element.outerHTML).not.toContain('one');
+        expect(element.outerHTML).not.toContain('two');
+    });
+});
+
