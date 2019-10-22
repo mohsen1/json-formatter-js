@@ -1,7 +1,6 @@
 'use strict';
 
 var path = require('path');
-var webpack = require('webpack');
 
 module.exports = {
   devtool: 'sourcemap',
@@ -35,14 +34,7 @@ module.exports = {
       }
     ]
   },
-  plugins: [
-    new webpack.optimize.UglifyJsPlugin({
-      beautify: true,
-      compress: {
-        dead_code: true
-      },
-      sourceMap: true,
-      mangle: false
-    })
-  ]
+  optimization: {
+    minimize: true
+  }
 };
