@@ -2,10 +2,13 @@
   "name": "json-formatter-js",
   "version": "2.2.1",
   "description": "JSON Formatter core library ",
-  "main": "dist/json-formatter.js",
+  "main": "dist/json-formatter.cjs.js",
+  "module": "dist/json-formatter.esm.js",
+  "browser": "dist/json-formatter.umd.js",
   "types": "dist/src/index.d.js",
   "scripts": {
-    "build": "webpack && webpack --config demo/webpack.config.js",
+    "build": "rollup -c",
+    "dev": "rollup -c rollup.dev.config.js",
     "test": "jest"
   },
   "jest": {
@@ -41,12 +44,14 @@
     "jest": "^24.9.0",
     "less": "^3.10.3",
     "less-loader": "^5.0.0",
-    "style-loader": "^1.0.0",
+    "rollup": "^1.25.1",
+    "rollup-plugin-less": "^1.1.2",
+    "rollup-plugin-livereload": "^1.0.4",
+    "rollup-plugin-serve": "^1.0.1",
+    "rollup-plugin-terser": "^5.1.2",
+    "rollup-plugin-typescript2": "^0.24.3",
     "ts-jest": "^24.1.0",
-    "ts-loader": "^6.2.0",
     "typescript": "^3.6.4",
-    "webpack": "^4.41.2",
-    "webpack-cli": "^3.3.9",
     "webpack-dev-server": "^3.8.2"
   }
 }
