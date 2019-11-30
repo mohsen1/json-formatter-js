@@ -98,6 +98,10 @@ export default class JSONFormatter {
     if (this.config.useToJSON === undefined) {
       this.config.useToJSON = _defaultConfig.useToJSON;
     }
+
+    if (this.key === '') {
+      this.key = '""';
+    }
   }
 
   /*
@@ -202,9 +206,9 @@ export default class JSONFormatter {
    * get object keys
    * If there is an empty key we pad it wit quotes to make it visible
   */
-  private get keys(): string[] {
+  private get keys(): string[] { 
     if (this.isObject) {
-      const keys = Object.keys(this.json).map((key)=> key ? key : '""')
+      const keys = Object.keys(this.json)
       return (!this.isArray && this.config.sortPropertiesBy)
         ? keys.sort(this.config.sortPropertiesBy)
         : keys;
