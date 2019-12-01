@@ -1,4 +1,5 @@
 import {
+  getType,
   isObject,
   getObjectName,
   getValuePreview,
@@ -193,9 +194,8 @@ export default class JSONFormatter {
    * Possible values: all JavaScript primitive types plus "array" and "null"
   */
   private get type(): string {
-    if (this.json === null) { return 'null'; }
     if (this.config.useToJSON && this.json && this.json['toJSON']) { return 'stringifiable'; }
-    return typeof this.json;
+    return getType(this.json)
   }
 
   /*
@@ -277,7 +277,7 @@ export default class JSONFormatter {
       const narrowKeys = keys.slice(0, this.config.hoverPreviewFieldCount);
 
       // json value schematic information
-      const kvs = narrowKeys.map(key => `${key}:${getPreview(this.type, this.json[key])}`);
+      const kvs = narrowKeys.map(key => `${key}:${getPreview(this.json[key])}`);
 
       // if keys count greater then 5 then show ellipsis
       const ellipsis = keys.length >= this.config.hoverPreviewFieldCount ? '…' : '';
