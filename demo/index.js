@@ -1,5 +1,3 @@
-var JSONFormatter = require('../dist/json-formatter.js').default;
-
 var live = document.getElementById('live');
 var hoverPreviewEnabledCheckbox = document.getElementById('hoverPreviewEnabled');
 
