@@ -101,6 +101,14 @@ describe('url string', () => {
     });
 });
 
+describe('object with empty property', () => {
+    const formatter = new JSONFormatter({ '': true });
+
+    it('should render true', () => {
+        expect(formatter.render().querySelector('.json-formatter-boolean').textContent).toEqual('true');
+    });
+});
+
 describe('openAtDepth after rendering', () => {
     const formatter = new JSONFormatter({depth1: {depth2: {depth3: {depth4: 21}}}}, Infinity, {
         animateOpen: false,
