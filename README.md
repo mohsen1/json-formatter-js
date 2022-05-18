@@ -46,7 +46,8 @@ Default:
   theme: '',
   animateOpen: true,
   animateClose: true,
-  useToJSON: true
+  useToJSON: true,
+  maxArrayItems: 100
 }
 ```
 Available configurations:
@@ -66,6 +67,9 @@ Available configurations:
 * `useToJSON`: use the toJSON method to render an object as a string as available. Usefull for objects like Date or Mongo's ObjectID that migh make more sense as a strign than as empty objects. True by default.
 
 * `sortPropertiesBy`: use the given sorting function to deeply sort the object properties.
+
+* `maxArrayItems`: use to split arrays in multiple smallerr groups. This value defines the size of each group. If the length of the array is less than this number no groups are created. It's the same behavior of Webkit developer tool's console.
+
 
 #### `openAtDepth([depth])`
 
