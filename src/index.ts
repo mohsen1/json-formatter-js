@@ -17,6 +17,9 @@ const JSON_DATE_REGEX = /\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{3}Z/;
 // When toggleing, don't animated removal or addition of more than a few items
 const MAX_ANIMATED_TOGGLE_ITEMS = 10;
 
+// A special string used to define a range in json key
+const RANGE_DELIMITER = " … ";
+
 const requestAnimationFrame = window.requestAnimationFrame || function(cb: ()=>void) { cb(); return 0; };
 
 export interface JSONFormatterConfiguration {
@@ -28,6 +31,7 @@ export interface JSONFormatterConfiguration {
   theme?: string;
   useToJSON?: boolean;
   sortPropertiesBy?: (a: string, b: string) => number;
+  maxArrayItems?: number;
 };
 
 const _defaultConfig: JSONFormatterConfiguration = {
@@ -38,7 +42,8 @@ const _defaultConfig: JSONFormatterConfiguration = {
   animateClose: true,
   theme: null,
   useToJSON: true,
-  sortPropertiesBy: null
+  sortPropertiesBy: null,
+  maxArrayItems: 100
 };
 
 
@@ -84,7 +89,7 @@ export default class JSONFormatter {
    * @param {string} [key=undefined] The key that this object in it's parent
    * context
   */
-  constructor(public json: any, private open = 1, private config: JSONFormatterConfiguration = _defaultConfig, private key?: string) {
+  constructor(public json: any, private open = 1, private config: JSONFormatterConfiguration = _defaultConfig, private key?: string, private displayKey?: string) {
 
     // Setting default values for config object
     if (this.config.hoverPreviewEnabled === undefined) {
@@ -100,8 +105,16 @@ export default class JSONFormatter {
       this.config.useToJSON = _defaultConfig.useToJSON;
     }
 
+    if (this.config.maxArrayItems === undefined) {
+      this.config.maxArrayItems = _defaultConfig.maxArrayItems;
+    }
+
     if (this.key === '') {
       this.key = '""';
+    }
+
+    if (this.displayKey === undefined) {
+      this.displayKey = this.key;
     }
   }
 
@@ -146,6 +159,13 @@ export default class JSONFormatter {
   */
   private get isArray(): boolean {
     return Array.isArray(this.json);
+  }
+
+  /*
+   * is this an array range?
+  */
+  private get isArrayRange(): boolean {
+    return this.isArray && this.hasKey && this.key.indexOf(RANGE_DELIMITER) >= 0;
   }
 
   /*
@@ -208,7 +228,19 @@ export default class JSONFormatter {
   */
   private get keys(): string[] { 
     if (this.isObject) {
-      const keys = Object.keys(this.json)
+      let keys = Object.keys(this.json);
+
+      // Split long arrays into multiple groups
+      if (this.isArray && this.json.length > this.config.maxArrayItems) {
+        let keysCount = Math.ceil(this.json.length / this.config.maxArrayItems);
+        keys = []
+        for (let i = 0; i < keysCount; i++) {
+          const min = i * this.config.maxArrayItems;
+          const max = Math.min(this.json.length, min + (this.config.maxArrayItems - 1));
+          keys.push(`${min}${RANGE_DELIMITER}${max}`);
+        }
+      }
+
       return (!this.isArray && this.config.sortPropertiesBy)
         ? keys.sort(this.config.sortPropertiesBy)
         : keys;
@@ -310,8 +342,10 @@ export default class JSONFormatter {
     }
 
     // if this is child of a parent formatter we need to append the key
-    if (this.hasKey) {
-      togglerLink.appendChild(createElement('span', 'key', `${this.key}:`));
+    if (this.isArrayRange) {
+      togglerLink.appendChild(createElement('span', 'range', `[${this.displayKey}]`));
+    } else if (this.hasKey) {
+      togglerLink.appendChild(createElement('span', 'key', `${this.displayKey}:`));
     }
 
     // Value for objects and arrays
@@ -324,11 +358,13 @@ export default class JSONFormatter {
       const objectWrapperSpan = createElement('span');
 
       // get constructor name and append it to wrapper span
-      var constructorName = createElement('span', 'constructor-name', this.constructorName);
-      objectWrapperSpan.appendChild(constructorName);
+      if (!this.isArrayRange) {
+        const constructorName = createElement('span', 'constructor-name', this.constructorName);
+        objectWrapperSpan.appendChild(constructorName);
+      }
 
       // if it's an array append the array specific elements like brackets and length
-      if (this.isArray) {
+      if (this.isArray && !this.isArrayRange) {
         const arrayWrapperSpan = createElement('span');
         arrayWrapperSpan.appendChild(createElement('span', 'bracket', '['));
         arrayWrapperSpan.appendChild(createElement('span', 'number', (this.json.length)));
@@ -407,7 +443,7 @@ export default class JSONFormatter {
       togglerLink.addEventListener('click', this.toggleOpen.bind(this));
     }
 
-    return this.element as HTMLDivElement;
+    return <HTMLDivElement>this.element;
   }
 
   /**
@@ -423,7 +459,8 @@ export default class JSONFormatter {
       let index = 0;
       const addAChild = ()=> {
         const key = this.keys[index];
-        const formatter = new JSONFormatter(this.json[key], this.open - 1, this.config, key);
+        const displayKey = (this.isArrayRange ? (Number(this.key.split(RANGE_DELIMITER)[0]) + Number(key)).toString() : key);
+        const formatter = new JSONFormatter(this.getJSONForKey(key), this.open - 1, this.config, key, displayKey);
         children.appendChild(formatter.render());
 
         index += 1;
@@ -441,10 +478,22 @@ export default class JSONFormatter {
 
     } else {
       this.keys.forEach(key => {
-        const formatter = new JSONFormatter(this.json[key], this.open - 1, this.config, key);
+        const displayKey = (this.isArrayRange ? (Number(this.key.split(RANGE_DELIMITER)[0]) + Number(key)).toString() : key);
+        const formatter = new JSONFormatter(this.getJSONForKey(key), this.open - 1, this.config, key, displayKey);
         children.appendChild(formatter.render());
       });
     }
+  }
+
+  /**
+   * Get the JSON object for passed key - it is a wrapper used to return an array subrange if available
+   */ 
+  getJSONForKey(key: string) {
+    if (this.isArray && key.indexOf(RANGE_DELIMITER) >= 0) {
+      const domain = key.split(RANGE_DELIMITER)
+      return this.json.slice(Number(domain[0]), Number(domain[1]) + 1);
+    }
+    return this.json[key];
   }
 
   /**
