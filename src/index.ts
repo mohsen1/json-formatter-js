@@ -491,7 +491,7 @@ export default class JSONFormatter {
   getJSONForKey(key: string) {
     if (this.isArray && key.indexOf(RANGE_DELIMITER) >= 0) {
       const domain = key.split(RANGE_DELIMITER)
-      return this.json.slice(Number(domain[0]), Number(domain[1]) + 1);
+      return this.json.slice(parseInt(domain[0]), parseInt(domain[1]) + 1);
     }
     return this.json[key];
   }
