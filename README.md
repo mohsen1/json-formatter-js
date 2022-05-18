@@ -68,7 +68,7 @@ Available configurations:
 
 * `sortPropertiesBy`: use the given sorting function to deeply sort the object properties.
 
-* `maxArrayItems`: use to split arrays in multiple smallerr groups. This value defines the size of each group. If the length of the array is less than this number no groups are created. It's the same behavior of Webkit developer tool's console.
+* `maxArrayItems`: use to split arrays in multiple smaller groups. This value defines the size of each group. If the length of the array is less than this number no groups are created. It's the same behavior of Webkit developer tool's console.
 
 
 #### `openAtDepth([depth])`
