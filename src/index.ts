@@ -243,7 +243,7 @@ export default class JSONFormatter {
         keys = []
         for (let i = 0; i < keysCount; i++) {
           const min = i * this.config.maxArrayItems;
-          const max = Math.min(this.json.length, min + (this.config.maxArrayItems - 1));
+          const max = Math.min(this.json.length - 1, min + (this.config.maxArrayItems - 1));
           keys.push(`${min} … ${max}`);
         }
       }
@@ -467,7 +467,7 @@ export default class JSONFormatter {
 
     const append = (key: string, index: number) => {
 
-      const range: [number, number] = (this.isLargeArray ? [index * this.config.maxArrayItems, Math.min(this.json.length, (index * this.config.maxArrayItems) + (this.config.maxArrayItems - 1))] : undefined);
+      const range: [number, number] = (this.isLargeArray ? [index * this.config.maxArrayItems, Math.min(this.json.length - 1, (index * this.config.maxArrayItems) + (this.config.maxArrayItems - 1))] : undefined);
       const displayKey = (this.isArrayRange ? (this.arrayRange[0] + index).toString() : key);
       const json = (range ? this.json.slice(range[0], range[1] + 1) : this.json[key]);
       const formatter = new JSONFormatter(json, this.open - 1, this.config, key, displayKey, (range ? this.path : this.path.concat(displayKey)), range);
