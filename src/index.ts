@@ -17,9 +17,6 @@ const JSON_DATE_REGEX = /\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{3}Z/;
 // When toggleing, don't animated removal or addition of more than a few items
 const MAX_ANIMATED_TOGGLE_ITEMS = 10;
 
-// A special string used to define a range in json key
-const RANGE_DELIMITER = " … ";
-
 const requestAnimationFrame = window.requestAnimationFrame || function(cb: ()=>void) { cb(); return 0; };
 
 export interface JSONFormatterConfiguration {
@@ -45,7 +42,6 @@ const _defaultConfig: JSONFormatterConfiguration = {
   sortPropertiesBy: null,
   maxArrayItems: 100
 };
-
 
 /**
  * @class JSONFormatter
@@ -88,8 +84,12 @@ export default class JSONFormatter {
    *
    * @param {string} [key=undefined] The key that this object in it's parent
    * context
+   * 
+   * @param {string[]} [path=undefined] An array of key used to correlate the DOM element to the original JSON
+   * 
+   * @param {[number, number]} [arrayRange=undefined] A range (min, max) of items. This is available when the parent node is an array range.
   */
-  constructor(public json: any, private open = 1, private config: JSONFormatterConfiguration = _defaultConfig, private key?: string, private displayKey?: string) {
+  constructor(public json: any, private open = 1, private config: JSONFormatterConfiguration = _defaultConfig, private key?: string, private displayKey?: string, private path: string[] = [], private arrayRange?: [number, number]) {
 
     // Setting default values for config object
     if (this.config.hoverPreviewEnabled === undefined) {
@@ -162,10 +162,17 @@ export default class JSONFormatter {
   }
 
   /*
+   * is this an array with too many elements?
+  */
+  private get isLargeArray(): boolean {
+    return (this.isArray && this.json.length > this.config.maxArrayItems);
+  }
+
+  /*
    * is this an array range?
   */
   private get isArrayRange(): boolean {
-    return this.isArray && this.hasKey && this.key.indexOf(RANGE_DELIMITER) >= 0;
+    return this.isArray && this.arrayRange !== undefined && this.arrayRange.length == 2;
   }
 
   /*
@@ -231,13 +238,13 @@ export default class JSONFormatter {
       let keys = Object.keys(this.json);
 
       // Split long arrays into multiple groups
-      if (this.isArray && this.json.length > this.config.maxArrayItems) {
+      if (this.isLargeArray) {
         let keysCount = Math.ceil(this.json.length / this.config.maxArrayItems);
         keys = []
         for (let i = 0; i < keysCount; i++) {
           const min = i * this.config.maxArrayItems;
           const max = Math.min(this.json.length, min + (this.config.maxArrayItems - 1));
-          keys.push(`${min}${RANGE_DELIMITER}${max}`);
+          keys.push(`${min} … ${max}`);
         }
       }
 
@@ -346,6 +353,9 @@ export default class JSONFormatter {
       togglerLink.appendChild(createElement('span', 'range', `[${this.displayKey}]`));
     } else if (this.hasKey) {
       togglerLink.appendChild(createElement('span', 'key', `${this.displayKey}:`));
+      
+      // add path to node data
+      (<HTMLElement>this.element).dataset.path = JSON.stringify(this.path);
     }
 
     // Value for objects and arrays
@@ -455,13 +465,20 @@ export default class JSONFormatter {
 
     if (!children || this.isEmpty) { return; }
 
+    const append = (key: string, index: number) => {
+
+      const range: [number, number] = (this.isLargeArray ? [index * this.config.maxArrayItems, Math.min(this.json.length, (index * this.config.maxArrayItems) + (this.config.maxArrayItems - 1))] : undefined);
+      const displayKey = (this.isArrayRange ? (this.arrayRange[0] + index).toString() : key);
+      const json = (range ? this.json.slice(range[0], range[1] + 1) : this.json[key]);
+      const formatter = new JSONFormatter(json, this.open - 1, this.config, key, displayKey, (range ? this.path : this.path.concat(displayKey)), range);
+      children.appendChild(formatter.render());
+    }
+
     if (animated) {
       let index = 0;
       const addAChild = ()=> {
         const key = this.keys[index];
-        const displayKey = (this.isArrayRange ? (Number(this.key.split(RANGE_DELIMITER)[0]) + Number(key)).toString() : key);
-        const formatter = new JSONFormatter(this.getJSONForKey(key), this.open - 1, this.config, key, displayKey);
-        children.appendChild(formatter.render());
+        append(key, index);
 
         index += 1;
 
@@ -477,23 +494,8 @@ export default class JSONFormatter {
       requestAnimationFrame(addAChild);
 
     } else {
-      this.keys.forEach(key => {
-        const displayKey = (this.isArrayRange ? (Number(this.key.split(RANGE_DELIMITER)[0]) + Number(key)).toString() : key);
-        const formatter = new JSONFormatter(this.getJSONForKey(key), this.open - 1, this.config, key, displayKey);
-        children.appendChild(formatter.render());
-      });
+      this.keys.forEach((key, index) => append(key, index));
     }
-  }
-
-  /**
-   * Get the JSON object for passed key - it is a wrapper used to return an array subrange if available
-   */ 
-  getJSONForKey(key: string) {
-    if (this.isArray && key.indexOf(RANGE_DELIMITER) >= 0) {
-      const domain = key.split(RANGE_DELIMITER)
-      return this.json.slice(parseInt(domain[0]), parseInt(domain[1]) + 1);
-    }
-    return this.json[key];
   }
 
   /**
