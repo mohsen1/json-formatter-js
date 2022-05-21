@@ -29,6 +29,7 @@ export interface JSONFormatterConfiguration {
   useToJSON?: boolean;
   sortPropertiesBy?: (a: string, b: string) => number;
   maxArrayItems?: number;
+  exposePath?: boolean;
 };
 
 const _defaultConfig: JSONFormatterConfiguration = {
@@ -40,7 +41,8 @@ const _defaultConfig: JSONFormatterConfiguration = {
   theme: null,
   useToJSON: true,
   sortPropertiesBy: null,
-  maxArrayItems: 100
+  maxArrayItems: 100,
+  exposePath: false
 };
 
 /**
@@ -355,7 +357,8 @@ export default class JSONFormatter {
       togglerLink.appendChild(createElement('span', 'key', `${this.displayKey}:`));
       
       // add path to node data
-      (<HTMLElement>this.element).dataset.path = JSON.stringify(this.path);
+      if (this.config.exposePath)
+        (<HTMLElement>this.element).dataset.path = JSON.stringify(this.path);
     }
 
     // Value for objects and arrays

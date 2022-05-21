@@ -47,7 +47,8 @@ Default:
   animateOpen: true,
   animateClose: true,
   useToJSON: true,
-  maxArrayItems: 100
+  maxArrayItems: 100,
+  exposePath: false
 }
 ```
 Available configurations:
@@ -70,6 +71,7 @@ Available configurations:
 
 * `maxArrayItems`: use to split arrays in multiple smaller groups. This value defines the size of each group. If the length of the array is less than this number no groups are created. It's the same behavior of Webkit developer tool's console.
 
+* `exposePath`: add an array of keys to each node dataset so it is possible to correlate nodes to the original json.
 
 #### `openAtDepth([depth])`
 
