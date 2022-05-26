@@ -1,6 +1,6 @@
 {
   "name": "json-formatter-js",
-  "version": "2.3.4",
+  "version": "2.4.0",
   "description": "JSON Formatter core library ",
   "main": "dist/json-formatter.cjs.js",
   "module": "dist/json-formatter.esm.js",
