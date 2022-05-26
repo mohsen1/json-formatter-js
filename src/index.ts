@@ -1,4 +1,5 @@
 import {
+  getType,
   isObject,
   getObjectName,
   getValuePreview,
@@ -27,6 +28,8 @@ export interface JSONFormatterConfiguration {
   theme?: string;
   useToJSON?: boolean;
   sortPropertiesBy?: (a: string, b: string) => number;
+  maxArrayItems?: number;
+  exposePath?: boolean;
 };
 
 const _defaultConfig: JSONFormatterConfiguration = {
@@ -37,9 +40,10 @@ const _defaultConfig: JSONFormatterConfiguration = {
   animateClose: true,
   theme: null,
   useToJSON: true,
-  sortPropertiesBy: null
+  sortPropertiesBy: null,
+  maxArrayItems: 100,
+  exposePath: false
 };
-
 
 /**
  * @class JSONFormatter
@@ -82,8 +86,12 @@ export default class JSONFormatter {
    *
    * @param {string} [key=undefined] The key that this object in it's parent
    * context
+   * 
+   * @param {string[]} [path=undefined] An array of key used to correlate the DOM element to the original JSON
+   * 
+   * @param {[number, number]} [arrayRange=undefined] A range (min, max) of items. This is available when the parent node is an array range.
   */
-  constructor(public json: any, private open = 1, private config: JSONFormatterConfiguration = _defaultConfig, private key?: string) {
+  constructor(public json: any, private open = 1, private config: JSONFormatterConfiguration = _defaultConfig, private key?: string, private displayKey?: string, private path: string[] = [], private arrayRange?: [number, number]) {
 
     // Setting default values for config object
     if (this.config.hoverPreviewEnabled === undefined) {
@@ -97,6 +105,18 @@ export default class JSONFormatter {
     }
     if (this.config.useToJSON === undefined) {
       this.config.useToJSON = _defaultConfig.useToJSON;
+    }
+
+    if (this.config.maxArrayItems === undefined) {
+      this.config.maxArrayItems = _defaultConfig.maxArrayItems;
+    }
+
+    if (this.key === '') {
+      this.key = '""';
+    }
+
+    if (this.displayKey === undefined) {
+      this.displayKey = this.key;
     }
   }
 
@@ -141,6 +161,20 @@ export default class JSONFormatter {
   */
   private get isArray(): boolean {
     return Array.isArray(this.json);
+  }
+
+  /*
+   * is this an array with too many elements?
+  */
+  private get isLargeArray(): boolean {
+    return (this.isArray && this.json.length > this.config.maxArrayItems);
+  }
+
+  /*
+   * is this an array range?
+  */
+  private get isArrayRange(): boolean {
+    return this.isArray && this.arrayRange !== undefined && this.arrayRange.length == 2;
   }
 
   /*
@@ -193,18 +227,29 @@ export default class JSONFormatter {
    * Possible values: all JavaScript primitive types plus "array" and "null"
   */
   private get type(): string {
-    if (this.json === null) { return 'null'; }
     if (this.config.useToJSON && this.json && this.json['toJSON']) { return 'stringifiable'; }
-    return typeof this.json;
+    return getType(this.json)
   }
 
   /*
    * get object keys
    * If there is an empty key we pad it wit quotes to make it visible
   */
-  private get keys(): string[] {
+  private get keys(): string[] { 
     if (this.isObject) {
-      const keys = Object.keys(this.json).map((key)=> key ? key : '""')
+      let keys = Object.keys(this.json);
+
+      // Split long arrays into multiple groups
+      if (this.isLargeArray) {
+        let keysCount = Math.ceil(this.json.length / this.config.maxArrayItems);
+        keys = []
+        for (let i = 0; i < keysCount; i++) {
+          const min = i * this.config.maxArrayItems;
+          const max = Math.min(this.json.length - 1, min + (this.config.maxArrayItems - 1));
+          keys.push(`${min} … ${max}`);
+        }
+      }
+
       return (!this.isArray && this.config.sortPropertiesBy)
         ? keys.sort(this.config.sortPropertiesBy)
         : keys;
@@ -277,7 +322,7 @@ export default class JSONFormatter {
       const narrowKeys = keys.slice(0, this.config.hoverPreviewFieldCount);
 
       // json value schematic information
-      const kvs = narrowKeys.map(key => `${key}:${getPreview(this.type, this.json[key])}`);
+      const kvs = narrowKeys.map(key => `${key}:${getPreview(this.json[key])}`);
 
       // if keys count greater then 5 then show ellipsis
       const ellipsis = keys.length >= this.config.hoverPreviewFieldCount ? '…' : '';
@@ -306,8 +351,14 @@ export default class JSONFormatter {
     }
 
     // if this is child of a parent formatter we need to append the key
-    if (this.hasKey) {
-      togglerLink.appendChild(createElement('span', 'key', `${this.key}:`));
+    if (this.isArrayRange) {
+      togglerLink.appendChild(createElement('span', 'range', `[${this.displayKey}]`));
+    } else if (this.hasKey) {
+      togglerLink.appendChild(createElement('span', 'key', `${this.displayKey}:`));
+      
+      // add path to node data
+      if (this.config.exposePath)
+        (<HTMLElement>this.element).dataset.path = JSON.stringify(this.path);
     }
 
     // Value for objects and arrays
@@ -320,11 +371,13 @@ export default class JSONFormatter {
       const objectWrapperSpan = createElement('span');
 
       // get constructor name and append it to wrapper span
-      var constructorName = createElement('span', 'constructor-name', this.constructorName);
-      objectWrapperSpan.appendChild(constructorName);
+      if (!this.isArrayRange) {
+        const constructorName = createElement('span', 'constructor-name', this.constructorName);
+        objectWrapperSpan.appendChild(constructorName);
+      }
 
       // if it's an array append the array specific elements like brackets and length
-      if (this.isArray) {
+      if (this.isArray && !this.isArrayRange) {
         const arrayWrapperSpan = createElement('span');
         arrayWrapperSpan.appendChild(createElement('span', 'bracket', '['));
         arrayWrapperSpan.appendChild(createElement('span', 'number', (this.json.length)));
@@ -403,7 +456,7 @@ export default class JSONFormatter {
       togglerLink.addEventListener('click', this.toggleOpen.bind(this));
     }
 
-    return this.element as HTMLDivElement;
+    return <HTMLDivElement>this.element;
   }
 
   /**
@@ -415,12 +468,20 @@ export default class JSONFormatter {
 
     if (!children || this.isEmpty) { return; }
 
+    const append = (key: string, index: number) => {
+
+      const range: [number, number] = (this.isLargeArray ? [index * this.config.maxArrayItems, Math.min(this.json.length - 1, (index * this.config.maxArrayItems) + (this.config.maxArrayItems - 1))] : undefined);
+      const displayKey = (this.isArrayRange ? (this.arrayRange[0] + index).toString() : key);
+      const json = (range ? this.json.slice(range[0], range[1] + 1) : this.json[key]);
+      const formatter = new JSONFormatter(json, this.open - 1, this.config, key, displayKey, (range ? this.path : this.path.concat(displayKey)), range);
+      children.appendChild(formatter.render());
+    }
+
     if (animated) {
       let index = 0;
       const addAChild = ()=> {
         const key = this.keys[index];
-        const formatter = new JSONFormatter(this.json[key], this.open - 1, this.config, key);
-        children.appendChild(formatter.render());
+        append(key, index);
 
         index += 1;
 
@@ -436,10 +497,7 @@ export default class JSONFormatter {
       requestAnimationFrame(addAChild);
 
     } else {
-      this.keys.forEach(key => {
-        const formatter = new JSONFormatter(this.json[key], this.open - 1, this.config, key);
-        children.appendChild(formatter.render());
-      });
+      this.keys.forEach((key, index) => append(key, index));
     }
   }
 

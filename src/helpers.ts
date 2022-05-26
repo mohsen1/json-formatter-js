@@ -2,7 +2,12 @@
  * Escapes `"` charachters from string
 */
 function escapeString(str: string): string {
-  return str.replace('"', '\"');
+  return str.replace(/"/g, '\\"');
+}
+
+export function getType(value: any): string {
+  if (value === null) { return 'null'; }
+  return typeof value;
 }
 
 /*
@@ -60,14 +65,14 @@ export function getValuePreview (type: string, object: Object, value: string): s
 /*
  * Generates inline preview for a JavaScript object
 */
-export function getPreview(type: string, object: string): string {
+export function getPreview(object: any): string {
   let value = '';
   if (isObject(object)) {
     value = getObjectName(object);
     if (Array.isArray(object))
       value += '[' + object.length + ']';
   } else {
-    value = getValuePreview(type, object, object);
+    value = getValuePreview(getType(object), object, object);
   }
   return value;
 }
