@@ -2,10 +2,19 @@
   "name": "json-formatter-js",
   "version": "2.4.0",
   "description": "JSON Formatter core library ",
-  "main": "dist/json-formatter.cjs.js",
-  "module": "dist/json-formatter.esm.js",
+  "main": "dist/json-formatter.cjs",
+  "module": "dist/json-formatter.mjs",
   "browser": "dist/json-formatter.umd.js",
   "types": "dist/src/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "dist/json-formatter.mjs",
+      "require": "dist/json-formatter.cjs",
+      "browser": "dist/json-formatter.umd.cjs",
+      "types": "dist/src/index.d.ts",
+      "default": "dist/json-formatter.cjs"
+    }
+  },
   "scripts": {
     "build": "rollup -c",
     "dev": "rollup -c rollup.dev.config.js",
