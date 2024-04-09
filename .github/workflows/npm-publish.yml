@@ -23,7 +23,6 @@ jobs:
         with:
           tag_name: "v%s"
           tag_message: "v%s"
-          commit_pattern: ^v[0-9]+.[0-9]+.[0-9]+$
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
