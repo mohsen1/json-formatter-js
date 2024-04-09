@@ -8,6 +8,8 @@ export interface JSONFormatterConfiguration {
     theme?: string;
     useToJSON?: boolean;
     sortPropertiesBy?: (a: string, b: string) => number;
+    maxArrayItems?: number;
+    exposePath?: boolean;
 }
 /**
  * @class JSONFormatter
@@ -19,7 +21,10 @@ export default class JSONFormatter {
     json: any;
     private open;
     private config;
-    private key;
+    private key?;
+    private displayKey?;
+    private path;
+    private arrayRange?;
     private _isOpen;
     private element;
     /**
@@ -49,20 +54,27 @@ export default class JSONFormatter {
      *
      * @param {string} [key=undefined] The key that this object in it's parent
      * context
+     *
+     * @param {string[]} [path=undefined] An array of key used to correlate the DOM element to the original JSON
+     *
+     * @param {[number, number]} [arrayRange=undefined] A range (min, max) of items. This is available when the parent node is an array range.
     */
-    constructor(json: any, open?: number, config?: JSONFormatterConfiguration, key?: string);
-    private isOpen;
-    private readonly isDate;
-    private readonly isUrl;
-    private readonly isArray;
-    private readonly isObject;
-    private readonly isEmptyObject;
-    private readonly isEmpty;
-    private readonly useToJSON;
-    private readonly hasKey;
-    private readonly constructorName;
-    private readonly type;
-    private readonly keys;
+    constructor(json: any, open?: number, config?: JSONFormatterConfiguration, key?: string, displayKey?: string, path?: string[], arrayRange?: [number, number]);
+    private get isOpen();
+    private set isOpen(value);
+    private get isDate();
+    private get isUrl();
+    private get isArray();
+    private get isLargeArray();
+    private get isArrayRange();
+    private get isObject();
+    private get isEmptyObject();
+    private get isEmpty();
+    private get useToJSON();
+    private get hasKey();
+    private get constructorName();
+    private get type();
+    private get keys();
     /**
      * Toggles `isOpen` state
      *
