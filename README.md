@@ -3,11 +3,11 @@
 
 > Render JSON objects in HTML with a **collapsible** navigation.
 
-JSON Formatter started as an [AngularJS directive](https://github.com/mohsen1/json-formatter). This is a pure JavaScript implementation of the same module.
+**Check out [`<pretty-json>` Custom Element](https://github.com/mohsen1/pretty-json) for a more portable and light solution**
 
-**[Live Demo](http://azimi.me/json-formatter-js/)**
 
 ## Usage
+**[Live Demo](http://azimi.me/json-formatter-js/)**
 
 Install via npm
 
