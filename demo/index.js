@@ -1,6 +1,6 @@
 var live = document.getElementById("live");
 var hoverPreviewEnabledCheckbox = document.getElementById(
-  "hoverPreviewEnabled"
+  "hoverPreviewEnabled",
 );
 
 function render() {
