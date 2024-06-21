@@ -13,6 +13,7 @@ import './style.less';
 const DATE_STRING_REGEX = /(^\d{1,4}[\.|\\/|-]\d{1,2}[\.|\\/|-]\d{1,4})(\s*(?:0?[1-9]:[0-5]|1(?=[012])\d:[0-5])\d\s*[ap]m)?$/;
 const PARTIAL_DATE_REGEX = /\d{2}:\d{2}:\d{2} GMT-\d{4}/;
 const JSON_DATE_REGEX = /\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{3}Z/;
+const URL_REGEX = /^https?:\/\//;
 
 // When toggleing, don't animated removal or addition of more than a few items
 const MAX_ANIMATED_TOGGLE_ITEMS = 10;
@@ -153,7 +154,7 @@ export default class JSONFormatter {
    * is this a URL string?
   */
   private get isUrl(): boolean {
-    return this.type === 'string' && (this.json.indexOf('http') === 0);
+    return this.type === 'string' && URL_REGEX.test(this.json);
   }
 
   /*
