@@ -3,30 +3,30 @@
     <script defer src="dist/json-formatter.umd.js" charset="UTF-8"></script>
     <script defer src="demo/index.js" charset="UTF-8"></script>
     <style type="text/css">
-    body {
-      max-width: 800px;
-      margin: 20px auto;
-      font-family: sans-serif;
-    }
-    .gh {
-      text-align: right;
-    }
-    .result  h3 + div {
-      border: 1px solid lightgray;
-      border-radius: 5px;
-      padding: 10px;
-    }
-    h1 code {
-      font-size: 2em;
-    }
-    pre {
-      font-size: 1.5rem;
-      background: #efefef;
-      padding: 1em;
-    }
-    textarea {
-      font-family: monospace;
-    }
+      body {
+        max-width: 800px;
+        margin: 20px auto;
+        font-family: sans-serif;
+      }
+      .gh {
+        text-align: right;
+      }
+      .result h3 + div {
+        border: 1px solid lightgray;
+        border-radius: 5px;
+        padding: 10px;
+      }
+      h1 code {
+        font-size: 2em;
+      }
+      pre {
+        font-size: 1.5rem;
+        background: #efefef;
+        padding: 1em;
+      }
+      textarea {
+        font-family: monospace;
+      }
     </style>
   </head>
   <body>
@@ -37,26 +37,32 @@
           frameborder="0"
           width="170"
           height="30"
-          scrolling="0">
+          scrolling="0"
+        >
         </iframe>
         <iframe
           src="http://ghbtns.com/github-btn.html?user=mohsen1&repo=json-formatter-js&type=fork&size=large&count=true"
           frameborder="0"
           width="170"
           height="30"
-          scrolling="0">
+          scrolling="0"
+        >
         </iframe>
       </div>
       <h1><code>JSONFormatter</code></h1>
+      <p>Render JSON objects in HTML with a <b>collapsible</b> navigation.</p>
       <p>
-        Render JSON objects in HTML with a <b>collapsible</b> navigation.
+        <b
+          ><a href="https://github.com/mohsen1/json-formatter-js"
+            >JSON Formatter project on GitHub</a
+          ></b
+        >
       </p>
-      <p><b><a href="https://github.com/mohsen1/json-formatter-js">JSON Formatter project on GitHub</a></b></p>
     </div>
     <h2>Usage</h2>
     <div class="usage">
       <p>Simple usage in ES6</p>
-<!-- HTML generated using hilite.me
+      <!-- HTML generated using hilite.me
 
 import JSONFormatter from 'json-formatter-js'
 
@@ -67,23 +73,40 @@ const formatter = new JSONFormatter(myJSON);
 document.body.appendChild(formatter.render());
 -->
 
-
-<div style="background: #f0f3f3; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #006699; font-weight: bold">import</span> JSONFormatter from <span style="color: #CC3300">&#39;json-formatter-js&#39;</span>
+      <div
+        style="
+          background: #f0f3f3;
+          overflow: auto;
+          width: auto;
+          border: solid gray;
+          border-width: 0.1em 0.1em 0.1em 0.8em;
+          padding: 0.2em 0.6em;
+        "
+      >
+        <pre
+          style="margin: 0; line-height: 125%"
+        ><span style="color: #006699; font-weight: bold">import</span> JSONFormatter from <span style="color: #CC3300">&#39;json-formatter-js&#39;</span>
 
 <span style="color: #006699; font-weight: bold">const</span> myJSON <span style="color: #555555">=</span> {ans<span style="color: #555555">:</span> <span style="color: #FF6600">42</span>};
 
 <span style="color: #006699; font-weight: bold">const</span> formatter <span style="color: #555555">=</span> <span style="color: #006699; font-weight: bold">new</span> JSONFormatter(myJSON);
 
 <span style="color: #336666">document</span>.body.appendChild(formatter.render());
-  </pre></div>  
+  </pre>
+      </div>
     </div>
     <h2>Playground</h2>
     <div class="playground">
-      <p>Updating the JSON value in this textarea renders a new formatter on the right.</p>
+      <p>
+        Updating the JSON value in this textarea renders a new formatter on the
+        right.
+      </p>
       <table>
         <tr>
           <td>
-            <textarea id="live" name="" id="" cols="30" rows="10">{"foo": 42}</textarea>
+            <textarea id="live" name="" id="" cols="30" rows="10">
+{"foo": 42}</textarea
+            >
           </td>
           <td>
             <div id="live-result"></div>
@@ -91,8 +114,10 @@ document.body.appendChild(formatter.render());
         </tr>
         <tr>
           <p>
-            <input type="checkbox" id="hoverPreviewEnabled">
-            <label for="hoverPreviewEnabled"><code>hoverPreviewEnabled</code></label>
+            <input type="checkbox" id="hoverPreviewEnabled" />
+            <label for="hoverPreviewEnabled"
+              ><code>hoverPreviewEnabled</code></label
+            >
           </p>
         </tr>
       </table>
