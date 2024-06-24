@@ -109,6 +109,16 @@ describe("url string", () => {
   });
 });
 
+describe("url detection shouldn't generate false positive for words starting with http", () => {
+  const formatter = new JSONFormatter("httpstatus");
+
+  it("should not make a link and add class 'url'", () => {
+    expect(formatter.render().querySelector("a.json-formatter-url")).toEqual(
+      null,
+    );
+  });
+});
+
 describe("object with empty property", () => {
   const formatter = new JSONFormatter({ "": true });
 
